@@ -105,6 +105,22 @@ export async function initializeGame(userId: string): Promise<GameInitResponse> 
 
     // Check if daily game is available, initialize if needed
     let dailyGameResult = await getDailyGameState(redis);
+
+    // Check if existing state uses sample images and force refresh if so
+    if (dailyGameResult.success && dailyGameResult.gameState) {
+      const firstRound = dailyGameResult.gameState.imageSet[0];
+      if (firstRound && firstRound.imageA.url.includes('example.com')) {
+        console.log('Detected sample images in cached state, clearing cache...');
+        const today = new Date().toISOString().split('T')[0];
+        const gameStateKey = `daily_game:${today}`;
+        const participantCountKey = `daily_participants:${today}`;
+        await redis.del(gameStateKey);
+        await redis.del(participantCountKey);
+        console.log('Cleared cached daily game state with sample images');
+        dailyGameResult = { success: false, error: 'Cache cleared' };
+      }
+    }
+
     if (!dailyGameResult.success || !dailyGameResult.gameState) {
       console.log('Daily game state not found, initializing...');
 
@@ -190,6 +206,22 @@ export async function startGame(userId: string): Promise<StartGameResponse> {
 
     // Get daily game state, initialize if needed
     let dailyGameResult = await getDailyGameState(redis);
+
+    // Check if existing state uses sample images and force refresh if so
+    if (dailyGameResult.success && dailyGameResult.gameState) {
+      const firstRound = dailyGameResult.gameState.imageSet[0];
+      if (firstRound && firstRound.imageA.url.includes('example.com')) {
+        console.log('Detected sample images in cached state during start game, clearing cache...');
+        const today = new Date().toISOString().split('T')[0];
+        const gameStateKey = `daily_game:${today}`;
+        const participantCountKey = `daily_participants:${today}`;
+        await redis.del(gameStateKey);
+        await redis.del(participantCountKey);
+        console.log('Cleared cached daily game state with sample images during start game');
+        dailyGameResult = { success: false, error: 'Cache cleared' };
+      }
+    }
+
     if (!dailyGameResult.success || !dailyGameResult.gameState) {
       console.log('Daily game state not found during start game, initializing...');
 

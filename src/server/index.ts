@@ -675,8 +675,8 @@ router.get('/api/debug/image-collection', async (_req, res): Promise<void> => {
   }
 });
 
-// Clear daily game state endpoint (development only)
-router.post('/api/debug/clear-daily-state', async (_req, res): Promise<void> => {
+// Clear daily game state endpoint (development only) - GET version for easy browser access
+router.get('/api/debug/clear-daily-state', async (_req, res): Promise<void> => {
   try {
     const today = new Date().toISOString().split('T')[0];
     const gameStateKey = `daily_game:${today}`;
