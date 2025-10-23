@@ -196,12 +196,18 @@ export async function startGame(userId: string): Promise<StartGameResponse> {
     }
 
     // Check if user has already played today
+    // TEMPORARY: Allow multiple plays for testing (remove in production)
+    const isDevelopmentMode = true; // Set to false for production
     const hasPlayed = await hasUserPlayedToday(userId);
-    if (hasPlayed) {
+    if (hasPlayed && !isDevelopmentMode) {
       return {
         success: false,
         error: "You have already completed today's challenge",
       };
+    }
+
+    if (hasPlayed && isDevelopmentMode) {
+      console.log('Development mode: Allowing multiple plays per day for testing');
     }
 
     // Get daily game state, initialize if needed

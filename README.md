@@ -67,8 +67,9 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 ### Complete Game Flow
 
 #### Pre-Game Setup (Splash Screen)
-- **Daily Challenge Display**: The splash screen shows the current date formatted as "Wednesday, October 23, 2025" and live participant count with real-time updates via Devvit's Realtime API
-- **Live Participant Counter**: Real-time counter showing total players who have attempted today's challenge, with a green "Live" indicator when connected
+The splash screen welcomes you with:
+- **Daily Challenge Display**: Shows the current date (e.g., "Wednesday, October 23, 2025") and live participant count with real-time updates via Devvit's Realtime API
+- **Live Participant Counter**: Real-time counter showing total players who have attempted today's challenge, with a green "Live" indicator when connected to real-time updates
 - **Game Rules Overview**: Clear instructions explaining the 5-round format, 10-second time limits, and scoring system
 - **One-Time Daily Access**: The game automatically checks if you've already played today - if so, you'll see your previous results instead of starting a new game
 

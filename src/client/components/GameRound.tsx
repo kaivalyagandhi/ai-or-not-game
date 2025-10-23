@@ -16,10 +16,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   const [feedbackData, setFeedbackData] = useState<SubmitAnswerResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Debug: Log image URLs when component renders
-  console.log('GameRound rendering with images:');
-  console.log('Image A URL:', round.imageA.url);
-  console.log('Image B URL:', round.imageB.url);
+
   
   // Enhanced error handling
   const errorHandler = useErrorHandler({
@@ -29,7 +26,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
 
   // Reset component state when round changes
   useEffect(() => {
-    console.log('New round started, resetting UI state');
+
     setTimeRemaining(10);
     setSelectedAnswer(null);
     setShowFeedback(false);
@@ -116,7 +113,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   useEffect(() => {
     if (showFeedback || selectedAnswer) return;
 
-    console.log('Starting timer for round', round.roundNumber);
+
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
@@ -128,10 +125,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
       });
     }, 1000);
 
-    return () => {
-      console.log('Clearing timer for round', round.roundNumber);
-      clearInterval(timer);
-    };
+    return () => clearInterval(timer);
   }, [showFeedback, selectedAnswer, submitAnswer, round.roundNumber]); // Added round.roundNumber
 
   // Get timer color based on remaining time
