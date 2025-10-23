@@ -24,9 +24,10 @@ Spot the Bot is a daily challenge game built on Reddit's Devvit platform where p
 #### Acceptance Criteria
 
 1. WHEN each round begins THEN the system SHALL display a 10-second countdown timer
-2. WHEN the timer reaches zero THEN the system SHALL automatically mark the round as incorrect and proceed to the next round
-3. WHEN a user selects an image THEN the system SHALL immediately show feedback and proceed to the next round
-4. WHEN a user selects the human image THEN the system SHALL record the remaining time as bonus points
+2. WHEN each round begins THEN the system SHALL randomize whether the AI-generated image appears on the left or right side
+3. WHEN the timer reaches zero THEN the system SHALL automatically mark the round as incorrect and proceed to the next round
+4. WHEN a user selects an image THEN the system SHALL immediately show feedback and proceed to the next round
+5. WHEN a user selects the human image THEN the system SHALL record the remaining time as bonus points
 
 ### Requirement 3
 
@@ -71,7 +72,8 @@ Spot the Bot is a daily challenge game built on Reddit's Devvit platform where p
 1. WHEN 00:00 UTC occurs THEN the system SHALL automatically load a new set of 5 image pairs
 2. WHEN selecting daily images THEN the system SHALL randomize the category order from: Animals, Architecture, Nature, Food, Products
 3. WHEN loading images THEN the system SHALL ensure each pair contains exactly one AI-generated and one human-captured image
-4. WHEN storing image metadata THEN the system SHALL maintain the correct answer for validation
+4. WHEN loading images THEN the system SHALL randomize the left/right placement of the AI-generated image for each round
+5. WHEN storing image metadata THEN the system SHALL maintain the correct answer for validation
 
 ### Requirement 7
 
@@ -91,9 +93,9 @@ Spot the Bot is a daily challenge game built on Reddit's Devvit platform where p
 #### Acceptance Criteria
 
 1. WHEN a user gets 5 correct answers THEN the system SHALL award the "AI Whisperer" badge
-2. WHEN a user gets 4 correct answers THEN the system SHALL award the "Good Samaritan" badge
+2. WHEN a user gets 4 correct answers THEN the system SHALL award the "Good Samaritan" badge  
 3. WHEN a user gets 3 correct answers THEN the system SHALL award the "Just Human" badge
-4. WHEN a user gets 2 or fewer correct answers THEN the system SHALL award the "Needs More Coffee" badge
+4. WHEN a user gets 2 or fewer correct answers THEN the system SHALL award the "Human in Training" badge
 5. WHEN displaying results THEN the system SHALL prominently show the earned badge
 
 ### Requirement 9
