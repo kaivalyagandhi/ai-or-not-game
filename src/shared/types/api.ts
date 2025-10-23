@@ -142,6 +142,49 @@ export interface ParticipantCountResponse {
   error?: string;
 }
 
+// Realtime message types
+export interface ParticipantUpdateMessage {
+  type: 'participant_count_update';
+  count: number;
+  timestamp: number;
+}
+
+export interface ParticipantJoinMessage {
+  type: 'participant_join';
+  userId: string;
+  username: string;
+  timestamp: number;
+}
+
+export interface ParticipantLeaveMessage {
+  type: 'participant_leave';
+  userId: string;
+  timestamp: number;
+}
+
+export interface LeaderboardUpdateMessage {
+  type: 'leaderboard_update';
+  leaderboardType: 'daily' | 'weekly' | 'all-time';
+  entry: LeaderboardEntry;
+  timestamp: number;
+}
+
+export interface RankUpdateMessage {
+  type: 'rank_update';
+  userId: string;
+  leaderboardType: 'daily' | 'weekly' | 'all-time';
+  newRank: number;
+  totalParticipants: number;
+  timestamp: number;
+}
+
+export type RealtimeMessage = 
+  | ParticipantUpdateMessage 
+  | ParticipantJoinMessage 
+  | ParticipantLeaveMessage
+  | LeaderboardUpdateMessage
+  | RankUpdateMessage;
+
 export interface GameResultsResponse {
   success: boolean;
   session?: GameSession;

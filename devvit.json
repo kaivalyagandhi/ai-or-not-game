@@ -7,12 +7,19 @@
       "default": {
         "entry": "index.html"
       }
+    },
+    "splash": {
+      "title": "Spot the Bot",
+      "description": "Test your ability to distinguish AI-generated images from real photos in this daily challenge!",
+      "image": "default-splash.png"
     }
   },
   "server": {
     "dir": "dist/server",
     "entry": "index.cjs"
   },
+  "realtime": true,
+  "redis": true,
   "media": {
     "dir": "assets"
   },

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { LeaderboardEntry, LeaderboardResponse, UserRankResponse } from '../../shared/types/api';
+import React, { useState, useEffect, useRef } from 'react';
+import { LeaderboardEntry, LeaderboardResponse, UserRankResponse, RealtimeMessage } from '../../shared/types/api';
+import { connectRealtime } from '@devvit/web/client';
 
 type LeaderboardType = 'daily' | 'weekly' | 'all-time';
 
@@ -18,6 +19,8 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
   const [totalParticipants, setTotalParticipants] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const connectionRef = useRef<any>(null);
 
   // Tab configuration
   const tabs = [
@@ -93,16 +96,98 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
     return currentUserId && entry.userId === currentUserId;
   };
 
+  // Set up realtime connection for live leaderboard updates
+  const setupRealtimeConnection = async () => {
+    try {
+      const connection = await connectRealtime({
+        channel: 'leaderboard_updates',
+        onConnect: (channel) => {
+          console.log(`Connected to ${channel}`);
+          setIsConnected(true);
+        },
+        onDisconnect: (channel) => {
+          console.log(`Disconnected from ${channel}`);
+          setIsConnected(false);
+        },
+        onMessage: (data: any) => {
+          console.log('Received leaderboard realtime message:', data);
+          
+          const message = data as RealtimeMessage;
+          
+          if (message.type === 'leaderboard_update') {
+            // Only update if it's for the current active tab
+            if (message.leaderboardType === activeTab) {
+              setEntries(prevEntries => {
+                // Check if this user already exists in the leaderboard
+                const existingIndex = prevEntries.findIndex(entry => entry.userId === message.entry.userId);
+                
+                if (existingIndex >= 0) {
+                  // Update existing entry
+                  const updatedEntries = [...prevEntries];
+                  updatedEntries[existingIndex] = message.entry;
+                  
+                  // Re-sort by score (descending)
+                  return updatedEntries.sort((a, b) => b.score - a.score);
+                } else {
+                  // Add new entry and sort
+                  const newEntries = [...prevEntries, message.entry];
+                  return newEntries.sort((a, b) => b.score - a.score);
+                }
+              });
+            }
+          } else if (message.type === 'rank_update') {
+            // Update user rank if it's for the current user and active tab
+            if (message.userId === currentUserId && message.leaderboardType === activeTab) {
+              setUserRank(message.newRank);
+              setTotalParticipants(message.totalParticipants);
+            }
+          }
+        },
+      });
+
+      connectionRef.current = connection;
+    } catch (err) {
+      console.error('Error setting up leaderboard realtime connection:', err);
+    }
+  };
+
   // Load data when tab changes
   useEffect(() => {
     fetchLeaderboard(activeTab);
   }, [activeTab, currentUserId]);
 
+  // Set up realtime connection on mount
+  useEffect(() => {
+    setupRealtimeConnection();
+    
+    // Cleanup on unmount
+    return () => {
+      if (connectionRef.current) {
+        connectionRef.current.disconnect();
+      }
+    };
+  }, []);
+
+  // Re-fetch data when realtime connection changes to ensure we have latest data
+  useEffect(() => {
+    if (isConnected) {
+      fetchLeaderboard(activeTab);
+    }
+  }, [isConnected]);
+
   return (
     <div className="flex flex-col h-full max-h-screen bg-white">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <h2 className="text-xl font-bold text-gray-900">Leaderboard</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-bold text-gray-900">Leaderboard</h2>
+          {isConnected && (
+            <div className="flex items-center">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1"></div>
+              <span className="text-xs text-green-600">Live</span>
+            </div>
+          )}
+        </div>
         {onClose && (
           <button
             onClick={onClose}

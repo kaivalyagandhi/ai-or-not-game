@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameRound as GameRoundType, SubmitAnswerResponse } from '../../shared/types/api';
+import { apiCall } from '../utils/network';
+import { useErrorHandler } from '../hooks/useErrorHandler';
 
 interface GameRoundProps {
   round: GameRoundType;
@@ -13,56 +15,81 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackData, setFeedbackData] = useState<SubmitAnswerResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Enhanced error handling
+  const errorHandler = useErrorHandler({
+    enableOfflineDetection: true,
+    enableAutoRetry: false, // Don't auto-retry during gameplay
+  });
 
-  // Submit answer to server
+  // Submit answer to server with enhanced error handling
   const submitAnswer = useCallback(async (answer: 'A' | 'B', timeLeft: number) => {
     if (isSubmitting) return;
     
     setIsSubmitting(true);
     setSelectedAnswer(answer);
+    errorHandler.clearError();
 
-    try {
-      const response = await fetch('/api/game/submit-answer', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId,
-          roundNumber: round.roundNumber,
-          userAnswer: answer,
-          timeRemaining: timeLeft,
-        }),
-      });
-
-      const data: SubmitAnswerResponse = await response.json();
-      
-      if (data.success) {
-        setFeedbackData(data);
+    const executeSubmit = async () => {
+      try {
+        const data: SubmitAnswerResponse = await apiCall('/api/game/submit-answer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sessionId,
+            roundNumber: round.roundNumber,
+            userAnswer: answer,
+            timeRemaining: timeLeft,
+          }),
+        }, {
+          maxRetries: 2,
+          baseDelay: 1000,
+        });
+        
+        if (data.success) {
+          setFeedbackData(data);
+          setShowFeedback(true);
+          
+          // Show feedback for 2 seconds before proceeding
+          setTimeout(() => {
+            onRoundComplete(data);
+          }, 2000);
+        } else {
+          console.error('Failed to submit answer:', data.error);
+          // Still proceed to next round on server error
+          setTimeout(() => {
+            onRoundComplete(data);
+          }, 1000);
+        }
+      } catch (error) {
+        console.error('Error submitting answer:', error);
+        errorHandler.handleError(error, 'Failed to submit answer');
+        
+        // For gameplay, we need to continue even on network errors
+        // Create a fallback response based on local validation
+        const fallbackResponse: SubmitAnswerResponse = {
+          success: false,
+          error: errorHandler.errorState.message,
+          isCorrect: answer === round.correctAnswer,
+          correctAnswer: round.correctAnswer,
+          aiImagePosition: round.aiImagePosition,
+          roundScore: answer === round.correctAnswer ? timeLeft * 0.01 : 0,
+        };
+        
+        setFeedbackData(fallbackResponse);
         setShowFeedback(true);
         
-        // Show feedback for 2 seconds before proceeding
+        // Show feedback and continue
         setTimeout(() => {
-          onRoundComplete(data);
+          onRoundComplete(fallbackResponse);
         }, 2000);
-      } else {
-        console.error('Failed to submit answer:', data.error);
-        // Still proceed to next round on error
-        setTimeout(() => {
-          onRoundComplete(data);
-        }, 1000);
       }
-    } catch (error) {
-      console.error('Error submitting answer:', error);
-      // Proceed to next round even on network error
-      setTimeout(() => {
-        onRoundComplete({
-          success: false,
-          error: 'Network error',
-        });
-      }, 1000);
-    }
-  }, [sessionId, round.roundNumber, onRoundComplete, isSubmitting]);
+    };
+
+    await executeSubmit();
+  }, [sessionId, round.roundNumber, round.correctAnswer, round.aiImagePosition, onRoundComplete, isSubmitting, errorHandler]);
 
   // Handle image selection
   const handleImageSelect = (answer: 'A' | 'B') => {

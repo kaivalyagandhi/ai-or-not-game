@@ -182,6 +182,9 @@ export async function startGame(userId: string): Promise<StartGameResponse> {
       };
     }
 
+    // Record start time for the first round
+    await recordRoundStart(session.sessionId, 1);
+
     return {
       success: true,
       sessionId: session.sessionId,
@@ -424,6 +427,101 @@ export function calculateRoundScore(isCorrect: boolean, timeRemaining: number): 
 }
 
 /**
+ * Enhanced server-side timer validation
+ */
+async function validateRoundTiming(
+  userId: string,
+  sessionId: string,
+  roundNumber: number,
+  timeRemaining: number
+): Promise<{ isValid: boolean; error?: string; adjustedTime?: number }> {
+  try {
+    // Get round start time from Redis
+    const roundStartKey = `round_start:${sessionId}:${roundNumber}`;
+    const roundStartTime = await redis.get(roundStartKey);
+    
+    if (!roundStartTime) {
+      // If no start time recorded, this might be the first submission for this round
+      // Record the current time as an approximate start time
+      const approximateStartTime = Date.now() - (10000 - timeRemaining);
+      await redis.set(roundStartKey, approximateStartTime.toString());
+      await redis.expire(roundStartKey, 300); // 5 minute expiry
+      
+      // Allow this submission but validate the time is reasonable
+      if (timeRemaining < 0 || timeRemaining > 10000) {
+        return { isValid: false, error: 'Invalid time remaining' };
+      }
+      
+      return { isValid: true, adjustedTime: timeRemaining };
+    }
+    
+    const startTime = parseInt(roundStartTime, 10);
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - startTime;
+    const maxRoundTime = 15000; // 15 seconds max (10 + 5 buffer for network delays)
+    
+    // Check if too much time has elapsed
+    if (elapsedTime > maxRoundTime) {
+      return { 
+        isValid: false, 
+        error: 'Round timeout - too much time elapsed',
+        adjustedTime: 0 
+      };
+    }
+    
+    // Calculate expected time remaining
+    const expectedTimeRemaining = Math.max(0, 10000 - elapsedTime);
+    const timeDifference = Math.abs(timeRemaining - expectedTimeRemaining);
+    const tolerance = 3000; // 3 second tolerance for network delays and client-server sync
+    
+    // If time difference is too large, adjust to server time
+    if (timeDifference > tolerance) {
+      console.warn(`Timer validation: Large time difference detected`, {
+        userId,
+        sessionId,
+        roundNumber,
+        clientTime: timeRemaining,
+        serverTime: expectedTimeRemaining,
+        difference: timeDifference,
+        elapsedTime,
+      });
+      
+      // Use server-calculated time but don't fail the request
+      return { 
+        isValid: true, 
+        adjustedTime: expectedTimeRemaining 
+      };
+    }
+    
+    return { isValid: true, adjustedTime: timeRemaining };
+  } catch (error) {
+    console.error('Timer validation error:', error);
+    // On error, allow the submission but use a conservative time
+    return { isValid: true, adjustedTime: Math.min(timeRemaining, 5000) };
+  }
+}
+
+/**
+ * Records round start time for server-side validation
+ */
+export async function recordRoundStart(
+  sessionId: string,
+  roundNumber: number
+): Promise<void> {
+  try {
+    const roundStartKey = `round_start:${sessionId}:${roundNumber}`;
+    const startTime = Date.now();
+    
+    // Store with 5 minute expiry
+    await redis.set(roundStartKey, startTime.toString());
+    await redis.expire(roundStartKey, 300); // 5 minute expiry
+  } catch (error) {
+    console.error('Error recording round start:', error);
+    // Non-critical error, don't throw
+  }
+}
+
+/**
  * Submit answer for a round and get immediate feedback
  */
 export async function submitAnswer(
@@ -498,28 +596,31 @@ export async function submitAnswer(
       };
     }
 
-    // Validate server-side timer (anti-cheat)
-    const maxTimePerRound = 10000; // 10 seconds in milliseconds
-    if (timeRemaining > maxTimePerRound) {
+    // Enhanced server-side timer validation
+    const timerValidation = await validateRoundTiming(userId, sessionId, roundNumber, timeRemaining);
+    if (!timerValidation.isValid) {
       return {
         success: false,
-        error: 'Invalid time remaining - exceeds maximum',
+        error: timerValidation.error || 'Timer validation failed',
       };
     }
+    
+    // Use server-validated time
+    const validatedTimeRemaining = timerValidation.adjustedTime || timeRemaining;
 
     // Process the answer
     const isCorrect = userAnswer === round.correctAnswer;
-    const roundScore = calculateRoundScore(isCorrect, timeRemaining);
+    const roundScore = calculateRoundScore(isCorrect, validatedTimeRemaining);
 
-    // Update round with user's answer
+    // Update round with user's answer (use validated time)
     round.userAnswer = userAnswer;
-    round.timeRemaining = timeRemaining;
+    round.timeRemaining = validatedTimeRemaining;
     round.isCorrect = isCorrect;
 
     // Update session scores
     if (isCorrect) {
       session.correctCount += 1;
-      session.totalTimeBonus += timeRemaining * 0.01;
+      session.totalTimeBonus += validatedTimeRemaining * 0.01;
     }
     session.totalScore += roundScore;
 
@@ -563,6 +664,11 @@ export async function submitAnswer(
     let nextRound;
     if (!gameComplete) {
       nextRound = session.rounds.find((r) => r.userAnswer === undefined);
+      
+      // Record start time for the next round
+      if (nextRound) {
+        await recordRoundStart(session.sessionId, nextRound.roundNumber);
+      }
     }
 
     const response: SubmitAnswerResponse = {

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { GameSession, BadgeType, LeaderboardResponse } from '../../shared/types/api';
+import React, { useState, useEffect, useRef } from 'react';
+import { GameSession, BadgeType, LeaderboardResponse, RealtimeMessage } from '../../shared/types/api';
+import { connectRealtime } from '@devvit/web/client';
 
 interface ResultsScreenProps {
   session: GameSession;
@@ -16,6 +17,8 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   const [totalParticipants, setTotalParticipants] = useState<number | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isConnected, setIsConnected] = useState(false);
+  const connectionRef = useRef<any>(null);
 
   // Badge display configuration
   const getBadgeInfo = (badge: BadgeType) => {
@@ -119,8 +122,50 @@ Can you beat my score? Try today's challenge!
     }
   };
 
+  // Set up realtime connection for live rank updates
+  const setupRealtimeConnection = async () => {
+    try {
+      const connection = await connectRealtime({
+        channel: 'leaderboard_updates',
+        onConnect: (channel) => {
+          console.log(`Connected to ${channel} for results screen`);
+          setIsConnected(true);
+        },
+        onDisconnect: (channel) => {
+          console.log(`Disconnected from ${channel} for results screen`);
+          setIsConnected(false);
+        },
+        onMessage: (data: any) => {
+          console.log('Received leaderboard realtime message in results:', data);
+          
+          const message = data as RealtimeMessage;
+          
+          if (message.type === 'rank_update') {
+            // Update user rank if it's for the current user and daily leaderboard
+            if (message.userId === session.userId && message.leaderboardType === 'daily') {
+              setLeaderboardPosition(message.newRank);
+              setTotalParticipants(message.totalParticipants);
+            }
+          }
+        },
+      });
+
+      connectionRef.current = connection;
+    } catch (err) {
+      console.error('Error setting up results realtime connection:', err);
+    }
+  };
+
   useEffect(() => {
     fetchLeaderboardPosition();
+    setupRealtimeConnection();
+    
+    // Cleanup on unmount
+    return () => {
+      if (connectionRef.current) {
+        connectionRef.current.disconnect();
+      }
+    };
   }, []);
 
   const badgeInfo = getBadgeInfo(session.badge);
@@ -180,8 +225,16 @@ Can you beat my score? Try today's challenge!
         {/* Leaderboard Position */}
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="text-center">
-            <div className="text-sm text-gray-500 uppercase tracking-wide mb-2">
-              Daily Leaderboard
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="text-sm text-gray-500 uppercase tracking-wide">
+                Daily Leaderboard
+              </div>
+              {isConnected && (
+                <div className="flex items-center">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse mr-1"></div>
+                  <span className="text-xs text-green-600">Live</span>
+                </div>
+              )}
             </div>
             {loading ? (
               <div className="flex items-center justify-center">

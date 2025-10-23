@@ -6,7 +6,7 @@
  * with atomic operations to prevent race conditions.
  */
 
-import { redis } from '@devvit/web/server';
+import { redis, realtime } from '@devvit/web/server';
 import { LeaderboardEntry, BadgeType } from '../../shared/types/api.js';
 import { LeaderboardKeys, KEY_EXPIRATION, isValidUserId } from './redis-keys.js';
 
@@ -99,6 +99,56 @@ export async function addScoreToLeaderboards(
 
     // Add to all-time leaderboard (no expiration)
     await redis.zAdd(allTimeKey, { member: JSON.stringify(entryData), score });
+
+    // Send realtime leaderboard updates for all leaderboard types
+    const leaderboardEntry: LeaderboardEntry = {
+      userId,
+      username,
+      score,
+      correctCount,
+      timeBonus,
+      completedAt,
+      badge,
+    };
+
+    // Send updates for each leaderboard type
+    const leaderboardTypes: LeaderboardType[] = ['daily', 'weekly', 'all-time'];
+    
+    for (const leaderboardType of leaderboardTypes) {
+      // Send leaderboard update message
+      await realtime.send('leaderboard_updates', {
+        type: 'leaderboard_update',
+        leaderboardType,
+        entry: {
+          userId: leaderboardEntry.userId,
+          username: leaderboardEntry.username,
+          score: leaderboardEntry.score,
+          correctCount: leaderboardEntry.correctCount,
+          timeBonus: leaderboardEntry.timeBonus,
+          completedAt: leaderboardEntry.completedAt,
+          badge: leaderboardEntry.badge,
+        },
+        timestamp: Date.now(),
+      });
+
+      // Get user's new rank and send rank update
+      try {
+        const rankData = await getUserRank(userId, leaderboardType);
+        if (rankData) {
+          await realtime.send('leaderboard_updates', {
+            type: 'rank_update',
+            userId,
+            leaderboardType,
+            newRank: rankData.rank,
+            totalParticipants: rankData.totalParticipants,
+            timestamp: Date.now(),
+          });
+        }
+      } catch (rankError) {
+        console.error(`Error getting rank for realtime update (${leaderboardType}):`, rankError);
+        // Don't fail the whole operation if rank lookup fails
+      }
+    }
   } catch (error) {
     console.error('Error adding score to leaderboards:', error);
     throw new LeaderboardError(

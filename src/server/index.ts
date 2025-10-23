@@ -9,7 +9,9 @@ import {
   SubmitAnswerResponse,
   SubmitAnswerRequest,
 } from '../shared/types/api';
-import { redis, reddit, createServer, context, getServerPort } from '@devvit/web/server';
+import { redis, reddit, createServer, context, getServerPort, realtime } from '@devvit/web/server';
+import { securityErrorHandler } from './middleware/security';
+import { trackRequestResult } from './utils/rateLimiter';
 import { createPost } from './core/post';
 import { resetDailyGameState } from './core/daily-game-manager.js';
 import { createSampleImageCollection } from './core/image-manager.js';
@@ -26,12 +28,15 @@ import { BadgeType } from '../shared/types/api.js';
 
 const app = express();
 
-// Middleware for JSON body parsing
-app.use(express.json());
-// Middleware for URL-encoded body parsing
-app.use(express.urlencoded({ extended: true }));
-// Middleware for plain text body parsing
-app.use(express.text());
+// Security middleware - applied globally
+app.use(trackRequestResult());
+
+// Middleware for JSON body parsing with size limits
+app.use(express.json({ limit: '1mb' }));
+// Middleware for URL-encoded body parsing with size limits
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+// Middleware for plain text body parsing with size limits
+app.use(express.text({ limit: '1mb' }));
 
 const router = express.Router();
 
@@ -112,7 +117,7 @@ router.post<{ postId: string }, DecrementResponse | { status: string; message: s
   }
 );
 
-// Game API Endpoints
+// Game API Endpoints with security middleware
 
 router.get<object, GameInitResponse>('/api/game/init', async (_req, res): Promise<void> => {
   try {
@@ -140,6 +145,41 @@ router.post<object, StartGameResponse, StartGameRequest>(
       const userId = username; // Use username as user ID
 
       const result = await startGame(userId);
+
+      // If game started successfully, register participant
+      if (result.success) {
+        // Track participant join in Redis using Hash
+        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+        const participantKey = `daily:participants:${today}`;
+        
+        // Add user to today's participant hash (Redis Hash ensures uniqueness)
+        const wasNew = await redis.hSet(participantKey, { [userId]: Date.now().toString() });
+        
+        // Set expiration for cleanup (keep for 7 days)
+        await redis.expire(participantKey, 7 * 24 * 60 * 60);
+        
+        // Only send updates if this is a new participant
+        if (wasNew > 0) {
+          // Get updated count
+          const count = await redis.hLen(participantKey);
+
+          // Send realtime update to all connected clients
+          await realtime.send('participant_updates', {
+            type: 'participant_count_update',
+            count,
+            timestamp: Date.now(),
+          });
+
+          // Also send participant join event
+          await realtime.send('participant_updates', {
+            type: 'participant_join',
+            userId,
+            username,
+            timestamp: Date.now(),
+          });
+        }
+      }
+
       res.json(result);
     } catch (error) {
       console.error('Error in /api/game/start:', error);
@@ -155,11 +195,44 @@ router.post<object, SubmitAnswerResponse, SubmitAnswerRequest>(
   '/api/game/submit-answer',
   async (req, res): Promise<void> => {
     try {
+      // Basic input validation
+      const { sessionId, roundNumber, userAnswer, timeRemaining } = req.body;
+      
+      if (!sessionId || typeof sessionId !== 'string') {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid session ID',
+        });
+        return;
+      }
+      
+      if (typeof roundNumber !== 'number' || roundNumber < 1 || roundNumber > 5) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid round number',
+        });
+        return;
+      }
+      
+      if (!['A', 'B'].includes(userAnswer)) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid answer',
+        });
+        return;
+      }
+      
+      if (typeof timeRemaining !== 'number' || timeRemaining < 0 || timeRemaining > 10000) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid time remaining',
+        });
+        return;
+      }
+
       // Get current user ID from Reddit context
       const username = await getCurrentUsername();
       const userId = username; // Use username as user ID
-
-      const { sessionId, roundNumber, userAnswer, timeRemaining } = req.body;
 
       const result = await submitAnswer(userId, sessionId, roundNumber, userAnswer, timeRemaining);
       res.json(result);
@@ -223,6 +296,7 @@ router.get('/api/leaderboard/daily', async (req, res): Promise<void> => {
     const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 100;
     const offset = req.query.offset ? parseInt(req.query.offset as string, 10) : 0;
 
+    // Enhanced validation
     if (isNaN(limit) || limit < 1 || limit > 1000) {
       res.status(400).json({
         success: false,
@@ -387,7 +461,17 @@ router.get('/api/participants/count', async (req, res): Promise<void> => {
       return;
     }
 
-    const count = await getLeaderboardParticipantCount(type);
+    let count: number;
+    
+    if (type === 'daily') {
+      // Use Redis Hash for real-time daily participant tracking
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const participantKey = `daily:participants:${today}`;
+      count = await redis.hLen(participantKey);
+    } else {
+      // Use leaderboard-based counting for weekly/all-time
+      count = await getLeaderboardParticipantCount(type);
+    }
 
     res.json({
       success: true,
@@ -395,6 +479,56 @@ router.get('/api/participants/count', async (req, res): Promise<void> => {
     });
   } catch (error) {
     console.error('Error in /api/participants/count:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+router.post('/api/participants/join', async (_req, res): Promise<void> => {
+  try {
+    // Get current user ID from Reddit context
+    const username = await getCurrentUsername();
+    const userId = username; // Use username as user ID
+
+    // Track participant join in Redis using Hash
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    const participantKey = `daily:participants:${today}`;
+    
+    // Add user to today's participant hash (Redis Hash ensures uniqueness)
+    const wasNew = await redis.hSet(participantKey, { [userId]: Date.now().toString() });
+    
+    // Set expiration for cleanup (keep for 7 days)
+    await redis.expire(participantKey, 7 * 24 * 60 * 60);
+    
+    // Get updated count
+    const count = await redis.hLen(participantKey);
+
+    // Only send updates if this is a new participant
+    if (wasNew > 0) {
+      // Send realtime update to all connected clients
+      await realtime.send('participant_updates', {
+        type: 'participant_count_update',
+        count,
+        timestamp: Date.now(),
+      });
+
+      // Also send participant join event
+      await realtime.send('participant_updates', {
+        type: 'participant_join',
+        userId,
+        username,
+        timestamp: Date.now(),
+      });
+    }
+
+    res.json({
+      success: true,
+      count,
+    });
+  } catch (error) {
+    console.error('Error in /api/participants/join:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -449,11 +583,23 @@ router.post('/internal/scheduler/daily-reset', async (_req, res): Promise<void> 
         throw new Error(resetResult.error || 'Failed to reset daily game state');
       }
 
+      // Reset daily participant count
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const participantKey = `daily:participants:${today}`;
+      await redis.del(participantKey);
+
+      // Send realtime update for participant count reset
+      await realtime.send('participant_updates', {
+        type: 'participant_count_update',
+        count: 0,
+        timestamp: Date.now(),
+      });
+
       return {
         date: resetResult.gameState?.date,
         categoryOrder: resetResult.gameState?.categoryOrder,
         roundCount: resetResult.gameState?.imageSet.length,
-        participantCount: resetResult.gameState?.participantCount,
+        participantCount: 0, // Reset to 0 for new day
       };
     },
     {
@@ -492,11 +638,23 @@ router.post('/api/test/daily-reset', async (_req, res): Promise<void> => {
         throw new Error(resetResult.error || 'Failed to reset daily game state');
       }
 
+      // Reset daily participant count
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const participantKey = `daily:participants:${today}`;
+      await redis.del(participantKey);
+
+      // Send realtime update for participant count reset
+      await realtime.send('participant_updates', {
+        type: 'participant_count_update',
+        count: 0,
+        timestamp: Date.now(),
+      });
+
       return {
         date: resetResult.gameState?.date,
         categoryOrder: resetResult.gameState?.categoryOrder,
         roundCount: resetResult.gameState?.imageSet.length,
-        participantCount: resetResult.gameState?.participantCount,
+        participantCount: 0, // Reset to 0 for new day
       };
     },
     {
@@ -525,6 +683,9 @@ router.post('/api/test/daily-reset', async (_req, res): Promise<void> => {
 
 // Use router middleware
 app.use(router);
+
+// Security error handling middleware (must be after routes)
+app.use(securityErrorHandler());
 
 // Get port from environment variable with fallback
 const port = getServerPort();
