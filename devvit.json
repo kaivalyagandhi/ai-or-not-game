@@ -7,11 +7,6 @@
       "default": {
         "entry": "index.html"
       }
-    },
-    "splash": {
-      "title": "Spot the Bot",
-      "description": "Test your ability to distinguish AI-generated images from real photos in this daily challenge!",
-      "image": "default-splash.png"
     }
   },
   "server": {
@@ -36,15 +31,6 @@
   },
   "triggers": {
     "onAppInstall": "/internal/on-app-install"
-  },
-  "scheduler": {
-    "jobs": [
-      {
-        "name": "daily-reset",
-        "cron": "0 0 * * *",
-        "endpoint": "/internal/scheduler/daily-reset"
-      }
-    ]
   },
   "dev": {
     "subreddit": "spot_the_bot_dev"

@@ -1,0 +1,5 @@
+# This file keeps the directory in git
+# Upload your nature image pairs here following the naming convention:
+# pair1-human.jpg, pair1-ai.jpg
+# pair2-human.png, pair2-ai.png
+# etc.

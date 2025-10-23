@@ -15,6 +15,7 @@ import { trackRequestResult } from './utils/rateLimiter';
 import { createPost } from './core/post';
 import { resetDailyGameState } from './core/daily-game-manager.js';
 import { createSampleImageCollection } from './core/image-manager.js';
+import { createImageCollection } from './core/image-loader.js';
 import { executeSchedulerJob } from './core/scheduler-manager.js';
 import { initializeGame, startGame, submitAnswer, getCurrentUsername } from './core/game-logic.js';
 import { getAllBadgeDisplayInfo, calculateBadgeProgress } from './core/badge-manager.js';
@@ -573,8 +574,8 @@ router.post('/internal/scheduler/daily-reset', async (_req, res): Promise<void> 
   const jobResult = await executeSchedulerJob(
     'daily-reset',
     async () => {
-      // Create sample image collection (in production, this would load from actual image assets)
-      const imageCollection = createSampleImageCollection();
+      // Load image collection from organized folder structure
+      const imageCollection = createImageCollection();
 
       // Reset daily game state with new randomized content
       const resetResult = await resetDailyGameState(redis, imageCollection);
@@ -631,7 +632,7 @@ router.post('/api/test/daily-reset', async (_req, res): Promise<void> => {
   const jobResult = await executeSchedulerJob(
     'daily-reset-test',
     async () => {
-      const imageCollection = createSampleImageCollection();
+      const imageCollection = createImageCollection();
       const resetResult = await resetDailyGameState(redis, imageCollection);
 
       if (!resetResult.success) {

@@ -4,6 +4,17 @@
 
 Spot the Bot is an engaging daily challenge game built on Reddit's Devvit platform where players test their ability to distinguish between real photographs and AI-generated images. Each day brings a fresh set of image pairs across different categories, challenging users to identify which image was created by a human versus artificial intelligence.
 
+## 🎯 Game Overview
+
+This is a **React-based web game** that runs directly within Reddit posts using the Devvit platform. Players are presented with side-by-side image comparisons and must quickly identify which image is real versus AI-generated. The game features:
+
+- **5 rounds per game** with 10-second time limits per round
+- **5 image categories**: Animals, Architecture, Nature, Food, and Products  
+- **Time-based scoring** that rewards both accuracy and speed
+- **Daily challenges** with fresh content that resets at midnight UTC
+- **Live leaderboards** with real-time updates and social sharing
+- **Achievement system** with 4 different performance badges
+
 ## 🎮 What Makes This Game Unique
 
 ### Revolutionary AI Detection Challenge
@@ -20,9 +31,13 @@ Spot the Bot is an engaging daily challenge game built on Reddit's Devvit platfo
 
 ### Technical Innovation
 - **Serverless Architecture**: Built on Devvit's modern serverless platform with Redis persistence for game state and leaderboards
-- **Error Resilience**: Comprehensive error boundaries, network retry logic, and graceful offline handling
+- **Error Resilience**: Comprehensive error boundaries, network retry logic, and graceful offline handling with local caching
 - **Mobile-First Design**: Responsive interface optimized for Reddit's mobile-heavy user base with touch-friendly controls
 - **Real-Time Updates**: Live participant counting and leaderboard updates without page refreshes using WebSocket connections
+- **Anti-Cheat Protection**: Server-side timer validation, rate limiting, and comprehensive input validation to ensure fair play
+- **Offline Support**: Smart caching system allows viewing results and retrying failed requests when connection is restored
+- **Progressive Enhancement**: Game works offline with cached data and gracefully handles network failures
+- **Security-First Design**: Rate limiting, input sanitization, and abuse detection protect against cheating and spam
 
 ## 🚀 Technology Stack
 
@@ -58,10 +73,10 @@ Spot the Bot is an engaging daily challenge game built on Reddit's Devvit platfo
 4. **See Results**: After selection, the correct answer is revealed with visual overlays showing "Real Photo" vs "AI Generated"
 
 #### Scoring System
-- **Base Points**: Earn points for each correct identification
+- **Base Points**: Earn 1 point for each correct identification
 - **Time Bonus**: Faster correct answers earn additional bonus points (0.01 points per millisecond remaining)
-- **Maximum Score**: Perfect accuracy with quick responses yields the highest scores
-- **Running Total**: Your score accumulates across all 5 rounds
+- **Maximum Score**: Perfect accuracy with quick responses yields the highest scores (up to 101 points per round)
+- **Running Total**: Your score accumulates across all 5 rounds for a maximum possible score of 505 points
 
 #### Badge System & Achievements
 - 🧙‍♂️ **AI Whisperer**: Perfect score (5/5 correct) - You can spot AI from a mile away
@@ -162,15 +177,17 @@ src/
 ```
 
 ### Key Features Implementation
-- **Game State Management**: React hooks with useGameState managing flow between splash, playing, results, and leaderboard screens
+- **Game State Management**: React hooks with `useGameState` managing flow between splash, playing, results, and leaderboard screens
 - **Real-Time Updates**: WebSocket connections via Devvit Realtime API for live participant counts and leaderboard updates
 - **Timer System**: Client-side countdown with visual progress bar and server-side validation for fair play
 - **Image Handling**: Responsive grid layout with hover effects, selection feedback, and result overlays
 - **Score Calculation**: Time-based bonus system (0.01 points per millisecond) rewards quick accurate responses
 - **Badge Assignment**: Automatic badge calculation based on correct answer count with visual badge cards
 - **Social Sharing**: Native sharing API with clipboard fallback and formatted result messages
-- **Error Resilience**: Comprehensive error boundaries, network retry logic, and offline caching
+- **Error Resilience**: Comprehensive error boundaries, network retry logic, and offline caching via `useErrorHandler`
 - **Leaderboard System**: Redis-based sorted sets with real-time updates and user rank tracking
+- **Session Management**: Secure session handling with Redis persistence and anti-cheat validation
+- **Network Optimization**: Smart retry logic with exponential backoff and offline detection
 
 ## 🎨 Design Philosophy
 
