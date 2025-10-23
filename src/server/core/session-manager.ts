@@ -51,12 +51,18 @@ export async function createGameSession(userId: string): Promise<GameSession> {
   }
 
   // Check if user has already played today
+  // TEMPORARY: Allow multiple plays for testing (remove in production)
+  const isDevelopmentMode = true; // Set to false for production
   const hasPlayedToday = await hasUserPlayedToday(userId);
-  if (hasPlayedToday) {
+  if (hasPlayedToday && !isDevelopmentMode) {
     throw new SessionError(
       "User has already completed today's challenge",
       SESSION_ERROR_CODES.ALREADY_PLAYED_TODAY
     );
+  }
+  
+  if (hasPlayedToday && isDevelopmentMode) {
+    console.log('Development mode: Bypassing daily session limit for testing');
   }
 
   // Generate session ID and create session object
