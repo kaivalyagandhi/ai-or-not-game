@@ -322,7 +322,23 @@ export const useGameState = (): GameStateManager => {
           console.log('Setting current round:', data.currentRound);
           console.log('Setting session ID:', data.sessionId);
           setCurrentRound(data.currentRound);
-          const updatedSession = session ? { ...session, sessionId: data.sessionId } : null;
+          
+          // Create a new session object if one doesn't exist
+          const updatedSession = session ? 
+            { ...session, sessionId: data.sessionId } : 
+            {
+              userId: 'current-user',
+              sessionId: data.sessionId,
+              startTime: Date.now(),
+              rounds: [],
+              totalScore: 0,
+              correctCount: 0,
+              totalTimeBonus: 0,
+              badge: 'human_in_training' as BadgeType,
+              completed: false,
+            };
+          
+          console.log('Setting session:', updatedSession);
           setSession(updatedSession);
           setGameState('playing');
           
