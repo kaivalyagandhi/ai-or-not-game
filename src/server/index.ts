@@ -675,6 +675,32 @@ router.get('/api/debug/image-collection', async (_req, res): Promise<void> => {
   }
 });
 
+// Clear daily game state endpoint (development only)
+router.post('/api/debug/clear-daily-state', async (_req, res): Promise<void> => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const gameStateKey = `daily_game:${today}`;
+    const participantCountKey = `daily_participants:${today}`;
+    
+    await redis.del(gameStateKey);
+    await redis.del(participantCountKey);
+    
+    console.log('Cleared daily game state for:', today);
+    
+    res.json({
+      success: true,
+      message: 'Daily game state cleared',
+      date: today,
+    });
+  } catch (error) {
+    console.error('Error clearing daily game state:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
 // Test endpoint for manual daily reset (development only)
 router.post('/api/test/daily-reset', async (_req, res): Promise<void> => {
   const jobResult = await executeSchedulerJob(

@@ -66,35 +66,38 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 
 ### Complete Game Flow
 
-#### Pre-Game Setup
-- **Daily Challenge Display**: The splash screen shows the current date and live participant count with real-time updates
-- **Game Rules Overview**: Quick instructions explain the 5-round format, 10-second time limits, and scoring system
-- **One-Time Daily Access**: The game checks if you've already played today - if so, you'll see your previous results instead of starting a new game
+#### Pre-Game Setup (Splash Screen)
+- **Daily Challenge Display**: The splash screen shows the current date formatted as "Wednesday, October 23, 2025" and live participant count with real-time updates via WebSocket
+- **Live Participant Counter**: Real-time counter showing total players who have attempted today's challenge, with a green "Live" indicator when connected
+- **Game Rules Overview**: Clear instructions explaining the 5-round format, 10-second time limits, and scoring system
+- **One-Time Daily Access**: The game automatically checks if you've already played today - if so, you'll see your previous results instead of starting a new game
 
 #### Round-by-Round Gameplay
 
 **Round Structure (5 Total Rounds)**
 - Each game consists of exactly 5 image comparison rounds
 - Categories are mixed across: Animals, Architecture, Nature, Food, and Products
-- Category labels are displayed at the top of each round
-- Images are presented side-by-side in a responsive grid layout
-- One image is a real photograph, one is AI-generated (positions are randomized)
+- Category labels are displayed at the top of each round (e.g., "Category: animals")
+- Images are presented side-by-side in a responsive grid layout with aspect-square containers
+- One image is a real photograph, one is AI-generated (positions are randomized between A and B)
+- Round progress is shown as "Round X of 5" at the top
 
 **Making Your Selection**
 1. **Analyze Both Images**: You have exactly 10 seconds to study both images carefully
 2. **Look for AI Tells**: Check for unnatural lighting, impossible geometry, weird textures, or uncanny valley effects
 3. **Click to Choose**: Click on the image you believe is the REAL photograph (not the AI-generated one)
-4. **Timer Pressure**: Watch the color-coded progress bar:
+4. **Timer Pressure**: Watch the color-coded countdown timer and progress bar:
    - **Green** (7-10 seconds): Plenty of time to analyze
    - **Yellow** (4-6 seconds): Time to make a decision
    - **Red** (1-3 seconds): Choose quickly!
-5. **Automatic Timeout**: If time runs out, the game automatically selects the first option
+5. **Automatic Timeout**: If time runs out, the game automatically selects option A as default
 
 **Immediate Feedback**
-- After selection, the correct answer is revealed with visual overlays
-- Real photos show 📸 "Real Photo" overlay
-- AI images show 🤖 "AI Generated" overlay
-- You see whether you were correct (✅ or ❌) and your round score
+- After selection, the correct answer is revealed with visual overlays on both images
+- Real photos show 📸 "Real Photo" overlay with white text on black semi-transparent background
+- AI images show 🤖 "AI Generated" overlay with white text on black semi-transparent background
+- You see whether you were correct (✅ Correct! or ❌ Incorrect) and your round score
+- Selected images get a blue border and scale effect, correct answers get green borders
 - The game automatically advances to the next round after 2 seconds
 
 #### Scoring System Explained
@@ -102,42 +105,51 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 - **Time Bonus**: 0.01 bonus points per millisecond remaining when you answer correctly
 - **Maximum Possible**: ~101 points per round (1 base + ~100 time bonus for instant correct answers)
 - **Running Total**: Your cumulative score is tracked across all 5 rounds
-- **Server Validation**: All timing is validated server-side to prevent cheating and ensure fair play
+- **Server Validation**: All timing is validated server-side with tolerance for network delays to prevent cheating
 
 #### Achievement Badge System
-Your final performance determines your badge:
-- 🧙‍♂️ **AI Whisperer** (5/5 correct): "You can spot AI from a mile away" - Purple badge
-- 😇 **Good Samaritan** (4/5 correct): "You got most of them right" - Blue badge
-- 🙂 **Just Human** (3/5 correct): "You're getting the hang of this" - Green badge
-- 🤖 **Human in Training** (≤2/5 correct): "AI is getting better every day" - Gray badge
+Your final performance determines your badge with custom colors and descriptions:
+- 🧙‍♂️ **AI Whisperer** (5/5 correct): "Perfect score! You can spot AI from a mile away" - Purple badge
+- 😇 **Good Samaritan** (4/5 correct): "Great job! You got most of them right" - Blue badge
+- 🙂 **Just Human** (3/5 correct): "Not bad! You're getting the hang of this" - Green badge
+- 🤖 **Human in Training** (≤2/5 correct): "Keep practicing! AI is getting better every day" - Gray badge
 
 ### Results & Social Features
 
 #### Final Results Screen
-After completing all 5 rounds, you'll see:
-- **Total Score**: Your final score with breakdown (base points + time bonus)
-- **Performance Stats**: Correct answers (X/5) and total time bonus earned
-- **Badge Achievement**: Your earned badge with custom emoji, title, and description
-- **Live Leaderboard Position**: Your current rank among all daily participants with real-time updates
-- **Social Sharing**: Share your results via native sharing or copy to clipboard
+After completing all 5 rounds, you'll see a celebration screen with:
+- **Total Score**: Your final score displayed prominently with decimal precision (e.g., "87.45")
+- **Performance Breakdown**: Grid showing correct answers (X/5) and total time bonus earned (+XX.XX)
+- **Badge Achievement**: Large badge display with custom emoji, title, and personalized description
+- **Live Leaderboard Position**: Your current rank among all daily participants with real-time updates and "Live" indicator
+- **Action Buttons**: Share Results, View Leaderboard, and Back to Home options
 
 #### Multi-Tier Leaderboard System
 - **Daily Leaderboard**: Compete against all players for the current day (resets at 00:00 UTC)
 - **Weekly Rankings**: See top performers over the past 7 days
 - **All-Time Champions**: View the highest scores since the game launched
-- **Live Updates**: Real-time position changes as other players complete games (green "Live" indicator)
-- **User Highlighting**: Your position is highlighted with special styling and "(You)" label
-- **Detailed Stats**: Each entry shows score, correct count, time bonus, and achievement badge
+- **Live Updates**: Real-time position changes as other players complete games with green "Live" indicator
+- **User Highlighting**: Your position is highlighted with indigo background and "(You)" label
+- **Detailed Stats**: Each entry shows username, score, correct count (✅ X/5), time bonus (⚡ +XX.XX), and badge emoji
+- **Rank Display**: Top 3 get medal emojis (🥇🥈🥉), others show numerical rank
 
 #### Social Sharing Features
-- **Native Sharing**: Use your device's built-in sharing on mobile devices
+- **Native Sharing**: Uses device's built-in sharing API on mobile devices
 - **Clipboard Fallback**: Automatically copies formatted results if native sharing isn't available
-- **Formatted Messages**: Generated share text includes:
-  - Your total score and breakdown
-  - Correct answers and time bonus
-  - Achievement badge with emoji
-  - Leaderboard position and total participants
-  - Challenge invitation for friends
+- **Formatted Share Messages**: Generated text includes:
+  ```
+  🤖 Spot the Bot - Daily Challenge Results 🤖
+  
+  📊 Score: 87.45 points
+  ✅ Correct: 4/5
+  ⚡ Time Bonus: +37.45
+  🏆 Badge: 😇 Good Samaritan
+  📈 Rank: #15 of 1,247 players
+  
+  Can you beat my score? Try today's challenge!
+  #SpotTheBot #AIChallenge
+  ```
+- **Toast Notifications**: "Results copied to clipboard!" confirmation with checkmark
 
 ### Game Rules & Fair Play
 
@@ -146,18 +158,19 @@ After completing all 5 rounds, you'll see:
 - **UTC Reset Schedule**: New challenges become available at 00:00 UTC (midnight)
 - **No Retries**: Your first and only attempt is final - make it count!
 - **Session Persistence**: If you start a game, you must complete it (no abandoning and restarting)
+- **Automatic Resume**: If you've already played today, the game shows your completed results
 
 #### Anti-Cheat & Fair Play Systems
-- **Server-Side Timer Validation**: All timing is verified on the server to prevent client-side manipulation
-- **Session Integrity Checks**: Game state is validated to prevent tampering
+- **Server-Side Timer Validation**: All timing is verified on the server with 3-second tolerance for network delays
+- **Session Integrity Checks**: Game state is validated to prevent tampering with rounds or scores
 - **Rate Limiting**: Prevents spam and abuse of the game systems
 - **Input Validation**: All user inputs are sanitized and validated server-side
-- **Network Resilience**: Game handles network issues gracefully without allowing exploitation
+- **Network Resilience**: Game handles network issues gracefully with retry logic and fallback responses
 
 #### Technical Features for Fair Play
-- **Offline Support**: View previous results and cached data when offline
-- **Error Recovery**: Comprehensive error handling with retry logic and fallback mechanisms
-- **Session Management**: Game state is preserved across browser refreshes and network interruptions
+- **Offline Support**: View previous results and cached data when offline with "Using cached data (offline)" indicators
+- **Error Recovery**: Comprehensive error handling with retry logic, exponential backoff, and fallback mechanisms
+- **Session Management**: Game state is preserved in local storage and Redis across browser refreshes
 - **Progressive Enhancement**: Core functionality works even with limited connectivity
 
 ### Pro Tips for Success
@@ -171,18 +184,18 @@ After completing all 5 rounds, you'll see:
 
 #### Strategic Gameplay
 - **Trust Your Instincts**: The "uncanny valley" feeling is often a reliable indicator of AI generation
-- **Balance Speed vs. Accuracy**: Time bonuses are significant, but accuracy is more important
+- **Balance Speed vs. Accuracy**: Time bonuses are significant, but accuracy is more important for overall score
 - **Category-Specific Patterns**: Each image category has different AI tells:
-  - **Animals**: Unnatural fur patterns, impossible anatomy, weird eyes
+  - **Animals**: Unnatural fur patterns, impossible anatomy, weird eyes or expressions
   - **Architecture**: Impossible geometry, floating elements, inconsistent perspective
-  - **Nature**: Too-perfect landscapes, impossible weather, unnatural colors
+  - **Nature**: Too-perfect landscapes, impossible weather combinations, unnatural colors
   - **Food**: Perfect textures, impossible arrangements, unnatural lighting
   - **Products**: Too-perfect surfaces, impossible reflections, uncanny branding
 
 #### Daily Practice Benefits
-- **Pattern Recognition**: Regular play helps you develop better AI detection skills
-- **Speed Improvement**: Practice helps you make faster, more confident decisions
-- **Category Familiarity**: Learn the specific tells for each image category
+- **Pattern Recognition**: Regular play helps you develop better AI detection skills over time
+- **Speed Improvement**: Practice helps you make faster, more confident decisions under time pressure
+- **Category Familiarity**: Learn the specific tells and patterns for each image category
 - **Competitive Edge**: Consistent play helps you climb the weekly and all-time leaderboards
 
 ## 🛠️ Development Setup
@@ -250,19 +263,19 @@ src/
 ```
 
 ### Key Features Implementation
-- **Game State Management**: React hooks with `useGameState` managing flow between splash, playing, results, and leaderboard screens with comprehensive state validation
-- **Real-Time Updates**: WebSocket connections via Devvit Realtime API for live participant counts and leaderboard updates with connection status indicators
-- **Timer System**: Client-side countdown with color-coded visual progress bar and server-side validation for fair play and anti-cheat protection
-- **Image Handling**: Responsive grid layout with hover effects, selection feedback, result overlays, and mobile-optimized touch controls
-- **Score Calculation**: Time-based bonus system (0.01 points per millisecond) rewards quick accurate responses with server-side validation
-- **Badge Assignment**: Automatic badge calculation based on correct answer count with visual badge cards, custom colors, and descriptions
-- **Social Sharing**: Native sharing API with clipboard fallback and formatted result messages including performance breakdown
-- **Error Resilience**: Comprehensive error boundaries, network retry logic with exponential backoff, and offline caching via `useErrorHandler`
-- **Leaderboard System**: Redis-based sorted sets with real-time updates, user rank tracking, and live position changes
-- **Session Management**: Secure session handling with Redis persistence, anti-cheat validation, and automatic cleanup
-- **Network Optimization**: Smart retry logic with exponential backoff, offline detection, and graceful degradation
-- **Loading States**: Comprehensive loading screens, skeleton states, and progress indicators throughout the user journey
-- **Offline Support**: Local caching system for game data, results viewing, and pending request queuing for when connection is restored
+- **Game State Management**: React hooks with `useGameState` managing flow between splash, playing, results, and leaderboard screens with comprehensive state validation and automatic session recovery
+- **Real-Time Updates**: WebSocket connections via Devvit Realtime API for live participant counts and leaderboard updates with connection status indicators and automatic reconnection
+- **Timer System**: Client-side countdown with color-coded visual progress bar (green/yellow/red) and server-side validation with 3-second tolerance for network delays
+- **Image Handling**: Responsive aspect-square grid layout with hover effects, selection feedback, visual result overlays (📸/🤖), and mobile-optimized touch controls
+- **Score Calculation**: Time-based bonus system (0.01 points per millisecond) rewards quick accurate responses with server-side validation and fallback scoring
+- **Badge Assignment**: Automatic badge calculation based on correct answer count with visual badge cards, custom colors, emoji, and personalized descriptions
+- **Social Sharing**: Native sharing API with clipboard fallback and formatted result messages including detailed performance breakdown and challenge invitation
+- **Error Resilience**: Comprehensive error boundaries, network retry logic with exponential backoff, offline detection, and graceful degradation via `useErrorHandler`
+- **Leaderboard System**: Redis-based sorted sets with real-time updates, user rank tracking, live position changes, and multi-tier rankings (daily/weekly/all-time)
+- **Session Management**: Secure session handling with Redis persistence, local storage caching, anti-cheat validation, and automatic cleanup
+- **Network Optimization**: Smart retry logic with exponential backoff, offline detection, pending request queuing, and graceful degradation
+- **Loading States**: Comprehensive loading screens, skeleton states, progress indicators, and smooth transitions throughout the user journey
+- **Offline Support**: Local caching system for game data, results viewing, cached leaderboards, and pending request queuing for when connection is restored
 
 ## 🎨 Design Philosophy
 
