@@ -8,7 +8,7 @@ This interactive React-based game runs directly within Reddit posts, providing a
 
 ## 🎯 What is Spot the Bot?
 
-Spot the Bot is a **daily visual challenge game** that tests your ability to distinguish between real photographs and AI-generated images. Built as a React web application that runs natively within Reddit posts using the Devvit platform, the game presents players with side-by-side image comparisons where they must identify which image is authentic.
+Spot the Bot is a **daily visual challenge game** that tests your ability to distinguish between real photographs and AI-generated images. Built as a React web application that runs natively within Reddit posts using the Devvit platform, the game presents players with side-by-side image comparisons where they must identify which image is the REAL photograph (not the AI-generated one).
 
 ### Core Game Mechanics
 - **5 rounds per game** with exactly 10 seconds per round
@@ -16,7 +16,7 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 - **Side-by-side comparison**: Two images displayed simultaneously - one real, one AI-generated
 - **Time-pressure scoring**: Faster correct answers earn higher scores with time bonuses (0.01 points per millisecond remaining)
 - **One attempt per day**: Each player gets exactly one chance per 24-hour period (resets at 00:00 UTC)
-- **Immediate feedback**: See the correct answer and explanation after each round with visual overlays
+- **Immediate feedback**: See the correct answer and explanation after each round with visual overlays (📸 Real Photo / 🤖 AI Generated)
 - **Progressive difficulty**: Mixed categories and randomized AI placement keep players guessing
 
 ## 🎮 What Makes This Game Revolutionary

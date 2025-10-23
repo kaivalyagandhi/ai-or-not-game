@@ -16,6 +16,11 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   const [feedbackData, setFeedbackData] = useState<SubmitAnswerResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // Debug: Log image URLs when component renders
+  console.log('GameRound rendering with images:');
+  console.log('Image A URL:', round.imageA.url);
+  console.log('Image B URL:', round.imageB.url);
+  
   // Enhanced error handling
   const errorHandler = useErrorHandler({
     enableOfflineDetection: true,
@@ -184,6 +189,11 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
               <img
                 src={round.imageA.url}
                 alt={`Option A - ${round.imageA.metadata.description}`}
+                onError={(e) => {
+                  console.error('Failed to load image A:', round.imageA.url);
+                  console.error('Image A error event:', e);
+                }}
+                onLoad={() => console.log('Successfully loaded image A:', round.imageA.url)}
                 className="w-full h-full object-cover"
               />
               
@@ -230,6 +240,11 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
               <img
                 src={round.imageB.url}
                 alt={`Option B - ${round.imageB.metadata.description}`}
+                onError={(e) => {
+                  console.error('Failed to load image B:', round.imageB.url);
+                  console.error('Image B error event:', e);
+                }}
+                onLoad={() => console.log('Successfully loaded image B:', round.imageB.url)}
                 className="w-full h-full object-cover"
               />
               
