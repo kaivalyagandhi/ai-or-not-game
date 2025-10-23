@@ -17,6 +17,7 @@ export const App = () => {
     error,
     loading,
     initializeGame,
+    startGame,
     handleRoundComplete,
     goToSplash,
     goToLeaderboard,
@@ -25,7 +26,7 @@ export const App = () => {
 
   // Handle start game from splash
   const handleStartGame = () => {
-    initializeGame();
+    startGame();
   };
 
   // Error boundary error handler

@@ -116,19 +116,15 @@ export function discoverImagePairs(
 
   console.log(`Discovering image pairs for category: ${category}`);
 
-  // For now, we'll create a placeholder structure that expects
-  // users to upload files following the naming convention
+  // Since we can't read the file system in a serverless environment,
+  // we'll create pairs based on the known uploaded images
+  // This should be replaced with a manifest file or database in production
+  
+  // Create pairs based on known uploaded images
+  const knownPairs = getKnownImagePairs(category, config);
+  pairs.push(...knownPairs);
 
-  // This is a placeholder - in a real implementation, you would:
-  // 1. Read the actual file system
-  // 2. Or maintain a manifest file
-  // 3. Or use a database to track uploaded images
-
-  // For development, let's create some example pairs
-  const examplePairs = generateExamplePairs(category, config);
-  pairs.push(...examplePairs);
-
-  console.log(`Generated ${pairs.length} example pairs for category: ${category}`);
+  console.log(`Found ${pairs.length} known image pairs for category: ${category}`);
 
   if (pairs.length === 0) {
     warnings.push(`No image pairs found for category: ${category}`);
@@ -143,31 +139,78 @@ export function discoverImagePairs(
 }
 
 /**
- * Generates example image pairs for development/testing
- *
- * This creates placeholder pairs that follow the expected structure.
- * Replace this with actual file discovery in production.
+ * Gets known image pairs based on uploaded files
+ * 
+ * This function maps to the actual uploaded images in the public folder.
+ * In production, this should be replaced with a manifest file or database.
  */
-function generateExamplePairs(category: ImageCategory, config: ImageLoaderConfig): ImagePair[] {
+function getKnownImagePairs(
+  category: ImageCategory,
+  config: ImageLoaderConfig
+): ImagePair[] {
   const pairs: ImagePair[] = [];
-
-  // Create 3 example pairs per category for development
-  for (let i = 1; i <= 3; i++) {
-    const humanFilename = `pair${i}-human.jpg`;
-    const aiFilename = `pair${i}-ai.jpg`;
-
-    const humanImage = createImageAsset(category, i, false, humanFilename, config);
-    const aiImage = createImageAsset(category, i, true, aiFilename, config);
-
+  
+  // Define known image pairs based on what's actually uploaded
+  const knownPairs = getKnownPairsForCategory(category);
+  
+  for (const pairInfo of knownPairs) {
+    const humanImage = createImageAsset(category, pairInfo.pairNumber, false, pairInfo.humanFilename, config);
+    const aiImage = createImageAsset(category, pairInfo.pairNumber, true, pairInfo.aiFilename, config);
+    
     pairs.push({
-      pairNumber: i,
+      pairNumber: pairInfo.pairNumber,
       category,
       humanImage,
       aiImage,
     });
   }
-
+  
   return pairs;
+}
+
+/**
+ * Returns known image pairs for each category based on uploaded files
+ */
+function getKnownPairsForCategory(category: ImageCategory): Array<{
+  pairNumber: number;
+  humanFilename: string;
+  aiFilename: string;
+}> {
+  switch (category) {
+    case ImageCategory.ANIMALS:
+      return [
+        { pairNumber: 1, humanFilename: 'pair1-human.jpg', aiFilename: 'pair1-ai.jpg' },
+        { pairNumber: 2, humanFilename: 'pair2-human.jpg', aiFilename: 'pair2-ai.png' },
+        { pairNumber: 3, humanFilename: 'pair3-human.jpg', aiFilename: 'pair3-ai.png' },
+      ];
+    
+    case ImageCategory.ARCHITECTURE:
+      return [
+        { pairNumber: 1, humanFilename: 'pair1-human.jpg', aiFilename: 'pair1-ai.jpg' },
+        { pairNumber: 2, humanFilename: 'pair2-human.jpg', aiFilename: 'pair2-ai.png' },
+      ];
+    
+    case ImageCategory.FOOD:
+      return [
+        { pairNumber: 1, humanFilename: 'pair1-human.jpg', aiFilename: 'pair1-ai.jpg' },
+        { pairNumber: 2, humanFilename: 'pair2-human.jpg', aiFilename: 'pair2-ai.jpg' },
+      ];
+    
+    case ImageCategory.NATURE:
+      return [
+        { pairNumber: 1, humanFilename: 'pair1-human.jpg', aiFilename: 'pair1-ai.png' },
+        { pairNumber: 2, humanFilename: 'pair2-human.jpg', aiFilename: 'pair2-ai.jpg' },
+      ];
+    
+    case ImageCategory.PRODUCTS:
+      return [
+        { pairNumber: 1, humanFilename: 'pair1-human.jpg', aiFilename: 'pair1-ai.jpg' },
+        { pairNumber: 2, humanFilename: 'pair2-human.jpg', aiFilename: 'pair2-ai.png' },
+      ];
+    
+    default:
+      return [];
+  }
 }
 
 /**

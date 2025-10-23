@@ -28,7 +28,7 @@ import {
   incrementParticipantCount,
   initializeDailyGameState,
 } from './daily-game-manager.js';
-import { createSampleImageCollection } from './image-manager.js';
+import { createImageCollection } from './image-loader.js';
 import { addScoreToLeaderboards } from './leaderboard-manager.js';
 import { determineBadge } from './badge-manager.js';
 
@@ -110,13 +110,15 @@ export async function initializeGame(userId: string): Promise<GameInitResponse> 
 
       // Initialize daily game state with image collection
       try {
-        console.log('Creating sample image collection...');
-        const imageCollection = createSampleImageCollection();
-        console.log('Sample image collection created successfully');
+        console.log('Creating image collection from uploaded images...');
+        const imageCollection = createImageCollection();
+        console.log('Image collection created successfully from uploaded images');
 
         // Log collection stats
         for (const [category, images] of Object.entries(imageCollection)) {
-          console.log(`Category ${category}: ${images.length} images`);
+          if (Array.isArray(images)) {
+            console.log(`Category ${category}: ${images.length} images`);
+          }
         }
 
         console.log('Initializing daily game state...');
@@ -193,9 +195,9 @@ export async function startGame(userId: string): Promise<StartGameResponse> {
 
       // Initialize daily game state with image collection
       try {
-        console.log('Creating sample image collection during start game...');
-        const imageCollection = createSampleImageCollection();
-        console.log('Sample image collection created successfully during start game');
+        console.log('Creating image collection from uploaded images during start game...');
+        const imageCollection = createImageCollection();
+        console.log('Image collection created successfully from uploaded images during start game');
 
         console.log('Initializing daily game state during start game...');
         dailyGameResult = await initializeDailyGameState(redis, imageCollection);
