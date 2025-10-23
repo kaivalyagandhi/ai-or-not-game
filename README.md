@@ -266,7 +266,7 @@ src/
 - **Game State Management**: React hooks with `useGameState` managing flow between splash, playing, results, and leaderboard screens with comprehensive state validation and automatic session recovery
 - **Real-Time Updates**: Realtime connections via Devvit Realtime API for live participant counts and leaderboard updates with connection status indicators and automatic reconnection
 - **Timer System**: Client-side countdown with color-coded visual progress bar (green/yellow/red) and server-side validation with 3-second tolerance for network delays
-- **Image Handling**: Responsive aspect-square grid layout with hover effects, selection feedback, visual result overlays (📸/🤖), and mobile-optimized touch controls
+- **Image Handling**: Responsive aspect-square grid layout with hover effects, selection feedback, visual result overlays (📸/🤖), and mobile-optimized touch controls with error handling for failed image loads
 - **Score Calculation**: Time-based bonus system (0.01 points per millisecond) rewards quick accurate responses with server-side validation and fallback scoring
 - **Badge Assignment**: Automatic badge calculation based on correct answer count with visual badge cards, custom colors, emoji, and personalized descriptions
 - **Social Sharing**: Native sharing API with clipboard fallback and formatted result messages including detailed performance breakdown and challenge invitation

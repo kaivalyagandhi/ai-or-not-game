@@ -27,6 +27,16 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
     enableAutoRetry: false, // Don't auto-retry during gameplay
   });
 
+  // Reset component state when round changes
+  useEffect(() => {
+    console.log('New round started, resetting UI state');
+    setTimeRemaining(10);
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setFeedbackData(null);
+    setIsSubmitting(false);
+  }, [round.roundNumber]); // Reset when round number changes
+
   // Submit answer to server with enhanced error handling
   const submitAnswer = useCallback(async (answer: 'A' | 'B', timeLeft: number) => {
     if (isSubmitting) return;
@@ -106,6 +116,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   useEffect(() => {
     if (showFeedback || selectedAnswer) return;
 
+    console.log('Starting timer for round', round.roundNumber);
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
@@ -117,8 +128,11 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
       });
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [showFeedback, selectedAnswer, submitAnswer]);
+    return () => {
+      console.log('Clearing timer for round', round.roundNumber);
+      clearInterval(timer);
+    };
+  }, [showFeedback, selectedAnswer, submitAnswer, round.roundNumber]); // Added round.roundNumber
 
   // Get timer color based on remaining time
   const getTimerColor = () => {
@@ -193,8 +207,13 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
                   console.error('Failed to load image A:', round.imageA.url);
                   console.error('Image A error event:', e);
                 }}
-                onLoad={() => console.log('Successfully loaded image A:', round.imageA.url)}
-                className="w-full h-full object-cover"
+                onLoad={(e) => {
+                  console.log('Successfully loaded image A:', round.imageA.url);
+                  const img = e.target as HTMLImageElement;
+                  console.log('Image A dimensions:', img.naturalWidth, 'x', img.naturalHeight);
+                  console.log('Image A display size:', img.width, 'x', img.height);
+                }}
+                className="w-full h-full object-contain bg-gray-100"
               />
               
               {/* Feedback overlay */}
@@ -244,8 +263,13 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
                   console.error('Failed to load image B:', round.imageB.url);
                   console.error('Image B error event:', e);
                 }}
-                onLoad={() => console.log('Successfully loaded image B:', round.imageB.url)}
-                className="w-full h-full object-cover"
+                onLoad={(e) => {
+                  console.log('Successfully loaded image B:', round.imageB.url);
+                  const img = e.target as HTMLImageElement;
+                  console.log('Image B dimensions:', img.naturalWidth, 'x', img.naturalHeight);
+                  console.log('Image B display size:', img.width, 'x', img.height);
+                }}
+                className="w-full h-full object-contain bg-gray-100"
               />
               
               {/* Feedback overlay */}

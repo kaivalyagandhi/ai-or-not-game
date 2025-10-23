@@ -58,11 +58,36 @@ export function selectRandomImagePair(
     return null;
   }
 
-  // Select random AI and human images
-  const aiImage = aiImages[Math.floor(Math.random() * aiImages.length)]!;
-  const humanImage = humanImages[Math.floor(Math.random() * humanImages.length)]!;
-
-  return { aiImage, humanImage };
+  // Find matching pairs by extracting pair numbers from filenames
+  const matchingPairs: { aiImage: ImageAsset; humanImage: ImageAsset }[] = [];
+  
+  for (const aiImage of aiImages) {
+    // Extract pair number from AI image filename (e.g., "pair1-ai.jpg" -> 1)
+    const aiPairMatch = aiImage.filename.match(/pair(\d+)-ai\./);
+    if (!aiPairMatch) continue;
+    
+    const pairNumber = aiPairMatch[1];
+    
+    // Find matching human image with same pair number
+    const matchingHuman = humanImages.find(humanImage => 
+      humanImage.filename.includes(`pair${pairNumber}-human.`)
+    );
+    
+    if (matchingHuman) {
+      matchingPairs.push({ aiImage, humanImage: matchingHuman });
+    }
+  }
+  
+  if (matchingPairs.length === 0) {
+    console.warn(`No matching pairs found for category ${category}`);
+    return null;
+  }
+  
+  // Select a random matching pair
+  const selectedPair = matchingPairs[Math.floor(Math.random() * matchingPairs.length)]!;
+  console.log(`Selected pair for ${category}: ${selectedPair.humanImage.filename} + ${selectedPair.aiImage.filename}`);
+  
+  return selectedPair;
 }
 
 /**
