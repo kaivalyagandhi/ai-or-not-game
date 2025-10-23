@@ -366,6 +366,11 @@ export const useGameState = (): GameStateManager => {
 
   // Handle round completion with proper state transitions
   const handleRoundComplete = useCallback((response: SubmitAnswerResponse) => {
+    console.log('Round completed with response:', response);
+    console.log('Game complete?', response.gameComplete);
+    console.log('Has nextRound?', !!response.nextRound);
+    console.log('NextRound data:', response.nextRound);
+    
     if (!response.success) {
       setError(response.error || 'Failed to submit answer');
       setGameState('error');

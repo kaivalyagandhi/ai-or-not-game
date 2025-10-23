@@ -23,7 +23,7 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 
 ### Cutting-Edge AI Detection Challenge
 - **Daily Fresh Content**: New image sets generated every day at 00:00 UTC with completely randomized categories, AI placement, and difficulty progression across 5 diverse image categories
-- **Real-Time Social Competition**: Live participant counter shows how many players have attempted today's challenge, with real-time updates as new players join via WebSocket connections
+- **Real-Time Social Competition**: Live participant counter shows how many players have attempted today's challenge, with real-time updates as new players join via Devvit's Realtime API
 - **Intelligent Scoring Algorithm**: Sophisticated time-based scoring system rewards both accuracy (1 point per correct answer) and speed (0.01 bonus points per millisecond remaining), creating strategic tension between careful analysis and quick decisions
 - **Cross-Platform Integration**: Seamlessly embedded within Reddit's ecosystem, playable directly in posts on mobile and desktop with responsive design optimized for touch and mouse interactions
 
@@ -41,7 +41,7 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 - **Serverless Architecture**: Built on Devvit's modern serverless platform with Redis persistence for game state, session management, and leaderboard data
 - **Comprehensive Error Resilience**: Advanced error boundaries, network retry logic with exponential backoff, offline detection, and graceful degradation with local caching
 - **Mobile-First Responsive Design**: Touch-optimized interface with adaptive layouts, hover states, and gesture-friendly controls designed for Reddit's mobile-heavy user base
-- **Real-Time WebSocket Updates**: Live participant counting, leaderboard position changes, and rank updates without page refreshes using Devvit's Realtime API
+- **Real-Time Updates**: Live participant counting, leaderboard position changes, and rank updates without page refreshes using Devvit's Realtime API
 - **Anti-Cheat Protection**: Server-side timer validation, rate limiting, session integrity checks, and comprehensive input validation to ensure fair play
 - **Progressive Web App Features**: Offline support with smart caching, pending request queuing, and automatic retry when connection is restored
 - **Accessibility & Performance**: Optimized loading states, skeleton screens, error recovery, and comprehensive keyboard navigation support
@@ -67,7 +67,7 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 ### Complete Game Flow
 
 #### Pre-Game Setup (Splash Screen)
-- **Daily Challenge Display**: The splash screen shows the current date formatted as "Wednesday, October 23, 2025" and live participant count with real-time updates via WebSocket
+- **Daily Challenge Display**: The splash screen shows the current date formatted as "Wednesday, October 23, 2025" and live participant count with real-time updates via Devvit's Realtime API
 - **Live Participant Counter**: Real-time counter showing total players who have attempted today's challenge, with a green "Live" indicator when connected
 - **Game Rules Overview**: Clear instructions explaining the 5-round format, 10-second time limits, and scoring system
 - **One-Time Daily Access**: The game automatically checks if you've already played today - if so, you'll see your previous results instead of starting a new game
@@ -264,7 +264,7 @@ src/
 
 ### Key Features Implementation
 - **Game State Management**: React hooks with `useGameState` managing flow between splash, playing, results, and leaderboard screens with comprehensive state validation and automatic session recovery
-- **Real-Time Updates**: WebSocket connections via Devvit Realtime API for live participant counts and leaderboard updates with connection status indicators and automatic reconnection
+- **Real-Time Updates**: Realtime connections via Devvit Realtime API for live participant counts and leaderboard updates with connection status indicators and automatic reconnection
 - **Timer System**: Client-side countdown with color-coded visual progress bar (green/yellow/red) and server-side validation with 3-second tolerance for network delays
 - **Image Handling**: Responsive aspect-square grid layout with hover effects, selection feedback, visual result overlays (📸/🤖), and mobile-optimized touch controls
 - **Score Calculation**: Time-based bonus system (0.01 points per millisecond) rewards quick accurate responses with server-side validation and fallback scoring
@@ -312,8 +312,8 @@ This project includes pre-configured Cursor IDE integration. To get started:
 
 ## 📈 Future Enhancements
 
-- Weekly and all-time leaderboards
-- Real-time multiplayer competitions  
 - Expanded image categories and difficulty levels
+- Real-time multiplayer competitions  
 - Achievement system with unlockable content
 - Community-generated image submissions
+- Advanced AI detection tutorials and training modes
