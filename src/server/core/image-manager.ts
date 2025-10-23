@@ -372,7 +372,11 @@ export function createSampleImageCollection(): ImageCollection {
 // Helper functions
 function isValidUrl(url: string): boolean {
   try {
-    new URL(url);
+    // Accept relative URLs (starting with /) or absolute URLs
+    if (url.startsWith('/')) {
+      return true; // Relative URLs are valid in web context
+    }
+    new URL(url); // Validate absolute URLs
     return true;
   } catch {
     return false;
