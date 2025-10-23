@@ -701,6 +701,47 @@ router.get('/api/debug/clear-daily-state', async (_req, res): Promise<void> => {
   }
 });
 
+// Game results persistence endpoint
+router.post('/api/game/results', async (req, res): Promise<void> => {
+  try {
+    console.log('API /game/results called with body:', req.body);
+    
+    // The results are already persisted during the game flow via submitAnswer
+    // This endpoint is mainly for client-side confirmation and cleanup
+    
+    // Validate the request has required fields
+    const { sessionId, userId, totalScore, correctCount, badge } = req.body;
+    
+    if (!sessionId || !userId || typeof totalScore !== 'number' || typeof correctCount !== 'number') {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields',
+      });
+    }
+    
+    console.log('Game results received:', {
+      sessionId,
+      userId,
+      totalScore,
+      correctCount,
+      badge,
+    });
+    
+    // Return success - the actual persistence happens during gameplay
+    res.json({
+      success: true,
+      message: 'Results received successfully',
+    });
+    
+  } catch (error) {
+    console.error('Error in /api/game/results:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
 // Test endpoint for manual daily reset (development only)
 router.post('/api/test/daily-reset', async (_req, res): Promise<void> => {
   const jobResult = await executeSchedulerJob(

@@ -106,17 +106,25 @@ export async function initializeGame(userId: string): Promise<GameInitResponse> 
     // Check if daily game is available, initialize if needed
     let dailyGameResult = await getDailyGameState(redis);
 
-    // Check if existing state uses sample images and force refresh if so
+    // Check if existing state uses sample images or mismatched pairs and force refresh if so
     if (dailyGameResult.success && dailyGameResult.gameState) {
       const firstRound = dailyGameResult.gameState.imageSet[0];
-      if (firstRound && firstRound.imageA.url.includes('example.com')) {
-        console.log('Detected sample images in cached state, clearing cache...');
+      const shouldClearCache =
+        firstRound &&
+        (firstRound.imageA.url.includes('example.com') || // Sample images
+          firstRound.imageB.url.includes('example.com') || // Sample images
+          !arePairsMatched(firstRound)); // Mismatched pairs
+
+      if (shouldClearCache) {
+        console.log(
+          'Detected outdated cached state (sample images or mismatched pairs), clearing cache...'
+        );
         const today = new Date().toISOString().split('T')[0];
         const gameStateKey = `daily_game:${today}`;
         const participantCountKey = `daily_participants:${today}`;
         await redis.del(gameStateKey);
         await redis.del(participantCountKey);
-        console.log('Cleared cached daily game state with sample images');
+        console.log('Cleared cached daily game state');
         dailyGameResult = { success: false, error: 'Cache cleared' };
       }
     }
@@ -213,17 +221,25 @@ export async function startGame(userId: string): Promise<StartGameResponse> {
     // Get daily game state, initialize if needed
     let dailyGameResult = await getDailyGameState(redis);
 
-    // Check if existing state uses sample images and force refresh if so
+    // Check if existing state uses sample images or mismatched pairs and force refresh if so
     if (dailyGameResult.success && dailyGameResult.gameState) {
       const firstRound = dailyGameResult.gameState.imageSet[0];
-      if (firstRound && firstRound.imageA.url.includes('example.com')) {
-        console.log('Detected sample images in cached state during start game, clearing cache...');
+      const shouldClearCache =
+        firstRound &&
+        (firstRound.imageA.url.includes('example.com') || // Sample images
+          firstRound.imageB.url.includes('example.com') || // Sample images
+          !arePairsMatched(firstRound)); // Mismatched pairs
+
+      if (shouldClearCache) {
+        console.log(
+          'Detected outdated cached state during start game (sample images or mismatched pairs), clearing cache...'
+        );
         const today = new Date().toISOString().split('T')[0];
         const gameStateKey = `daily_game:${today}`;
         const participantCountKey = `daily_participants:${today}`;
         await redis.del(gameStateKey);
         await redis.del(participantCountKey);
-        console.log('Cleared cached daily game state with sample images during start game');
+        console.log('Cleared cached daily game state during start game');
         dailyGameResult = { success: false, error: 'Cache cleared' };
       }
     }
@@ -811,6 +827,23 @@ export async function submitAnswer(
       error: 'Failed to submit answer. Please try again.',
     };
   }
+}
+
+/**
+ * Check if images in a round are from the same pair
+ */
+function arePairsMatched(round: GameRound): boolean {
+  const imageAMatch = round.imageA.url.match(/pair(\d+)-/);
+  const imageBMatch = round.imageB.url.match(/pair(\d+)-/);
+
+  if (!imageAMatch || !imageBMatch) {
+    return false; // Can't determine pair numbers
+  }
+
+  const pairA = imageAMatch[1];
+  const pairB = imageBMatch[1];
+
+  return pairA === pairB;
 }
 
 /**
