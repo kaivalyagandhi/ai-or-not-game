@@ -145,11 +145,15 @@ router.post<object, StartGameResponse, StartGameRequest>(
   '/api/game/start',
   async (_req, res): Promise<void> => {
     try {
+      console.log('API /game/start called');
       // Get current user ID from Reddit context
       const username = await getCurrentUsername();
+      console.log('Got username for start game:', username);
       const userId = username; // Use username as user ID
 
+      console.log('Calling startGame with userId:', userId);
       const result = await startGame(userId);
+      console.log('startGame result:', result);
 
       // If game started successfully, register participant
       if (result.success) {

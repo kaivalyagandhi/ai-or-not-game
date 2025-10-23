@@ -14,25 +14,25 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 - **5 rounds per game** with exactly 10 seconds per round
 - **5 image categories**: Animals, Architecture, Nature, Food, and Products
 - **Side-by-side comparison**: Two images displayed simultaneously - one real, one AI-generated
-- **Time-pressure scoring**: Faster correct answers earn higher scores with time bonuses
-- **One attempt per day**: Each player gets exactly one chance per 24-hour period
-- **Immediate feedback**: See the correct answer and explanation after each round
+- **Time-pressure scoring**: Faster correct answers earn higher scores with time bonuses (0.01 points per millisecond remaining)
+- **One attempt per day**: Each player gets exactly one chance per 24-hour period (resets at 00:00 UTC)
+- **Immediate feedback**: See the correct answer and explanation after each round with visual overlays
 - **Progressive difficulty**: Mixed categories and randomized AI placement keep players guessing
 
 ## 🎮 What Makes This Game Revolutionary
 
 ### Cutting-Edge AI Detection Challenge
 - **Daily Fresh Content**: New image sets generated every day at 00:00 UTC with completely randomized categories, AI placement, and difficulty progression across 5 diverse image categories
-- **Real-Time Social Competition**: Live participant counter shows how many players have attempted today's challenge, with real-time updates as new players join
+- **Real-Time Social Competition**: Live participant counter shows how many players have attempted today's challenge, with real-time updates as new players join via WebSocket connections
 - **Intelligent Scoring Algorithm**: Sophisticated time-based scoring system rewards both accuracy (1 point per correct answer) and speed (0.01 bonus points per millisecond remaining), creating strategic tension between careful analysis and quick decisions
 - **Cross-Platform Integration**: Seamlessly embedded within Reddit's ecosystem, playable directly in posts on mobile and desktop with responsive design optimized for touch and mouse interactions
 
 ### Advanced Social & Community Features
 - **Dynamic Achievement System**: Earn performance-based badges with custom emoji and descriptions:
-  - 🧙‍♂️ **AI Whisperer** (5/5 correct): "You can spot AI from a mile away"
-  - 😇 **Good Samaritan** (4/5 correct): "You got most of them right"
-  - 🙂 **Just Human** (3/5 correct): "You're getting the hang of this"
-  - 🤖 **Human in Training** (≤2/5 correct): "AI is getting better every day"
+  - 🧙‍♂️ **AI Whisperer** (5/5 correct): "Perfect score! You can spot AI from a mile away"
+  - 😇 **Good Samaritan** (4/5 correct): "Great job! You got most of them right"
+  - 🙂 **Just Human** (3/5 correct): "Not bad! You're getting the hang of this"
+  - 🤖 **Human in Training** (≤2/5 correct): "Keep practicing! AI is getting better every day"
 - **Multi-Tier Live Leaderboards**: Real-time daily, weekly, and all-time rankings with live position updates, user highlighting, and total participant tracking
 - **Smart Social Sharing**: Native sharing API integration with clipboard fallback, generating formatted result messages with detailed performance breakdowns for social media
 - **Community-Driven Competition**: Built natively for Reddit with automatic user authentication, username display, and seamless social features

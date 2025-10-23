@@ -316,7 +316,11 @@ export const useGameState = (): GameStateManager => {
           baseDelay: 1000,
         });
         
+        console.log('Start game response:', data);
+        
         if (data.success && data.currentRound && data.sessionId) {
+          console.log('Setting current round:', data.currentRound);
+          console.log('Setting session ID:', data.sessionId);
           setCurrentRound(data.currentRound);
           const updatedSession = session ? { ...session, sessionId: data.sessionId } : null;
           setSession(updatedSession);
@@ -327,6 +331,8 @@ export const useGameState = (): GameStateManager => {
             gameStorage.saveSession(updatedSession);
           }
         } else {
+          console.error('Start game failed. Response:', data);
+          console.error('Missing data - success:', data.success, 'currentRound:', !!data.currentRound, 'sessionId:', !!data.sessionId);
           throw new Error(data.error || 'Failed to start game');
         }
       } catch (err) {
