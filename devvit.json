@@ -30,6 +30,15 @@
   "triggers": {
     "onAppInstall": "/internal/on-app-install"
   },
+  "scheduler": {
+    "jobs": [
+      {
+        "name": "daily-reset",
+        "cron": "0 0 * * *",
+        "endpoint": "/internal/scheduler/daily-reset"
+      }
+    ]
+  },
   "dev": {
     "subreddit": "spot_the_bot_dev"
   }

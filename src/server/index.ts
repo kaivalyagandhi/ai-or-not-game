@@ -1,7 +1,22 @@
 import express from 'express';
-import { InitResponse, IncrementResponse, DecrementResponse } from '../shared/types/api';
+import {
+  InitResponse,
+  IncrementResponse,
+  DecrementResponse,
+  GameInitResponse,
+  StartGameResponse,
+  StartGameRequest,
+  SubmitAnswerResponse,
+  SubmitAnswerRequest,
+} from '../shared/types/api';
 import { redis, reddit, createServer, context, getServerPort } from '@devvit/web/server';
 import { createPost } from './core/post';
+import { resetDailyGameState } from './core/daily-game-manager.js';
+import { createSampleImageCollection } from './core/image-manager.js';
+import { executeSchedulerJob } from './core/scheduler-manager.js';
+import { initializeGame, startGame, submitAnswer, getCurrentUsername } from './core/game-logic.js';
+import { getAllBadgeDisplayInfo, calculateBadgeProgress } from './core/badge-manager.js';
+import { BadgeType } from '../shared/types/api.js';
 
 const app = express();
 
@@ -91,6 +106,110 @@ router.post<{ postId: string }, DecrementResponse | { status: string; message: s
   }
 );
 
+// Game API Endpoints
+
+router.get<object, GameInitResponse>('/api/game/init', async (_req, res): Promise<void> => {
+  try {
+    // Get current user ID from Reddit context
+    const username = await getCurrentUsername();
+    const userId = username; // Use username as user ID
+
+    const result = await initializeGame(userId);
+    res.json(result);
+  } catch (error) {
+    console.error('Error in /api/game/init:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+router.post<object, StartGameResponse, StartGameRequest>(
+  '/api/game/start',
+  async (_req, res): Promise<void> => {
+    try {
+      // Get current user ID from Reddit context
+      const username = await getCurrentUsername();
+      const userId = username; // Use username as user ID
+
+      const result = await startGame(userId);
+      res.json(result);
+    } catch (error) {
+      console.error('Error in /api/game/start:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+      });
+    }
+  }
+);
+
+router.post<object, SubmitAnswerResponse, SubmitAnswerRequest>(
+  '/api/game/submit-answer',
+  async (req, res): Promise<void> => {
+    try {
+      // Get current user ID from Reddit context
+      const username = await getCurrentUsername();
+      const userId = username; // Use username as user ID
+
+      const { sessionId, roundNumber, userAnswer, timeRemaining } = req.body;
+
+      const result = await submitAnswer(userId, sessionId, roundNumber, userAnswer, timeRemaining);
+      res.json(result);
+    } catch (error) {
+      console.error('Error in /api/game/submit-answer:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+      });
+    }
+  }
+);
+
+router.get('/api/badges/all', async (_req, res): Promise<void> => {
+  try {
+    // Return all badge information for display
+    const badges = getAllBadgeDisplayInfo(BadgeType.HUMAN_IN_TRAINING); // Default to show all as unearned
+    res.json({
+      success: true,
+      badges,
+    });
+  } catch (error) {
+    console.error('Error in /api/badges/all:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+router.get('/api/badges/progress/:correctCount', async (req, res): Promise<void> => {
+  try {
+    const correctCount = parseInt(req.params.correctCount, 10);
+
+    if (isNaN(correctCount) || correctCount < 0 || correctCount > 5) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid correct count. Must be between 0 and 5.',
+      });
+      return;
+    }
+
+    const progress = calculateBadgeProgress(correctCount);
+    res.json({
+      success: true,
+      progress,
+    });
+  } catch (error) {
+    console.error('Error in /api/badges/progress:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
 router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
   try {
     const post = await createPost();
@@ -120,6 +239,94 @@ router.post('/internal/menu/post-create', async (_req, res): Promise<void> => {
     res.status(400).json({
       status: 'error',
       message: 'Failed to create post',
+    });
+  }
+});
+
+router.post('/internal/scheduler/daily-reset', async (_req, res): Promise<void> => {
+  const jobResult = await executeSchedulerJob(
+    'daily-reset',
+    async () => {
+      // Create sample image collection (in production, this would load from actual image assets)
+      const imageCollection = createSampleImageCollection();
+
+      // Reset daily game state with new randomized content
+      const resetResult = await resetDailyGameState(redis, imageCollection);
+
+      if (!resetResult.success) {
+        throw new Error(resetResult.error || 'Failed to reset daily game state');
+      }
+
+      return {
+        date: resetResult.gameState?.date,
+        categoryOrder: resetResult.gameState?.categoryOrder,
+        roundCount: resetResult.gameState?.imageSet.length,
+        participantCount: resetResult.gameState?.participantCount,
+      };
+    },
+    {
+      jobName: 'daily-reset',
+      scheduledTime: '00:00 UTC',
+      executionTime: new Date().toISOString(),
+    }
+  );
+
+  if (jobResult.success) {
+    res.json({
+      status: 'success',
+      message: jobResult.message,
+      data: jobResult.data,
+      timestamp: jobResult.timestamp,
+    });
+  } else {
+    res.status(500).json({
+      status: 'error',
+      message: jobResult.message,
+      error: jobResult.error,
+      timestamp: jobResult.timestamp,
+    });
+  }
+});
+
+// Test endpoint for manual daily reset (development only)
+router.post('/api/test/daily-reset', async (_req, res): Promise<void> => {
+  const jobResult = await executeSchedulerJob(
+    'daily-reset-test',
+    async () => {
+      const imageCollection = createSampleImageCollection();
+      const resetResult = await resetDailyGameState(redis, imageCollection);
+
+      if (!resetResult.success) {
+        throw new Error(resetResult.error || 'Failed to reset daily game state');
+      }
+
+      return {
+        date: resetResult.gameState?.date,
+        categoryOrder: resetResult.gameState?.categoryOrder,
+        roundCount: resetResult.gameState?.imageSet.length,
+        participantCount: resetResult.gameState?.participantCount,
+      };
+    },
+    {
+      jobName: 'daily-reset-test',
+      scheduledTime: 'manual',
+      executionTime: new Date().toISOString(),
+    }
+  );
+
+  if (jobResult.success) {
+    res.json({
+      status: 'success',
+      message: 'Manual daily reset completed successfully',
+      data: jobResult.data,
+      timestamp: jobResult.timestamp,
+    });
+  } else {
+    res.status(500).json({
+      status: 'error',
+      message: 'Manual daily reset failed',
+      error: jobResult.error,
+      timestamp: jobResult.timestamp,
     });
   }
 });

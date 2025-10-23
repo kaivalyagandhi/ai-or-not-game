@@ -1,0 +1,614 @@
+/**
+ * Core Game Logic and Round Management
+ *
+ * This module handles game initialization, round progression logic,
+ * and validation to ensure proper game flow and prevent cheating.
+ */
+
+import { redis, reddit } from '@devvit/web/server';
+import {
+  GameSession,
+  GameRound,
+  BadgeType,
+  GameInitResponse,
+  StartGameResponse,
+  SubmitAnswerResponse,
+} from '../../shared/types/api.js';
+import {
+  createGameSession,
+  getGameSession,
+  updateGameSession,
+  hasUserPlayedToday,
+  getUserDailyCompletion,
+  markDailyCompleted,
+  SessionError,
+} from './session-manager.js';
+import { getDailyGameState, incrementParticipantCount } from './daily-game-manager.js';
+import { addScoreToLeaderboards } from './leaderboard-manager.js';
+import { determineBadge } from './badge-manager.js';
+
+/**
+ * Game Logic Errors
+ */
+export class GameLogicError extends Error {
+  constructor(
+    message: string,
+    public code: string
+  ) {
+    super(message);
+    this.name = 'GameLogicError';
+  }
+}
+
+export const GAME_LOGIC_ERROR_CODES = {
+  INVALID_USER_ID: 'INVALID_USER_ID',
+  INVALID_SESSION_ID: 'INVALID_SESSION_ID',
+  GAME_NOT_INITIALIZED: 'GAME_NOT_INITIALIZED',
+  DAILY_GAME_NOT_AVAILABLE: 'DAILY_GAME_NOT_AVAILABLE',
+  ALREADY_COMPLETED: 'ALREADY_COMPLETED',
+  SESSION_NOT_FOUND: 'SESSION_NOT_FOUND',
+  INVALID_GAME_STATE: 'INVALID_GAME_STATE',
+  REDIS_ERROR: 'REDIS_ERROR',
+} as const;
+
+/**
+ * Initialize game for a user - check if they can play and return appropriate response
+ */
+export async function initializeGame(userId: string): Promise<GameInitResponse> {
+  try {
+    // Validate user ID
+    if (!userId || typeof userId !== 'string') {
+      return {
+        success: false,
+        error: 'Invalid user ID',
+      };
+    }
+
+    // Check if user has already played today
+    const hasPlayed = await hasUserPlayedToday(userId);
+    if (hasPlayed) {
+      // Return their existing completion data
+      const completionData = await getUserDailyCompletion(userId);
+      if (completionData && typeof completionData === 'object') {
+        const data = completionData as {
+          sessionId: string;
+          completedAt: number;
+          totalScore: number;
+          correctCount: number;
+          badge: BadgeType;
+        };
+
+        // Create a mock session object with their results
+        const completedSession: GameSession = {
+          userId,
+          sessionId: data.sessionId,
+          startTime: data.completedAt,
+          rounds: [], // Don't need to return full rounds for completed games
+          totalScore: data.totalScore,
+          correctCount: data.correctCount,
+          totalTimeBonus: 0, // Will be calculated from totalScore - correctCount
+          badge: data.badge,
+          completed: true,
+        };
+
+        return {
+          success: true,
+          session: completedSession,
+        };
+      }
+    }
+
+    // Check if daily game is available
+    const dailyGameResult = await getDailyGameState(redis);
+    if (!dailyGameResult.success || !dailyGameResult.gameState) {
+      return {
+        success: false,
+        error: 'Daily game not available. Please try again later.',
+      };
+    }
+
+    // User can play - return success with no session (they need to start the game)
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error('Error initializing game:', error);
+
+    if (error instanceof SessionError) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: false,
+      error: 'Failed to initialize game. Please try again.',
+    };
+  }
+}
+
+/**
+ * Start a new game session for a user
+ */
+export async function startGame(userId: string): Promise<StartGameResponse> {
+  try {
+    // Validate user ID
+    if (!userId || typeof userId !== 'string') {
+      return {
+        success: false,
+        error: 'Invalid user ID',
+      };
+    }
+
+    // Check if user has already played today
+    const hasPlayed = await hasUserPlayedToday(userId);
+    if (hasPlayed) {
+      return {
+        success: false,
+        error: "You have already completed today's challenge",
+      };
+    }
+
+    // Get daily game state
+    const dailyGameResult = await getDailyGameState(redis);
+    if (!dailyGameResult.success || !dailyGameResult.gameState) {
+      return {
+        success: false,
+        error: 'Daily game not available. Please try again later.',
+      };
+    }
+
+    const { gameState } = dailyGameResult;
+
+    // Create new game session
+    const session = await createGameSession(userId);
+
+    // Populate session with daily game rounds
+    session.rounds = [...gameState.imageSet]; // Copy the rounds
+
+    // Update session in Redis
+    await updateGameSession(session);
+
+    // Increment participant count
+    await incrementParticipantCount(redis);
+
+    // Return first round
+    const firstRound = session.rounds[0];
+    if (!firstRound) {
+      return {
+        success: false,
+        error: "No rounds available for today's game",
+      };
+    }
+
+    return {
+      success: true,
+      sessionId: session.sessionId,
+      currentRound: firstRound,
+    };
+  } catch (error) {
+    console.error('Error starting game:', error);
+
+    if (error instanceof SessionError) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: false,
+      error: 'Failed to start game. Please try again.',
+    };
+  }
+}
+
+/**
+ * Get current round for an active session
+ */
+export async function getCurrentRound(
+  userId: string,
+  sessionId: string
+): Promise<GameRound | null> {
+  try {
+    // Get session
+    const session = await getGameSession(userId, sessionId);
+    if (!session) {
+      throw new GameLogicError('Session not found', GAME_LOGIC_ERROR_CODES.SESSION_NOT_FOUND);
+    }
+
+    // Check if game is completed
+    if (session.completed) {
+      return null; // Game is finished
+    }
+
+    // Find the next unanswered round
+    const currentRound = session.rounds.find((round) => round.userAnswer === undefined);
+    return currentRound || null;
+  } catch (error) {
+    console.error('Error getting current round:', error);
+    throw error;
+  }
+}
+
+/**
+ * Validate game session state
+ */
+export function validateGameSession(session: GameSession): { isValid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  // Validate basic session properties
+  if (!session.userId || typeof session.userId !== 'string') {
+    errors.push('Invalid user ID');
+  }
+
+  if (!session.sessionId || typeof session.sessionId !== 'string') {
+    errors.push('Invalid session ID');
+  }
+
+  if (!session.startTime || typeof session.startTime !== 'number') {
+    errors.push('Invalid start time');
+  }
+
+  // Validate rounds
+  if (!Array.isArray(session.rounds)) {
+    errors.push('Rounds must be an array');
+  } else {
+    if (session.rounds.length !== 5) {
+      errors.push('Session must have exactly 5 rounds');
+    }
+
+    // Validate each round
+    session.rounds.forEach((round, index) => {
+      if (round.roundNumber !== index + 1) {
+        errors.push(`Round ${index + 1} has incorrect round number: ${round.roundNumber}`);
+      }
+
+      if (!round.imageA || !round.imageB) {
+        errors.push(`Round ${index + 1} is missing images`);
+      }
+
+      if (!['A', 'B'].includes(round.correctAnswer)) {
+        errors.push(`Round ${index + 1} has invalid correct answer: ${round.correctAnswer}`);
+      }
+
+      if (!['A', 'B'].includes(round.aiImagePosition)) {
+        errors.push(`Round ${index + 1} has invalid AI image position: ${round.aiImagePosition}`);
+      }
+    });
+  }
+
+  // Validate score fields
+  if (typeof session.totalScore !== 'number' || session.totalScore < 0) {
+    errors.push('Invalid total score');
+  }
+
+  if (
+    typeof session.correctCount !== 'number' ||
+    session.correctCount < 0 ||
+    session.correctCount > 5
+  ) {
+    errors.push('Invalid correct count');
+  }
+
+  if (typeof session.totalTimeBonus !== 'number' || session.totalTimeBonus < 0) {
+    errors.push('Invalid time bonus');
+  }
+
+  // Validate badge
+  if (!Object.values(BadgeType).includes(session.badge)) {
+    errors.push('Invalid badge type');
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Check if a session is in a valid state for gameplay
+ */
+export function isSessionPlayable(session: GameSession): boolean {
+  // Session must not be completed
+  if (session.completed) {
+    return false;
+  }
+
+  // Session must have unanswered rounds
+  const unansweredRounds = session.rounds.filter((round) => round.userAnswer === undefined);
+  return unansweredRounds.length > 0;
+}
+
+/**
+ * Get game progress for a session
+ */
+export function getGameProgress(session: GameSession): {
+  currentRoundNumber: number;
+  totalRounds: number;
+  answeredRounds: number;
+  remainingRounds: number;
+  isComplete: boolean;
+} {
+  const totalRounds = session.rounds.length;
+  const answeredRounds = session.rounds.filter((round) => round.userAnswer !== undefined).length;
+  const remainingRounds = totalRounds - answeredRounds;
+  const isComplete = session.completed || remainingRounds === 0;
+  const currentRoundNumber = answeredRounds + 1;
+
+  return {
+    currentRoundNumber: Math.min(currentRoundNumber, totalRounds),
+    totalRounds,
+    answeredRounds,
+    remainingRounds,
+    isComplete,
+  };
+}
+
+/**
+ * Validate that a user can make a move (anti-cheat)
+ */
+export async function validateUserCanPlay(
+  userId: string,
+  sessionId: string
+): Promise<{
+  canPlay: boolean;
+  reason?: string;
+  session?: GameSession;
+}> {
+  try {
+    // Get session
+    const session = await getGameSession(userId, sessionId);
+    if (!session) {
+      return {
+        canPlay: false,
+        reason: 'Session not found',
+      };
+    }
+
+    // Validate session integrity
+    const validation = validateGameSession(session);
+    if (!validation.isValid) {
+      return {
+        canPlay: false,
+        reason: `Invalid session: ${validation.errors.join(', ')}`,
+      };
+    }
+
+    // Check if session is playable
+    if (!isSessionPlayable(session)) {
+      return {
+        canPlay: false,
+        reason: 'Game session is not in a playable state',
+        session,
+      };
+    }
+
+    // Check session timing (prevent sessions that are too old)
+    const sessionAge = Date.now() - session.startTime;
+    const maxSessionAge = 24 * 60 * 60 * 1000; // 24 hours
+    if (sessionAge > maxSessionAge) {
+      return {
+        canPlay: false,
+        reason: 'Session has expired',
+      };
+    }
+
+    return {
+      canPlay: true,
+      session,
+    };
+  } catch (error) {
+    console.error('Error validating user can play:', error);
+    return {
+      canPlay: false,
+      reason: 'Validation error occurred',
+    };
+  }
+}
+
+/**
+ * Calculate score for a round based on correctness and time remaining
+ */
+export function calculateRoundScore(isCorrect: boolean, timeRemaining: number): number {
+  if (!isCorrect) {
+    return 0; // No points for incorrect answers
+  }
+
+  // 1 point for correct answer + time bonus (0.01 points per millisecond remaining)
+  const correctnessPoints = 1;
+  const timeBonus = Math.max(0, timeRemaining) * 0.01;
+
+  return correctnessPoints + timeBonus;
+}
+
+/**
+ * Submit answer for a round and get immediate feedback
+ */
+export async function submitAnswer(
+  userId: string,
+  sessionId: string,
+  roundNumber: number,
+  userAnswer: 'A' | 'B',
+  timeRemaining: number
+): Promise<SubmitAnswerResponse> {
+  try {
+    // Validate inputs
+    if (!userId || typeof userId !== 'string') {
+      return {
+        success: false,
+        error: 'Invalid user ID',
+      };
+    }
+
+    if (!sessionId || typeof sessionId !== 'string') {
+      return {
+        success: false,
+        error: 'Invalid session ID',
+      };
+    }
+
+    if (typeof roundNumber !== 'number' || roundNumber < 1 || roundNumber > 5) {
+      return {
+        success: false,
+        error: 'Invalid round number',
+      };
+    }
+
+    if (!['A', 'B'].includes(userAnswer)) {
+      return {
+        success: false,
+        error: 'Invalid answer. Must be A or B',
+      };
+    }
+
+    if (typeof timeRemaining !== 'number' || timeRemaining < 0) {
+      return {
+        success: false,
+        error: 'Invalid time remaining',
+      };
+    }
+
+    // Validate user can play
+    const validation = await validateUserCanPlay(userId, sessionId);
+    if (!validation.canPlay || !validation.session) {
+      return {
+        success: false,
+        error: validation.reason || 'Cannot submit answer',
+      };
+    }
+
+    const session = validation.session;
+
+    // Find the round
+    const round = session.rounds.find((r) => r.roundNumber === roundNumber);
+    if (!round) {
+      return {
+        success: false,
+        error: 'Round not found',
+      };
+    }
+
+    // Check if round was already answered
+    if (round.userAnswer !== undefined) {
+      return {
+        success: false,
+        error: 'Round already answered',
+      };
+    }
+
+    // Validate server-side timer (anti-cheat)
+    const maxTimePerRound = 10000; // 10 seconds in milliseconds
+    if (timeRemaining > maxTimePerRound) {
+      return {
+        success: false,
+        error: 'Invalid time remaining - exceeds maximum',
+      };
+    }
+
+    // Process the answer
+    const isCorrect = userAnswer === round.correctAnswer;
+    const roundScore = calculateRoundScore(isCorrect, timeRemaining);
+
+    // Update round with user's answer
+    round.userAnswer = userAnswer;
+    round.timeRemaining = timeRemaining;
+    round.isCorrect = isCorrect;
+
+    // Update session scores
+    if (isCorrect) {
+      session.correctCount += 1;
+      session.totalTimeBonus += timeRemaining * 0.01;
+    }
+    session.totalScore += roundScore;
+
+    // Check if game is complete
+    const answeredRounds = session.rounds.filter((r) => r.userAnswer !== undefined).length;
+    const gameComplete = answeredRounds === 5;
+
+    let finalResults;
+    if (gameComplete) {
+      // Calculate final badge
+      session.badge = determineBadge(session.correctCount);
+      session.completed = true;
+
+      finalResults = {
+        totalScore: session.totalScore,
+        correctCount: session.correctCount,
+        timeBonus: session.totalTimeBonus,
+        badge: session.badge,
+      };
+
+      // Mark daily completion and add to leaderboards
+      await markDailyCompleted(userId, session);
+
+      // Add to leaderboards
+      const username = await getCurrentUsername();
+      await addScoreToLeaderboards(
+        userId,
+        username,
+        session.totalScore,
+        session.correctCount,
+        session.totalTimeBonus,
+        session.badge,
+        Date.now()
+      );
+    }
+
+    // Update session in Redis
+    await updateGameSession(session);
+
+    // Get next round if game is not complete
+    let nextRound;
+    if (!gameComplete) {
+      nextRound = session.rounds.find((r) => r.userAnswer === undefined);
+    }
+
+    const response: SubmitAnswerResponse = {
+      success: true,
+      isCorrect,
+      correctAnswer: round.correctAnswer,
+      aiImagePosition: round.aiImagePosition,
+      roundScore,
+      gameComplete,
+    };
+
+    if (nextRound) {
+      response.nextRound = nextRound;
+    }
+
+    if (finalResults) {
+      response.finalResults = finalResults;
+    }
+
+    return response;
+  } catch (error) {
+    console.error('Error submitting answer:', error);
+
+    if (error instanceof SessionError) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: false,
+      error: 'Failed to submit answer. Please try again.',
+    };
+  }
+}
+
+/**
+ * Get user's current username from Reddit
+ */
+export async function getCurrentUsername(): Promise<string> {
+  try {
+    const username = await reddit.getCurrentUsername();
+    return username || 'anonymous';
+  } catch (error) {
+    console.error('Error getting current username:', error);
+    return 'anonymous';
+  }
+}
