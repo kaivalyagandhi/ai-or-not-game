@@ -122,11 +122,15 @@ router.post<{ postId: string }, DecrementResponse | { status: string; message: s
 
 router.get<object, GameInitResponse>('/api/game/init', async (_req, res): Promise<void> => {
   try {
+    console.log('API /game/init called');
     // Get current user ID from Reddit context
     const username = await getCurrentUsername();
+    console.log('Got username:', username);
     const userId = username; // Use username as user ID
 
+    console.log('Calling initializeGame with userId:', userId);
     const result = await initializeGame(userId);
+    console.log('initializeGame result:', result);
     res.json(result);
   } catch (error) {
     console.error('Error in /api/game/init:', error);

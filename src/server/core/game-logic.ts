@@ -23,8 +23,11 @@ import {
   markDailyCompleted,
   SessionError,
 } from './session-manager.js';
-import { getDailyGameState, incrementParticipantCount, initializeDailyGameState } from './daily-game-manager.js';
-import { createImageCollection } from './image-loader.js';
+import {
+  getDailyGameState,
+  incrementParticipantCount,
+  initializeDailyGameState,
+} from './daily-game-manager.js';
 import { createSampleImageCollection } from './image-manager.js';
 import { addScoreToLeaderboards } from './leaderboard-manager.js';
 import { determineBadge } from './badge-manager.js';
@@ -104,21 +107,21 @@ export async function initializeGame(userId: string): Promise<GameInitResponse> 
     let dailyGameResult = await getDailyGameState(redis);
     if (!dailyGameResult.success || !dailyGameResult.gameState) {
       console.log('Daily game state not found, initializing...');
-      
+
       // Initialize daily game state with image collection
       try {
         console.log('Creating sample image collection...');
         const imageCollection = createSampleImageCollection();
         console.log('Sample image collection created successfully');
-        
+
         // Log collection stats
         for (const [category, images] of Object.entries(imageCollection)) {
           console.log(`Category ${category}: ${images.length} images`);
         }
-        
+
         console.log('Initializing daily game state...');
         dailyGameResult = await initializeDailyGameState(redis, imageCollection);
-        
+
         if (!dailyGameResult.success || !dailyGameResult.gameState) {
           console.error('Daily game state initialization failed:', dailyGameResult.error);
           return {
@@ -126,7 +129,7 @@ export async function initializeGame(userId: string): Promise<GameInitResponse> 
             error: `Daily game initialization failed: ${dailyGameResult.error}`,
           };
         }
-        
+
         console.log('Daily game state initialized successfully');
       } catch (error) {
         console.error('Exception during game initialization:', error);
@@ -136,7 +139,7 @@ export async function initializeGame(userId: string): Promise<GameInitResponse> 
           error: `Game initialization exception: ${error instanceof Error ? error.message : 'Unknown error'}`,
         };
       }
-      
+
       console.log('Daily game state initialized successfully');
     }
 
@@ -187,24 +190,27 @@ export async function startGame(userId: string): Promise<StartGameResponse> {
     let dailyGameResult = await getDailyGameState(redis);
     if (!dailyGameResult.success || !dailyGameResult.gameState) {
       console.log('Daily game state not found during start game, initializing...');
-      
+
       // Initialize daily game state with image collection
       try {
         console.log('Creating sample image collection during start game...');
         const imageCollection = createSampleImageCollection();
         console.log('Sample image collection created successfully during start game');
-        
+
         console.log('Initializing daily game state during start game...');
         dailyGameResult = await initializeDailyGameState(redis, imageCollection);
-        
+
         if (!dailyGameResult.success || !dailyGameResult.gameState) {
-          console.error('Daily game state initialization failed during start game:', dailyGameResult.error);
+          console.error(
+            'Daily game state initialization failed during start game:',
+            dailyGameResult.error
+          );
           return {
             success: false,
             error: `Daily game initialization failed: ${dailyGameResult.error}`,
           };
         }
-        
+
         console.log('Daily game state initialized successfully during start game');
       } catch (error) {
         console.error('Exception during start game initialization:', error);
@@ -214,7 +220,7 @@ export async function startGame(userId: string): Promise<StartGameResponse> {
           error: `Start game initialization exception: ${error instanceof Error ? error.message : 'Unknown error'}`,
         };
       }
-      
+
       console.log('Daily game state initialized successfully during start game');
     }
 
@@ -498,41 +504,41 @@ async function validateRoundTiming(
     // Get round start time from Redis
     const roundStartKey = `round_start:${sessionId}:${roundNumber}`;
     const roundStartTime = await redis.get(roundStartKey);
-    
+
     if (!roundStartTime) {
       // If no start time recorded, this might be the first submission for this round
       // Record the current time as an approximate start time
       const approximateStartTime = Date.now() - (10000 - timeRemaining);
       await redis.set(roundStartKey, approximateStartTime.toString());
       await redis.expire(roundStartKey, 300); // 5 minute expiry
-      
+
       // Allow this submission but validate the time is reasonable
       if (timeRemaining < 0 || timeRemaining > 10000) {
         return { isValid: false, error: 'Invalid time remaining' };
       }
-      
+
       return { isValid: true, adjustedTime: timeRemaining };
     }
-    
+
     const startTime = parseInt(roundStartTime, 10);
     const currentTime = Date.now();
     const elapsedTime = currentTime - startTime;
     const maxRoundTime = 15000; // 15 seconds max (10 + 5 buffer for network delays)
-    
+
     // Check if too much time has elapsed
     if (elapsedTime > maxRoundTime) {
-      return { 
-        isValid: false, 
+      return {
+        isValid: false,
         error: 'Round timeout - too much time elapsed',
-        adjustedTime: 0 
+        adjustedTime: 0,
       };
     }
-    
+
     // Calculate expected time remaining
     const expectedTimeRemaining = Math.max(0, 10000 - elapsedTime);
     const timeDifference = Math.abs(timeRemaining - expectedTimeRemaining);
     const tolerance = 3000; // 3 second tolerance for network delays and client-server sync
-    
+
     // If time difference is too large, adjust to server time
     if (timeDifference > tolerance) {
       console.warn(`Timer validation: Large time difference detected`, {
@@ -544,14 +550,14 @@ async function validateRoundTiming(
         difference: timeDifference,
         elapsedTime,
       });
-      
+
       // Use server-calculated time but don't fail the request
-      return { 
-        isValid: true, 
-        adjustedTime: expectedTimeRemaining 
+      return {
+        isValid: true,
+        adjustedTime: expectedTimeRemaining,
       };
     }
-    
+
     return { isValid: true, adjustedTime: timeRemaining };
   } catch (error) {
     console.error('Timer validation error:', error);
@@ -563,14 +569,11 @@ async function validateRoundTiming(
 /**
  * Records round start time for server-side validation
  */
-export async function recordRoundStart(
-  sessionId: string,
-  roundNumber: number
-): Promise<void> {
+export async function recordRoundStart(sessionId: string, roundNumber: number): Promise<void> {
   try {
     const roundStartKey = `round_start:${sessionId}:${roundNumber}`;
     const startTime = Date.now();
-    
+
     // Store with 5 minute expiry
     await redis.set(roundStartKey, startTime.toString());
     await redis.expire(roundStartKey, 300); // 5 minute expiry
@@ -656,14 +659,19 @@ export async function submitAnswer(
     }
 
     // Enhanced server-side timer validation
-    const timerValidation = await validateRoundTiming(userId, sessionId, roundNumber, timeRemaining);
+    const timerValidation = await validateRoundTiming(
+      userId,
+      sessionId,
+      roundNumber,
+      timeRemaining
+    );
     if (!timerValidation.isValid) {
       return {
         success: false,
         error: timerValidation.error || 'Timer validation failed',
       };
     }
-    
+
     // Use server-validated time
     const validatedTimeRemaining = timerValidation.adjustedTime || timeRemaining;
 
@@ -723,7 +731,7 @@ export async function submitAnswer(
     let nextRound;
     if (!gameComplete) {
       nextRound = session.rounds.find((r) => r.userAnswer === undefined);
-      
+
       // Record start time for the next round
       if (nextRound) {
         await recordRoundStart(session.sessionId, nextRound.roundNumber);

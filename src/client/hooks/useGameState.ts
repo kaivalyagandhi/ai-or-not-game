@@ -249,20 +249,28 @@ export const useGameState = (): GameStateManager => {
           baseDelay: 1000,
         });
         
-        if (data.success && data.session) {
-          setSession(data.session);
-          
-          // Cache session for offline recovery
-          gameStorage.saveSession(data.session);
-          
-          // If user already completed today's game, show results
-          if (data.session.completed) {
-            setGameState('results');
+        if (data.success) {
+          if (data.session) {
+            // User has an existing session (already played today)
+            setSession(data.session);
+            
+            // Cache session for offline recovery
+            gameStorage.saveSession(data.session);
+            
+            // If user already completed today's game, show results
+            if (data.session.completed) {
+              setGameState('results');
+            } else {
+              // Resume existing game
+              await startGame();
+            }
           } else {
-            // Start a new game
-            await startGame();
+            // User can play but hasn't started yet - stay on splash screen
+            console.log('User can play, ready to start new game');
+            setGameState('splash');
           }
         } else {
+          console.error('Game initialization failed. Server response:', data);
           throw new Error(data.error || 'Failed to initialize game');
         }
       } catch (err) {

@@ -4,40 +4,47 @@
 
 Spot the Bot is an engaging daily challenge game built on Reddit's Devvit platform where players test their ability to distinguish between real photographs and AI-generated images. Each day brings a fresh set of image pairs across different categories, challenging users to identify which image was created by a human versus artificial intelligence.
 
-## 🎯 Game Overview
+This interactive React-based game runs directly within Reddit posts, providing a seamless gaming experience with real-time leaderboards, achievement badges, and social sharing features. Players compete against the clock and each other in a daily test of visual perception and AI detection skills.
 
-This is a **React-based web game** that runs directly within Reddit posts using the Devvit platform. Players are presented with side-by-side image comparisons and must quickly identify which image is real versus AI-generated. The game features:
+## 🎯 What is Spot the Bot?
 
-- **5 rounds per game** with 10-second time limits per round
-- **5 image categories**: Animals, Architecture, Nature, Food, and Products  
-- **Time-based scoring** that rewards both accuracy and speed
-- **Daily challenges** with fresh content that resets at midnight UTC
-- **Live leaderboards** with real-time updates and social sharing
-- **Achievement system** with 4 different performance badges
+Spot the Bot is a **daily visual challenge game** that tests your ability to distinguish between real photographs and AI-generated images. Built as a React web application that runs natively within Reddit posts using the Devvit platform, the game presents players with side-by-side image comparisons where they must identify which image is authentic.
 
-## 🎮 What Makes This Game Unique
+### Core Game Mechanics
+- **5 rounds per game** with exactly 10 seconds per round
+- **5 image categories**: Animals, Architecture, Nature, Food, and Products
+- **Side-by-side comparison**: Two images displayed simultaneously - one real, one AI-generated
+- **Time-pressure scoring**: Faster correct answers earn higher scores with time bonuses
+- **One attempt per day**: Each player gets exactly one chance per 24-hour period
+- **Immediate feedback**: See the correct answer and explanation after each round
+- **Progressive difficulty**: Mixed categories and randomized AI placement keep players guessing
 
-### Revolutionary AI Detection Challenge
-- **Daily Fresh Content**: New image challenges every day at 00:00 UTC with randomized categories and AI placement across 5 different image categories (animals, architecture, nature, food, products)
-- **Real-Time Competition**: Live participant counter and leaderboard rankings with immediate feedback using Devvit's Realtime API
-- **Smart Scoring System**: Time-based scoring rewards both accuracy and speed, with bonus points for quick correct answers (0.01 points per millisecond remaining)
-- **Cross-Platform Gaming**: Seamlessly integrated into Reddit's ecosystem, playable directly in posts on mobile and desktop
+## 🎮 What Makes This Game Revolutionary
 
-### Advanced Social Features
-- **Achievement Badges**: Earn unique badges based on performance, from "AI Whisperer" (perfect score) to "Human in Training"
-- **Live Leaderboards**: Real-time daily, weekly, and all-time rankings with live position updates
-- **Social Sharing**: Share your results and challenge friends with detailed performance breakdowns using native sharing or clipboard
-- **Community Integration**: Built natively for Reddit with automatic user authentication and social features
+### Cutting-Edge AI Detection Challenge
+- **Daily Fresh Content**: New image sets generated every day at 00:00 UTC with completely randomized categories, AI placement, and difficulty progression across 5 diverse image categories
+- **Real-Time Social Competition**: Live participant counter shows how many players have attempted today's challenge, with real-time updates as new players join
+- **Intelligent Scoring Algorithm**: Sophisticated time-based scoring system rewards both accuracy (1 point per correct answer) and speed (0.01 bonus points per millisecond remaining), creating strategic tension between careful analysis and quick decisions
+- **Cross-Platform Integration**: Seamlessly embedded within Reddit's ecosystem, playable directly in posts on mobile and desktop with responsive design optimized for touch and mouse interactions
 
-### Technical Innovation
-- **Serverless Architecture**: Built on Devvit's modern serverless platform with Redis persistence for game state and leaderboards
-- **Error Resilience**: Comprehensive error boundaries, network retry logic, and graceful offline handling with local caching
-- **Mobile-First Design**: Responsive interface optimized for Reddit's mobile-heavy user base with touch-friendly controls
-- **Real-Time Updates**: Live participant counting and leaderboard updates without page refreshes using WebSocket connections
-- **Anti-Cheat Protection**: Server-side timer validation, rate limiting, and comprehensive input validation to ensure fair play
-- **Offline Support**: Smart caching system allows viewing results and retrying failed requests when connection is restored
-- **Progressive Enhancement**: Game works offline with cached data and gracefully handles network failures
-- **Security-First Design**: Rate limiting, input sanitization, and abuse detection protect against cheating and spam
+### Advanced Social & Community Features
+- **Dynamic Achievement System**: Earn performance-based badges with custom emoji and descriptions:
+  - 🧙‍♂️ **AI Whisperer** (5/5 correct): "You can spot AI from a mile away"
+  - 😇 **Good Samaritan** (4/5 correct): "You got most of them right"
+  - 🙂 **Just Human** (3/5 correct): "You're getting the hang of this"
+  - 🤖 **Human in Training** (≤2/5 correct): "AI is getting better every day"
+- **Multi-Tier Live Leaderboards**: Real-time daily, weekly, and all-time rankings with live position updates, user highlighting, and total participant tracking
+- **Smart Social Sharing**: Native sharing API integration with clipboard fallback, generating formatted result messages with detailed performance breakdowns for social media
+- **Community-Driven Competition**: Built natively for Reddit with automatic user authentication, username display, and seamless social features
+
+### Technical Innovation & User Experience
+- **Serverless Architecture**: Built on Devvit's modern serverless platform with Redis persistence for game state, session management, and leaderboard data
+- **Comprehensive Error Resilience**: Advanced error boundaries, network retry logic with exponential backoff, offline detection, and graceful degradation with local caching
+- **Mobile-First Responsive Design**: Touch-optimized interface with adaptive layouts, hover states, and gesture-friendly controls designed for Reddit's mobile-heavy user base
+- **Real-Time WebSocket Updates**: Live participant counting, leaderboard position changes, and rank updates without page refreshes using Devvit's Realtime API
+- **Anti-Cheat Protection**: Server-side timer validation, rate limiting, session integrity checks, and comprehensive input validation to ensure fair play
+- **Progressive Web App Features**: Offline support with smart caching, pending request queuing, and automatic retry when connection is restored
+- **Accessibility & Performance**: Optimized loading states, skeleton screens, error recovery, and comprehensive keyboard navigation support
 
 ## 🚀 Technology Stack
 
@@ -49,68 +56,134 @@ This is a **React-based web game** that runs directly within Reddit posts using 
 - **[Tailwind CSS](https://tailwindcss.com/)**: Utility-first styling with responsive design
 - **[TypeScript](https://www.typescriptlang.org/)**: Full type safety across the entire stack
 
-## 🎯 How to Play
+## 🎯 How to Play Spot the Bot
 
 ### Getting Started
-1. **Find the Game**: Look for Spot the Bot posts in participating subreddits
-2. **Launch**: Click the "Launch App" button to open the game in full-screen mode
-3. **Welcome Screen**: View today's date, live participant count, and game instructions
-4. **Start Playing**: Click "Start Playing" to begin your daily challenge
+1. **Find the Game**: Look for Spot the Bot posts in participating subreddits or communities where the app is installed
+2. **Launch the App**: Click the "Launch App" button in the Reddit post to open the game in full-screen webview mode
+3. **Welcome Screen**: You'll see today's date, a live participant counter showing how many players have attempted today's challenge, and basic game instructions
+4. **Join the Challenge**: Click "Start Playing" to begin your daily challenge and join the live participant count
 
-### Game Flow & Mechanics
+### Complete Game Flow
 
-#### Round Structure
-- **5 Rounds Total**: Each game consists of exactly 5 image comparison rounds
-- **Mixed Categories**: Images span animals, architecture, nature, food, and products
-- **Side-by-Side Display**: Two images shown simultaneously - one real photo, one AI-generated
-- **10-Second Timer**: You have exactly 10 seconds per round to make your choice
-- **Visual Feedback**: Immediate feedback shows correct answer and whether you were right
+#### Pre-Game Setup
+- **Daily Challenge Display**: The splash screen shows the current date and live participant count with real-time updates
+- **Game Rules Overview**: Quick instructions explain the 5-round format, 10-second time limits, and scoring system
+- **One-Time Daily Access**: The game checks if you've already played today - if so, you'll see your previous results instead of starting a new game
 
-#### Making Your Choice
-1. **Study Both Images**: Look carefully at the details, textures, and realism
-2. **Click to Select**: Click on the image you believe is the REAL photograph (not AI)
-3. **Watch the Timer**: Green progress bar (6+ seconds), yellow (3-6 seconds), red (under 3 seconds)
-4. **See Results**: After selection, the correct answer is revealed with visual overlays showing "Real Photo" vs "AI Generated"
+#### Round-by-Round Gameplay
 
-#### Scoring System
-- **Base Points**: Earn 1 point for each correct identification
-- **Time Bonus**: Faster correct answers earn additional bonus points (0.01 points per millisecond remaining)
-- **Maximum Score**: Perfect accuracy with quick responses yields the highest scores (up to 101 points per round)
-- **Running Total**: Your score accumulates across all 5 rounds for a maximum possible score of 505 points
+**Round Structure (5 Total Rounds)**
+- Each game consists of exactly 5 image comparison rounds
+- Categories are mixed across: Animals, Architecture, Nature, Food, and Products
+- Category labels are displayed at the top of each round
+- Images are presented side-by-side in a responsive grid layout
+- One image is a real photograph, one is AI-generated (positions are randomized)
 
-#### Badge System & Achievements
-- 🧙‍♂️ **AI Whisperer**: Perfect score (5/5 correct) - You can spot AI from a mile away
-- 😇 **Good Samaritan**: Great performance (4/5 correct) - You got most of them right  
-- 🙂 **Just Human**: Solid effort (3/5 correct) - You're getting the hang of this
-- 🤖 **Human in Training**: Keep practicing (≤2/5 correct) - AI is getting better every day
+**Making Your Selection**
+1. **Analyze Both Images**: You have exactly 10 seconds to study both images carefully
+2. **Look for AI Tells**: Check for unnatural lighting, impossible geometry, weird textures, or uncanny valley effects
+3. **Click to Choose**: Click on the image you believe is the REAL photograph (not the AI-generated one)
+4. **Timer Pressure**: Watch the color-coded progress bar:
+   - **Green** (7-10 seconds): Plenty of time to analyze
+   - **Yellow** (4-6 seconds): Time to make a decision
+   - **Red** (1-3 seconds): Choose quickly!
+5. **Automatic Timeout**: If time runs out, the game automatically selects the first option
 
-### Results & Competition
+**Immediate Feedback**
+- After selection, the correct answer is revealed with visual overlays
+- Real photos show 📸 "Real Photo" overlay
+- AI images show 🤖 "AI Generated" overlay
+- You see whether you were correct (✅ or ❌) and your round score
+- The game automatically advances to the next round after 2 seconds
+
+#### Scoring System Explained
+- **Base Points**: 1 point for each correct identification
+- **Time Bonus**: 0.01 bonus points per millisecond remaining when you answer correctly
+- **Maximum Possible**: ~101 points per round (1 base + ~100 time bonus for instant correct answers)
+- **Running Total**: Your cumulative score is tracked across all 5 rounds
+- **Server Validation**: All timing is validated server-side to prevent cheating and ensure fair play
+
+#### Achievement Badge System
+Your final performance determines your badge:
+- 🧙‍♂️ **AI Whisperer** (5/5 correct): "You can spot AI from a mile away" - Purple badge
+- 😇 **Good Samaritan** (4/5 correct): "You got most of them right" - Blue badge
+- 🙂 **Just Human** (3/5 correct): "You're getting the hang of this" - Green badge
+- 🤖 **Human in Training** (≤2/5 correct): "AI is getting better every day" - Gray badge
+
+### Results & Social Features
 
 #### Final Results Screen
-- **Score Breakdown**: See your total score, correct answers, and time bonus with detailed breakdown
-- **Badge Display**: Your earned badge with description and emoji in a colored badge card
-- **Leaderboard Position**: Your rank among all daily participants with live updates
-- **Share Results**: Copy formatted results to clipboard or use native sharing with detailed stats
+After completing all 5 rounds, you'll see:
+- **Total Score**: Your final score with breakdown (base points + time bonus)
+- **Performance Stats**: Correct answers (X/5) and total time bonus earned
+- **Badge Achievement**: Your earned badge with custom emoji, title, and description
+- **Live Leaderboard Position**: Your current rank among all daily participants with real-time updates
+- **Social Sharing**: Share your results via native sharing or copy to clipboard
 
-#### Leaderboard Features
-- **Daily Rankings**: Compete against all players for the current day
-- **Weekly & All-Time**: View broader competition across different time periods with tabbed interface
-- **Live Updates**: Real-time position changes as other players complete games (indicated by "Live" status)
-- **User Highlighting**: Your position is highlighted with special styling and "(You)" indicator
+#### Multi-Tier Leaderboard System
+- **Daily Leaderboard**: Compete against all players for the current day (resets at 00:00 UTC)
+- **Weekly Rankings**: See top performers over the past 7 days
+- **All-Time Champions**: View the highest scores since the game launched
+- **Live Updates**: Real-time position changes as other players complete games (green "Live" indicator)
+- **User Highlighting**: Your position is highlighted with special styling and "(You)" label
+- **Detailed Stats**: Each entry shows score, correct count, time bonus, and achievement badge
 
-### Game Rules & Restrictions
-- **One Game Per Day**: Each player can only participate once per 24-hour period (resets at 00:00 UTC)
-- **No Retries**: Your first attempt is final - choose carefully and trust your instincts!
-- **Fair Play**: Server-side validation ensures accurate timing and prevents cheating
-- **Fresh Content**: New image sets generated daily for consistent challenge across all players
-- **Auto-Save**: Progress is automatically saved, and results persist for sharing
+#### Social Sharing Features
+- **Native Sharing**: Use your device's built-in sharing on mobile devices
+- **Clipboard Fallback**: Automatically copies formatted results if native sharing isn't available
+- **Formatted Messages**: Generated share text includes:
+  - Your total score and breakdown
+  - Correct answers and time bonus
+  - Achievement badge with emoji
+  - Leaderboard position and total participants
+  - Challenge invitation for friends
 
-### Tips for Success
-- **Look for Details**: AI often struggles with fine details like text, hands, or complex textures
-- **Trust Your Instincts**: Sometimes the "uncanny valley" feeling indicates AI generation
-- **Work Quickly**: Time bonuses can significantly boost your score
-- **Study Patterns**: Each category has different telltale signs of AI generation
-- **Practice Daily**: Regular play helps you develop better AI detection skills
+### Game Rules & Fair Play
+
+#### Daily Challenge Restrictions
+- **One Attempt Per Day**: Each Reddit user can play exactly once per 24-hour period
+- **UTC Reset Schedule**: New challenges become available at 00:00 UTC (midnight)
+- **No Retries**: Your first and only attempt is final - make it count!
+- **Session Persistence**: If you start a game, you must complete it (no abandoning and restarting)
+
+#### Anti-Cheat & Fair Play Systems
+- **Server-Side Timer Validation**: All timing is verified on the server to prevent client-side manipulation
+- **Session Integrity Checks**: Game state is validated to prevent tampering
+- **Rate Limiting**: Prevents spam and abuse of the game systems
+- **Input Validation**: All user inputs are sanitized and validated server-side
+- **Network Resilience**: Game handles network issues gracefully without allowing exploitation
+
+#### Technical Features for Fair Play
+- **Offline Support**: View previous results and cached data when offline
+- **Error Recovery**: Comprehensive error handling with retry logic and fallback mechanisms
+- **Session Management**: Game state is preserved across browser refreshes and network interruptions
+- **Progressive Enhancement**: Core functionality works even with limited connectivity
+
+### Pro Tips for Success
+
+#### Visual Analysis Techniques
+- **Detail Inspection**: AI often struggles with fine details like text, hands, reflections, or complex textures
+- **Lighting Consistency**: Look for unnatural lighting, impossible shadows, or inconsistent light sources
+- **Geometric Logic**: Check for impossible architecture, floating objects, or perspective errors
+- **Texture Realism**: AI-generated textures can appear too perfect or have subtle repetitive patterns
+- **Human Elements**: Pay special attention to faces, hands, and human interactions - AI's biggest weakness
+
+#### Strategic Gameplay
+- **Trust Your Instincts**: The "uncanny valley" feeling is often a reliable indicator of AI generation
+- **Balance Speed vs. Accuracy**: Time bonuses are significant, but accuracy is more important
+- **Category-Specific Patterns**: Each image category has different AI tells:
+  - **Animals**: Unnatural fur patterns, impossible anatomy, weird eyes
+  - **Architecture**: Impossible geometry, floating elements, inconsistent perspective
+  - **Nature**: Too-perfect landscapes, impossible weather, unnatural colors
+  - **Food**: Perfect textures, impossible arrangements, unnatural lighting
+  - **Products**: Too-perfect surfaces, impossible reflections, uncanny branding
+
+#### Daily Practice Benefits
+- **Pattern Recognition**: Regular play helps you develop better AI detection skills
+- **Speed Improvement**: Practice helps you make faster, more confident decisions
+- **Category Familiarity**: Learn the specific tells for each image category
+- **Competitive Edge**: Consistent play helps you climb the weekly and all-time leaderboards
 
 ## 🛠️ Development Setup
 
@@ -177,17 +250,19 @@ src/
 ```
 
 ### Key Features Implementation
-- **Game State Management**: React hooks with `useGameState` managing flow between splash, playing, results, and leaderboard screens
-- **Real-Time Updates**: WebSocket connections via Devvit Realtime API for live participant counts and leaderboard updates
-- **Timer System**: Client-side countdown with visual progress bar and server-side validation for fair play
-- **Image Handling**: Responsive grid layout with hover effects, selection feedback, and result overlays
-- **Score Calculation**: Time-based bonus system (0.01 points per millisecond) rewards quick accurate responses
-- **Badge Assignment**: Automatic badge calculation based on correct answer count with visual badge cards
-- **Social Sharing**: Native sharing API with clipboard fallback and formatted result messages
-- **Error Resilience**: Comprehensive error boundaries, network retry logic, and offline caching via `useErrorHandler`
-- **Leaderboard System**: Redis-based sorted sets with real-time updates and user rank tracking
-- **Session Management**: Secure session handling with Redis persistence and anti-cheat validation
-- **Network Optimization**: Smart retry logic with exponential backoff and offline detection
+- **Game State Management**: React hooks with `useGameState` managing flow between splash, playing, results, and leaderboard screens with comprehensive state validation
+- **Real-Time Updates**: WebSocket connections via Devvit Realtime API for live participant counts and leaderboard updates with connection status indicators
+- **Timer System**: Client-side countdown with color-coded visual progress bar and server-side validation for fair play and anti-cheat protection
+- **Image Handling**: Responsive grid layout with hover effects, selection feedback, result overlays, and mobile-optimized touch controls
+- **Score Calculation**: Time-based bonus system (0.01 points per millisecond) rewards quick accurate responses with server-side validation
+- **Badge Assignment**: Automatic badge calculation based on correct answer count with visual badge cards, custom colors, and descriptions
+- **Social Sharing**: Native sharing API with clipboard fallback and formatted result messages including performance breakdown
+- **Error Resilience**: Comprehensive error boundaries, network retry logic with exponential backoff, and offline caching via `useErrorHandler`
+- **Leaderboard System**: Redis-based sorted sets with real-time updates, user rank tracking, and live position changes
+- **Session Management**: Secure session handling with Redis persistence, anti-cheat validation, and automatic cleanup
+- **Network Optimization**: Smart retry logic with exponential backoff, offline detection, and graceful degradation
+- **Loading States**: Comprehensive loading screens, skeleton states, and progress indicators throughout the user journey
+- **Offline Support**: Local caching system for game data, results viewing, and pending request queuing for when connection is restored
 
 ## 🎨 Design Philosophy
 
