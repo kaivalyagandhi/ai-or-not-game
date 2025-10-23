@@ -23,7 +23,9 @@ import {
   markDailyCompleted,
   SessionError,
 } from './session-manager.js';
-import { getDailyGameState, incrementParticipantCount } from './daily-game-manager.js';
+import { getDailyGameState, incrementParticipantCount, initializeDailyGameState } from './daily-game-manager.js';
+import { createImageCollection } from './image-loader.js';
+import { createSampleImageCollection } from './image-manager.js';
 import { addScoreToLeaderboards } from './leaderboard-manager.js';
 import { determineBadge } from './badge-manager.js';
 
@@ -98,13 +100,44 @@ export async function initializeGame(userId: string): Promise<GameInitResponse> 
       }
     }
 
-    // Check if daily game is available
-    const dailyGameResult = await getDailyGameState(redis);
+    // Check if daily game is available, initialize if needed
+    let dailyGameResult = await getDailyGameState(redis);
     if (!dailyGameResult.success || !dailyGameResult.gameState) {
-      return {
-        success: false,
-        error: 'Daily game not available. Please try again later.',
-      };
+      console.log('Daily game state not found, initializing...');
+      
+      // Initialize daily game state with image collection
+      try {
+        console.log('Creating sample image collection...');
+        const imageCollection = createSampleImageCollection();
+        console.log('Sample image collection created successfully');
+        
+        // Log collection stats
+        for (const [category, images] of Object.entries(imageCollection)) {
+          console.log(`Category ${category}: ${images.length} images`);
+        }
+        
+        console.log('Initializing daily game state...');
+        dailyGameResult = await initializeDailyGameState(redis, imageCollection);
+        
+        if (!dailyGameResult.success || !dailyGameResult.gameState) {
+          console.error('Daily game state initialization failed:', dailyGameResult.error);
+          return {
+            success: false,
+            error: `Daily game initialization failed: ${dailyGameResult.error}`,
+          };
+        }
+        
+        console.log('Daily game state initialized successfully');
+      } catch (error) {
+        console.error('Exception during game initialization:', error);
+        console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+        return {
+          success: false,
+          error: `Game initialization exception: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        };
+      }
+      
+      console.log('Daily game state initialized successfully');
     }
 
     // User can play - return success with no session (they need to start the game)
@@ -150,13 +183,39 @@ export async function startGame(userId: string): Promise<StartGameResponse> {
       };
     }
 
-    // Get daily game state
-    const dailyGameResult = await getDailyGameState(redis);
+    // Get daily game state, initialize if needed
+    let dailyGameResult = await getDailyGameState(redis);
     if (!dailyGameResult.success || !dailyGameResult.gameState) {
-      return {
-        success: false,
-        error: 'Daily game not available. Please try again later.',
-      };
+      console.log('Daily game state not found during start game, initializing...');
+      
+      // Initialize daily game state with image collection
+      try {
+        console.log('Creating sample image collection during start game...');
+        const imageCollection = createSampleImageCollection();
+        console.log('Sample image collection created successfully during start game');
+        
+        console.log('Initializing daily game state during start game...');
+        dailyGameResult = await initializeDailyGameState(redis, imageCollection);
+        
+        if (!dailyGameResult.success || !dailyGameResult.gameState) {
+          console.error('Daily game state initialization failed during start game:', dailyGameResult.error);
+          return {
+            success: false,
+            error: `Daily game initialization failed: ${dailyGameResult.error}`,
+          };
+        }
+        
+        console.log('Daily game state initialized successfully during start game');
+      } catch (error) {
+        console.error('Exception during start game initialization:', error);
+        console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+        return {
+          success: false,
+          error: `Start game initialization exception: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        };
+      }
+      
+      console.log('Daily game state initialized successfully during start game');
     }
 
     const { gameState } = dailyGameResult;

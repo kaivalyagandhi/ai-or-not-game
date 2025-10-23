@@ -14,7 +14,7 @@ import { securityErrorHandler } from './middleware/security';
 import { trackRequestResult } from './utils/rateLimiter';
 import { createPost } from './core/post';
 import { resetDailyGameState } from './core/daily-game-manager.js';
-import { createSampleImageCollection } from './core/image-manager.js';
+
 import { createImageCollection } from './core/image-loader.js';
 import { executeSchedulerJob } from './core/scheduler-manager.js';
 import { initializeGame, startGame, submitAnswer, getCurrentUsername } from './core/game-logic.js';
@@ -25,7 +25,7 @@ import {
   getLeaderboardParticipantCount,
   LeaderboardType 
 } from './core/leaderboard-manager.js';
-import { BadgeType } from '../shared/types/api.js';
+import { BadgeType, ImageCategory } from '../shared/types/api.js';
 
 const app = express();
 
@@ -623,6 +623,46 @@ router.post('/internal/scheduler/daily-reset', async (_req, res): Promise<void> 
       message: jobResult.message,
       error: jobResult.error,
       timestamp: jobResult.timestamp,
+    });
+  }
+});
+
+// Debug endpoint to test image collection (development only)
+router.get('/api/debug/image-collection', async (_req, res): Promise<void> => {
+  try {
+    console.log('Debug: Testing image collection creation...');
+    const imageCollection = createImageCollection();
+    
+    const stats: Record<string, any> = {};
+    for (const category of Object.values(ImageCategory)) {
+      const categoryImages = imageCollection[category];
+      const humanCount = categoryImages.filter(img => !img.isAI).length;
+      const aiCount = categoryImages.filter(img => img.isAI).length;
+      
+      stats[category] = {
+        total: categoryImages.length,
+        human: humanCount,
+        ai: aiCount,
+        images: categoryImages.map(img => ({
+          id: img.id,
+          filename: img.filename,
+          isAI: img.isAI,
+          url: img.url
+        }))
+      };
+    }
+    
+    res.json({
+      success: true,
+      stats,
+      message: 'Image collection created successfully'
+    });
+  } catch (error) {
+    console.error('Debug: Error creating image collection:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
     });
   }
 });

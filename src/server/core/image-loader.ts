@@ -1,6 +1,6 @@
 /**
  * Dynamic Image Loader
- * 
+ *
  * Loads image pairs from the organized folder structure and creates
  * ImageCollection objects for use in the daily game system.
  */
@@ -59,7 +59,7 @@ function createImageAsset(
   const categoryPath = category.toLowerCase();
   const url = `${config.baseUrl}/${categoryPath}/${filename}`;
   const imageType = isAI ? 'ai' : 'human';
-  
+
   return {
     id: `${category}_${imageType}_pair${pairNumber}`,
     filename,
@@ -84,15 +84,15 @@ export function parseImageFilename(filename: string): {
 } {
   // Expected format: pair{number}-{human|ai}.{ext}
   const match = filename.match(/^pair(\d+)-(human|ai)\.(jpg|jpeg|png|webp)$/i);
-  
+
   if (!match) {
     return { pairNumber: 0, isAI: false, isValid: false };
   }
-  
-  const pairNumber = parseInt(match[1], 10);
-  const type = match[2].toLowerCase();
+
+  const pairNumber = parseInt(match[1]!, 10);
+  const type = match[2]!.toLowerCase();
   const isAI = type === 'ai';
-  
+
   return {
     pairNumber,
     isAI,
@@ -102,7 +102,7 @@ export function parseImageFilename(filename: string): {
 
 /**
  * Discovers image pairs from the expected folder structure
- * 
+ *
  * This function simulates file system discovery. In a real implementation,
  * you would scan the actual file system or have a manifest file.
  */
@@ -113,23 +113,27 @@ export function discoverImagePairs(
   const pairs: ImagePair[] = [];
   const errors: string[] = [];
   const warnings: string[] = [];
-  
+
+  console.log(`Discovering image pairs for category: ${category}`);
+
   // For now, we'll create a placeholder structure that expects
   // users to upload files following the naming convention
-  
+
   // This is a placeholder - in a real implementation, you would:
   // 1. Read the actual file system
   // 2. Or maintain a manifest file
   // 3. Or use a database to track uploaded images
-  
+
   // For development, let's create some example pairs
   const examplePairs = generateExamplePairs(category, config);
   pairs.push(...examplePairs);
-  
+
+  console.log(`Generated ${pairs.length} example pairs for category: ${category}`);
+
   if (pairs.length === 0) {
     warnings.push(`No image pairs found for category: ${category}`);
   }
-  
+
   return {
     success: errors.length === 0,
     pairs,
@@ -140,24 +144,21 @@ export function discoverImagePairs(
 
 /**
  * Generates example image pairs for development/testing
- * 
+ *
  * This creates placeholder pairs that follow the expected structure.
  * Replace this with actual file discovery in production.
  */
-function generateExamplePairs(
-  category: ImageCategory,
-  config: ImageLoaderConfig
-): ImagePair[] {
+function generateExamplePairs(category: ImageCategory, config: ImageLoaderConfig): ImagePair[] {
   const pairs: ImagePair[] = [];
-  
+
   // Create 3 example pairs per category for development
   for (let i = 1; i <= 3; i++) {
     const humanFilename = `pair${i}-human.jpg`;
     const aiFilename = `pair${i}-ai.jpg`;
-    
+
     const humanImage = createImageAsset(category, i, false, humanFilename, config);
     const aiImage = createImageAsset(category, i, true, aiFilename, config);
-    
+
     pairs.push({
       pairNumber: i,
       category,
@@ -165,7 +166,7 @@ function generateExamplePairs(
       aiImage,
     });
   }
-  
+
   return pairs;
 }
 
@@ -182,11 +183,11 @@ export function loadAllImagePairs(
     [ImageCategory.FOOD]: [],
     [ImageCategory.PRODUCTS]: [],
   };
-  
+
   // Discover pairs for each category
   for (const category of Object.values(ImageCategory)) {
     const discovery = discoverImagePairs(category, config);
-    
+
     if (discovery.success && discovery.pairs.length > 0) {
       // Add all images from pairs to the collection
       for (const pair of discovery.pairs) {
@@ -197,7 +198,7 @@ export function loadAllImagePairs(
       console.warn(`Failed to load images for category ${category}:`, discovery.errors);
     }
   }
-  
+
   return collection;
 }
 
@@ -209,29 +210,29 @@ export function validateImagePairs(pairs: ImagePair[]): {
   errors: string[];
 } {
   const errors: string[] = [];
-  
+
   for (const pair of pairs) {
     // Check that both images exist
     if (!pair.humanImage || !pair.aiImage) {
       errors.push(`Pair ${pair.pairNumber} in ${pair.category} is missing images`);
       continue;
     }
-    
+
     // Check that categories match
     if (pair.humanImage.category !== pair.category || pair.aiImage.category !== pair.category) {
       errors.push(`Pair ${pair.pairNumber} has category mismatch`);
     }
-    
+
     // Check that AI flags are correct
     if (pair.humanImage.isAI !== false) {
       errors.push(`Pair ${pair.pairNumber} human image has incorrect AI flag`);
     }
-    
+
     if (pair.aiImage.isAI !== true) {
       errors.push(`Pair ${pair.pairNumber} AI image has incorrect AI flag`);
     }
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors,
@@ -240,7 +241,7 @@ export function validateImagePairs(pairs: ImagePair[]): {
 
 /**
  * Creates a production-ready image collection
- * 
+ *
  * This function should be called during app initialization to load
  * all available image pairs from the file system.
  */
@@ -248,18 +249,30 @@ export function createImageCollection(
   config: ImageLoaderConfig = DEFAULT_IMAGE_CONFIG
 ): ImageCollection {
   console.log('Loading image collection from:', config.baseUrl);
-  
+
   const collection = loadAllImagePairs(config);
-  
-  // Log statistics
+
+  // Log statistics and validate
   for (const category of Object.values(ImageCategory)) {
     const categoryImages = collection[category];
-    const humanCount = categoryImages.filter(img => !img.isAI).length;
-    const aiCount = categoryImages.filter(img => img.isAI).length;
-    
-    console.log(`Category ${category}: ${humanCount} human, ${aiCount} AI images`);
+    const humanCount = categoryImages.filter((img) => !img.isAI).length;
+    const aiCount = categoryImages.filter((img) => img.isAI).length;
+
+    console.log(
+      `Category ${category}: ${humanCount} human, ${aiCount} AI images (total: ${categoryImages.length})`
+    );
+
+    if (categoryImages.length === 0) {
+      console.warn(`Warning: No images found for category ${category}`);
+    }
+    if (humanCount === 0) {
+      console.warn(`Warning: No human images found for category ${category}`);
+    }
+    if (aiCount === 0) {
+      console.warn(`Warning: No AI images found for category ${category}`);
+    }
   }
-  
+
   return collection;
 }
 
@@ -271,7 +284,7 @@ export function getAvailablePairs(
   config: ImageLoaderConfig = DEFAULT_IMAGE_CONFIG
 ): number[] {
   const discovery = discoverImagePairs(category, config);
-  return discovery.pairs.map(pair => pair.pairNumber).sort((a, b) => a - b);
+  return discovery.pairs.map((pair) => pair.pairNumber).sort((a, b) => a - b);
 }
 
 /**

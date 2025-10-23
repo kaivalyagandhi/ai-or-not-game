@@ -173,16 +173,23 @@ export function createDailyGameState(
   date?: string,
   options: GameRoundGenerationOptions = {}
 ): DailyGameState {
+  console.log('createDailyGameState: Starting creation...');
   const gameDate = date || getCurrentDateUTC();
   const categoryOrder = options.categoryOrder || generateRandomCategoryOrder();
+  console.log('createDailyGameState: Game date:', gameDate, 'Category order:', categoryOrder);
 
   // Validate image collection before generating rounds
+  console.log('createDailyGameState: Validating image collection...');
   const validationResult = validateImageCollection(collection);
   if (!validationResult.isValid) {
+    console.error('createDailyGameState: Image collection validation failed:', validationResult.errors);
     throw new Error(`Invalid image collection: ${validationResult.errors.join(', ')}`);
   }
+  console.log('createDailyGameState: Image collection validation passed');
 
+  console.log('createDailyGameState: Generating daily game rounds...');
   const imageSet = generateDailyGameRounds(collection, { ...options, categoryOrder });
+  console.log('createDailyGameState: Generated', imageSet.length, 'rounds');
 
   return {
     date: gameDate,
@@ -202,12 +209,17 @@ export async function initializeDailyGameState(
   options: GameRoundGenerationOptions = {}
 ): Promise<DailyGameInitializationResult> {
   try {
+    console.log('initializeDailyGameState: Starting initialization...');
     const gameDate = date || getCurrentDateUTC();
+    console.log('initializeDailyGameState: Game date:', gameDate);
     const gameStateKey = DailyGameKeys.gameState(gameDate);
+    console.log('initializeDailyGameState: Game state key:', gameStateKey);
 
     // Check if daily game state already exists
+    console.log('initializeDailyGameState: Checking for existing state...');
     const existingState = await redis.get(gameStateKey);
     if (existingState) {
+      console.log('initializeDailyGameState: Found existing state, returning it');
       return {
         success: true,
         gameState: JSON.parse(existingState) as DailyGameState,
@@ -215,7 +227,9 @@ export async function initializeDailyGameState(
     }
 
     // Create new daily game state
+    console.log('initializeDailyGameState: Creating new daily game state...');
     const gameState = createDailyGameState(collection, gameDate, options);
+    console.log('initializeDailyGameState: Daily game state created successfully');
 
     // Store in Redis with expiration
     await redis.set(gameStateKey, JSON.stringify(gameState));
