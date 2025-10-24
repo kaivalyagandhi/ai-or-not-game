@@ -436,7 +436,7 @@ router.get('/api/leaderboard/user-rank/:type', async (req, res): Promise<void> =
     if (!rankData) {
       res.json({
         success: true,
-        rank: null,
+        userRank: null,
         score: null,
         totalParticipants: await getLeaderboardParticipantCount(type),
       });
@@ -445,7 +445,7 @@ router.get('/api/leaderboard/user-rank/:type', async (req, res): Promise<void> =
 
     res.json({
       success: true,
-      rank: rankData.rank,
+      userRank: rankData.rank,
       score: rankData.score,
       totalParticipants: rankData.totalParticipants,
     });
