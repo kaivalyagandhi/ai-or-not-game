@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { GameRound as GameRoundType, SubmitAnswerResponse } from '../../shared/types/api';
 import { apiCall } from '../utils/network';
 import { useErrorHandler } from '../hooks/useErrorHandler';
+import { useAudio } from '../hooks/useAudio';
 
 interface GameRoundProps {
   round: GameRoundType;
@@ -10,13 +11,14 @@ interface GameRoundProps {
 }
 
 export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundComplete }) => {
-  const [timeRemaining, setTimeRemaining] = useState(10);
+  const [timeRemaining, setTimeRemaining] = useState(15);
   const [selectedAnswer, setSelectedAnswer] = useState<'A' | 'B' | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackData, setFeedbackData] = useState<SubmitAnswerResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-
+  // Audio controls
+  const audio = useAudio();
   
   // Enhanced error handling
   const errorHandler = useErrorHandler({
@@ -27,7 +29,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   // Reset component state when round changes
   useEffect(() => {
 
-    setTimeRemaining(10);
+    setTimeRemaining(15);
     setSelectedAnswer(null);
     setShowFeedback(false);
     setFeedbackData(null);
@@ -64,6 +66,13 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
           setFeedbackData(data);
           setShowFeedback(true);
           
+          // Play success or failure sound based on answer
+          if (data.isCorrect) {
+            audio?.playSuccessSound();
+          } else {
+            audio?.playFailureSound();
+          }
+          
           // Show feedback for 2 seconds before proceeding
           setTimeout(() => {
             onRoundComplete(data);
@@ -93,6 +102,13 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
         setFeedbackData(fallbackResponse);
         setShowFeedback(true);
         
+        // Play success or failure sound based on answer
+        if (fallbackResponse.isCorrect) {
+          audio?.playSuccessSound();
+        } else {
+          audio?.playFailureSound();
+        }
+        
         // Show feedback and continue
         setTimeout(() => {
           onRoundComplete(fallbackResponse);
@@ -106,6 +122,10 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   // Handle image selection
   const handleImageSelect = (answer: 'A' | 'B') => {
     if (selectedAnswer || showFeedback) return;
+    
+    // Play click sound
+    audio?.playClickSound();
+    
     submitAnswer(answer, timeRemaining);
   };
 
@@ -130,15 +150,15 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
 
   // Get timer color based on remaining time
   const getTimerColor = () => {
-    if (timeRemaining > 6) return 'text-green-600';
-    if (timeRemaining > 3) return 'text-yellow-600';
+    if (timeRemaining > 10) return 'text-green-600';
+    if (timeRemaining > 5) return 'text-yellow-600';
     return 'text-red-600';
   };
 
   // Get progress bar color
   const getProgressColor = () => {
-    if (timeRemaining > 6) return 'bg-green-500';
-    if (timeRemaining > 3) return 'bg-yellow-500';
+    if (timeRemaining > 10) return 'bg-green-500';
+    if (timeRemaining > 5) return 'bg-yellow-500';
     return 'bg-red-500';
   };
 
@@ -149,7 +169,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
         <div className="text-center mb-6">
           <div className="flex items-center justify-between mb-4">
             <div className="text-sm text-gray-500">
-              Round {round.roundNumber} of 5
+              Round {round.roundNumber} of 6
             </div>
             <div className="text-sm text-gray-500 capitalize">
               Category: {round.category}
@@ -164,7 +184,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
             <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
               <div
                 className={`h-2 rounded-full transition-all duration-1000 ${getProgressColor()}`}
-                style={{ width: `${(timeRemaining / 10) * 100}%` }}
+                style={{ width: `${(timeRemaining / 15) * 100}%` }}
               />
             </div>
           </div>

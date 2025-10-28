@@ -1,13 +1,17 @@
-import { ErrorInfo } from 'react';
+import { ErrorInfo, useRef, useEffect } from 'react';
 import { 
   SplashScreen, 
   GameRound, 
   ResultsScreen,
   LeaderboardTabs,
   ErrorBoundary,
-  LoadingScreen
+  LoadingScreen,
+  EducationalContent,
+  AudioSystem
 } from './components';
 import { useGameState } from './hooks/useGameState';
+import { AudioContextManager } from './utils/audio';
+import { AudioContext, useAudioRef, AudioControls } from './hooks/useAudio';
 
 export const App = () => {
   const {
@@ -16,18 +20,42 @@ export const App = () => {
     currentRound,
     error,
     loading,
-    initializeGame,
+
     startGame,
     handleRoundComplete,
     goToSplash,
     goToLeaderboard,
     goBackFromLeaderboard,
+    continueFromEducational,
   } = useGameState();
 
+  // Audio system ref for controlling audio
+  const audioSystemRef = useAudioRef();
+
   // Handle start game from splash
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
+    // Unlock audio context on user interaction
+    await AudioContextManager.getInstance().unlockAudioContext();
+    
+    // Start background music when game begins
+    audioSystemRef.current?.playBackgroundMusic();
+    
     startGame();
   };
+
+  // Handle game state changes for audio
+  useEffect(() => {
+    switch (gameState) {
+      case 'results':
+        // Stop background music when game ends
+        audioSystemRef.current?.stopBackgroundMusic();
+        break;
+      case 'splash':
+        // Stop background music when returning to splash
+        audioSystemRef.current?.stopBackgroundMusic();
+        break;
+    }
+  }, [gameState]);
 
   // Error boundary error handler
   const handleErrorBoundaryError = (error: Error, errorInfo: ErrorInfo) => {
@@ -93,8 +121,17 @@ export const App = () => {
 
   // Main game container with error boundary
   return (
-    <ErrorBoundary onError={handleErrorBoundaryError}>
-      <div className="game-container">
+    <AudioContext.Provider value={audioSystemRef}>
+      <ErrorBoundary onError={handleErrorBoundaryError}>
+        <div className="game-container relative">
+          {/* Audio System - always present */}
+          <AudioSystem 
+            ref={(ref) => {
+              if (ref) {
+                audioSystemRef.current = ref;
+              }
+            }}
+          />
         {(() => {
           switch (gameState) {
             case 'splash':
@@ -113,6 +150,13 @@ export const App = () => {
                   round={currentRound}
                   sessionId={session.sessionId}
                   onRoundComplete={handleRoundComplete}
+                />
+              );
+            
+            case 'educational':
+              return (
+                <EducationalContent
+                  onContinue={continueFromEducational}
                 />
               );
             
@@ -146,7 +190,8 @@ export const App = () => {
               return <SplashScreen onStartGame={handleStartGame} />;
           }
         })()}
-      </div>
-    </ErrorBoundary>
+        </div>
+      </ErrorBoundary>
+    </AudioContext.Provider>
   );
 };

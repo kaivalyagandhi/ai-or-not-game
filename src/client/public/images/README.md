@@ -22,7 +22,7 @@ Each category should contain multiple image pairs following this naming conventi
 
 ## Game Logic Integration
 
-The game randomly selects one image pair from each category to create a 5-round game. The categories are:
+The game randomly selects one image pair from each category to create a 6-round game. The categories are:
 
 1. **Animals** (`ImageCategory.ANIMALS`)
 2. **Architecture** (`ImageCategory.ARCHITECTURE`) 

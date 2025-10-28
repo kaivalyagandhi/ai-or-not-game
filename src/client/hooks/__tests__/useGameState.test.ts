@@ -187,8 +187,8 @@ describe('useGameState Hook - Score Calculation', () => {
   it('should assign correct badges based on score', () => {
     const { result } = renderHook(() => useGameState());
     
-    // Test AI_WHISPERER badge (5 correct)
-    const perfectRounds = Array.from({ length: 5 }, (_, i) => ({
+    // Test AI_WHISPERER badge (6 correct for 6-round gameplay)
+    const perfectRounds = Array.from({ length: 6 }, (_, i) => ({
       ...createMockGameRound(i + 1),
       isCorrect: true,
       timeRemaining: 1000,
@@ -205,6 +205,8 @@ describe('useGameState Hook - Score Calculation', () => {
         totalTimeBonus: 0,
         badge: BadgeType.HUMAN_IN_TRAINING,
         completed: false,
+        attemptNumber: 1,
+        showedEducationalContent: false,
       });
     });
     

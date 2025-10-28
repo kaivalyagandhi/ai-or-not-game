@@ -7,9 +7,14 @@ import { determineBadge } from '../badge-manager.js';
 import { BadgeType } from '../../../shared/types/api.js';
 
 describe('Badge Manager - Badge Assignment', () => {
-  it('should assign AI_WHISPERER badge for 5 correct answers', () => {
-    const badge = determineBadge(5);
+  it('should assign AI_WHISPERER badge for 6 correct answers', () => {
+    const badge = determineBadge(6);
     expect(badge).toBe(BadgeType.AI_WHISPERER);
+  });
+
+  it('should assign AI_DETECTIVE badge for 5 correct answers', () => {
+    const badge = determineBadge(5);
+    expect(badge).toBe(BadgeType.AI_DETECTIVE);
   });
 
   it('should assign GOOD_SAMARITAN badge for 4 correct answers', () => {
@@ -42,7 +47,7 @@ describe('Badge Manager - Badge Assignment', () => {
     expect(badge).toBe(BadgeType.HUMAN_IN_TRAINING);
   });
 
-  it('should handle edge case of more than 5 correct answers', () => {
+  it('should handle edge case of more than 6 correct answers', () => {
     const badge = determineBadge(10);
     expect(badge).toBe(BadgeType.AI_WHISPERER);
   });

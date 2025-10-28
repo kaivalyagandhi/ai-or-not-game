@@ -11,7 +11,7 @@ import { apiCall } from '../utils/network';
 import { useErrorHandler } from './useErrorHandler';
 import { gameStorage } from '../utils/storage';
 
-export type GameState = 'splash' | 'playing' | 'results' | 'leaderboard' | 'error' | 'loading';
+export type GameState = 'splash' | 'playing' | 'educational' | 'results' | 'leaderboard' | 'error' | 'loading';
 
 interface GameStateManager {
   // State
@@ -38,6 +38,7 @@ interface GameStateManager {
   goToSplash: () => void;
   goToLeaderboard: () => void;
   goBackFromLeaderboard: () => void;
+  continueFromEducational: () => void;
   
   // Session management
   validateSession: () => boolean;
@@ -116,8 +117,10 @@ export const useGameState = (): GameStateManager => {
 
     // Determine badge based on correct count
     let badge: BadgeType;
-    if (correctCount >= 5) {
+    if (correctCount >= 6) {
       badge = BadgeType.AI_WHISPERER;
+    } else if (correctCount >= 5) {
+      badge = BadgeType.AI_DETECTIVE;
     } else if (correctCount >= 4) {
       badge = BadgeType.GOOD_SAMARITAN;
     } else if (correctCount >= 3) {
@@ -336,6 +339,8 @@ export const useGameState = (): GameStateManager => {
               totalTimeBonus: 0,
               badge: 'human_in_training' as BadgeType,
               completed: false,
+              attemptNumber: 1,
+              showedEducationalContent: false,
             };
           
           console.log('Setting session:', updatedSession);
@@ -442,13 +447,21 @@ export const useGameState = (): GameStateManager => {
       
       console.log('Game completed with final results:', response.finalResults);
     } else if (response.nextRound) {
-      // Move to next round
-      setCurrentRound(response.nextRound);
-      console.log('Moving to round:', response.nextRound.roundNumber);
+      // Check if we just completed round 3 and should show educational content
+      if (currentRound?.roundNumber === 3 && !session?.showedEducationalContent) {
+        console.log('Round 3 completed, showing educational content');
+        // Store the next round for after educational content
+        setCurrentRound(response.nextRound);
+        setGameState('educational');
+      } else {
+        // Move to next round normally
+        setCurrentRound(response.nextRound);
+        console.log('Moving to round:', response.nextRound.roundNumber);
+      }
     } else {
       // Check if we've completed all rounds locally
       const completedRounds = session?.rounds?.filter(r => r.isCorrect !== undefined).length || 0;
-      if (completedRounds >= 5) {
+      if (completedRounds >= 6) {
         console.log('All rounds completed, calculating final score');
         calculateFinalScore();
         setGameState('results');
@@ -473,6 +486,20 @@ export const useGameState = (): GameStateManager => {
       setGameState('splash');
     }
   }, [session?.completed]);
+
+  const continueFromEducational = useCallback(() => {
+    // Mark that educational content has been shown
+    setSession(prevSession => {
+      if (!prevSession) return null;
+      return {
+        ...prevSession,
+        showedEducationalContent: true,
+      };
+    });
+    
+    // Continue to next round (round 4)
+    setGameState('playing');
+  }, []);
 
   // Auto-persist session when game completes
   useEffect(() => {
@@ -514,6 +541,7 @@ export const useGameState = (): GameStateManager => {
     goToSplash,
     goToLeaderboard,
     goBackFromLeaderboard,
+    continueFromEducational,
     
     // Session management
     validateSession,

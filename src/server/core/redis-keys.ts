@@ -25,6 +25,9 @@ export const KEY_PREFIXES = {
 
   // Participant counting
   PARTICIPANT_COUNT: 'participant_count',
+
+  // Play limit tracking
+  USER_PLAY_LIMIT: 'user_play_limit',
 } as const;
 
 /**
@@ -105,6 +108,15 @@ export const UserSessionKeys = {
     const gameDate = date || getCurrentDateUTC();
     return `${KEY_PREFIXES.USER_DAILY_COMPLETION}${KEY_SEPARATOR}${userId}${KEY_SEPARATOR}${gameDate}`;
   },
+
+  /**
+   * Key for tracking user daily play limits
+   * Format: user_play_limit:userId:YYYY-MM-DD
+   */
+  playLimit: (userId: string, date?: string): string => {
+    const gameDate = date || getCurrentDateUTC();
+    return `${KEY_PREFIXES.USER_PLAY_LIMIT}${KEY_SEPARATOR}${userId}${KEY_SEPARATOR}${gameDate}`;
+  },
 };
 
 /**
@@ -167,6 +179,9 @@ export const KEY_EXPIRATION = {
 
   // Daily participant count expires after 25 hours
   DAILY_PARTICIPANT_COUNT: 25 * 60 * 60,
+
+  // User play limits expire after 25 hours
+  USER_PLAY_LIMIT: 25 * 60 * 60,
 
   // Daily leaderboards expire after 8 days (to allow for weekly rollup)
   DAILY_LEADERBOARD: 8 * 24 * 60 * 60,

@@ -1,0 +1,14 @@
+{
+  "tips": [
+    "Look for unnatural lighting or shadows that don't match the scene - AI often struggles with consistent light sources.",
+    "Check hands and fingers carefully - AI frequently generates extra fingers, missing digits, or oddly positioned hands.",
+    "Examine text in images - AI-generated text is often blurry, nonsensical, or contains spelling errors.",
+    "Notice repetitive patterns or textures that seem too perfect - real photos have natural imperfections.",
+    "Look for facial features that seem slightly 'off' - AI may create asymmetrical eyes or unnatural skin textures.",
+    "Check reflections and mirrors - AI often fails to create accurate reflections of the scene.",
+    "Observe hair details - AI-generated hair may look too smooth, lack individual strands, or have unnatural flow.",
+    "Look for objects that blend unnaturally into backgrounds or have unclear edges.",
+    "Notice if small details like jewelry, buttons, or accessories appear distorted or incomplete.",
+    "Check for consistent perspective - AI sometimes creates objects that don't follow proper perspective rules."
+  ]
+}

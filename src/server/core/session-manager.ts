@@ -9,6 +9,7 @@
 import { redis } from '@devvit/web/server';
 import { GameSession, BadgeType } from '../../shared/types/api.js';
 import { UserSessionKeys, KEY_EXPIRATION, isValidUserId, isValidSessionId } from './redis-keys.js';
+import { getUserPlayStats } from './play-limit-manager.js';
 
 /**
  * Session Management Errors
@@ -65,6 +66,10 @@ export async function createGameSession(userId: string): Promise<GameSession> {
     console.log('Development mode: Bypassing daily session limit for testing');
   }
 
+  // Get current attempt number from play stats
+  const playStats = await getUserPlayStats(userId);
+  const attemptNumber = playStats.attempts; // This will be the current attempt (already incremented)
+
   // Generate session ID and create session object
   const sessionId = generateSessionId(userId);
   const session: GameSession = {
@@ -77,6 +82,8 @@ export async function createGameSession(userId: string): Promise<GameSession> {
     totalTimeBonus: 0,
     badge: BadgeType.HUMAN_IN_TRAINING, // Default badge
     completed: false,
+    attemptNumber,
+    showedEducationalContent: false,
   };
 
   try {

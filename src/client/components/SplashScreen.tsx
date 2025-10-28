@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ParticipantCountResponse, RealtimeMessage } from '../../shared/types/api';
+import { ParticipantCountResponse, RealtimeMessage, PlayAttemptsResponse } from '../../shared/types/api';
 import { connectRealtime } from '@devvit/web/client';
 import { apiCall } from '../utils/network';
 import { useErrorHandler } from '../hooks/useErrorHandler';
@@ -14,6 +14,13 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStartGame }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [playAttempts, setPlayAttempts] = useState<{
+    attempts: number;
+    maxAttempts: number;
+    remainingAttempts: number;
+    bestScore: number;
+  } | null>(null);
+  const [playAttemptsLoading, setPlayAttemptsLoading] = useState(true);
   const connectionRef = useRef<any>(null);
   
   // Enhanced error handling
@@ -33,6 +40,38 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStartGame }) => {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  // Fetch play attempts data
+  const fetchPlayAttempts = async () => {
+    try {
+      const data: PlayAttemptsResponse = await apiCall('/api/game/play-attempts', {
+        method: 'GET',
+      }, {
+        maxRetries: 2,
+        baseDelay: 1000,
+      });
+      
+      if (data.success) {
+        setPlayAttempts({
+          attempts: data.attempts || 0,
+          maxAttempts: data.maxAttempts || 2,
+          remainingAttempts: data.remainingAttempts || 0,
+          bestScore: data.bestScore || 0,
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching play attempts:', err);
+      // Set default values on error
+      setPlayAttempts({
+        attempts: 0,
+        maxAttempts: 2,
+        remainingAttempts: 2,
+        bestScore: 0,
+      });
+    } finally {
+      setPlayAttemptsLoading(false);
+    }
   };
 
   // Fetch initial participant count with enhanced error handling
@@ -124,8 +163,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStartGame }) => {
   };
 
   useEffect(() => {
-    // Fetch initial count
+    // Fetch initial data
     fetchParticipantCount();
+    fetchPlayAttempts();
     
     // Set up realtime connection
     setupRealtimeConnection();
@@ -161,6 +201,40 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStartGame }) => {
             {getCurrentDate()}
           </p>
         </div>
+
+        {/* Play Attempts and Best Score */}
+        {!playAttemptsLoading && playAttempts && (
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <p className="text-sm text-gray-500 uppercase tracking-wide font-medium mb-3">
+              Your Progress
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-indigo-600">
+                  {playAttempts.remainingAttempts}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Attempts Left
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-green-600">
+                  {playAttempts.bestScore > 0 ? playAttempts.bestScore.toFixed(2) : '—'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Best Score
+                </p>
+              </div>
+            </div>
+            {playAttempts.remainingAttempts === 0 && (
+              <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-center">
+                <p className="text-sm text-yellow-700">
+                  Daily limit reached. Come back tomorrow!
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Participant Counter */}
         <div className="bg-white rounded-lg p-4 shadow-sm">
@@ -199,7 +273,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStartGame }) => {
           <ul className="space-y-2 text-sm text-gray-600">
             <li className="flex items-start">
               <span className="text-indigo-600 font-bold mr-2">1.</span>
-              You'll see 5 pairs of images
+              You'll see 6 pairs of images
             </li>
             <li className="flex items-start">
               <span className="text-indigo-600 font-bold mr-2">2.</span>
@@ -207,7 +281,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStartGame }) => {
             </li>
             <li className="flex items-start">
               <span className="text-indigo-600 font-bold mr-2">3.</span>
-              You have 10 seconds per round
+              You have 15 seconds per round
             </li>
             <li className="flex items-start">
               <span className="text-indigo-600 font-bold mr-2">4.</span>
@@ -219,6 +293,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStartGame }) => {
         {/* Start Game Button */}
         <button
           onClick={async () => {
+            // Check if user can play
+            if (playAttempts && playAttempts.remainingAttempts === 0) {
+              return; // Button should be disabled, but just in case
+            }
+
             // Register participant join when starting game with error handling
             try {
               await apiCall('/api/participants/join', {
@@ -234,14 +313,22 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStartGame }) => {
             }
             onStartGame();
           }}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform"
+          disabled={playAttempts?.remainingAttempts === 0}
+          className={`w-full font-bold py-4 px-8 rounded-lg text-lg transition-colors duration-200 shadow-lg ${
+            playAttempts?.remainingAttempts === 0
+              ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+              : 'bg-indigo-600 hover:bg-indigo-700 text-white hover:shadow-xl transform hover:scale-105 transition-transform'
+          }`}
         >
-          Start Playing
+          {playAttempts?.remainingAttempts === 0 ? 'Daily Limit Reached' : 'Start Playing'}
         </button>
 
         {/* Footer */}
         <p className="text-xs text-gray-400 mt-8">
-          One game per day • Compete on the leaderboard
+          {playAttempts?.maxAttempts === 999 
+            ? 'Unlimited attempts (dev mode) • Compete on the leaderboard'
+            : `${playAttempts?.maxAttempts || 2} attempts per day • Compete on the leaderboard`
+          }
         </p>
       </div>
     </div>

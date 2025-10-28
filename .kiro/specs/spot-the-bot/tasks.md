@@ -1,194 +1,272 @@
 # Implementation Plan
 
-- [x] 1. Set up core game data models and shared types
+## Gameplay Improvements Overview
 
-  - Create TypeScript interfaces for GameSession, GameRound, ImageData, and LeaderboardEntry in shared types
-  - Define ImageCategory enum and BadgeType enum
-  - Create API request/response types for all game endpoints
-  - _Requirements: 1.1, 2.1, 6.3, 9.1_
+This implementation plan covers the enhancement of Spot the Bot with:
 
-- [x] 2. Implement Redis data layer and game state management
+- 6 rounds instead of 5 (15 seconds per round instead of 10)
+- Educational content after round 3 (tips and AI facts)
+- Inspirational/humorous content with results
+- Audio system (background music and sound effects)
+- Enhanced sharing with friends and play limits (2 attempts per day)
+- Science category addition (6 total categories)
 
-  - [x] 2.1 Create Redis key schemas for daily game state, user sessions, and leaderboards
+## Current Status
 
-    - Design Redis key naming conventions for daily games, user sessions, and leaderboard data
-    - Implement utility functions for generating consistent Redis keys
-    - _Requirements: 6.1, 7.1, 9.5_
+The base game is fully implemented with 5 rounds, 10-second timers, and all core functionality including:
 
-  - [x] 2.2 Implement game session storage and retrieval
+- Complete game logic and scoring system
+- Redis data layer and session management
+- Real-time features and leaderboards
+- Client interface components
+- Error handling and validation
+- Testing suite
 
-    - Create functions to store and retrieve user game sessions in Redis
-    - Implement session validation to ensure users can only play once per day
-    - Add session expiration handling for cleanup
-    - _Requirements: 1.4, 6.1_
+## Enhancement Tasks
 
-  - [x] 2.3 Implement leaderboard operations using Redis sorted sets
-    - Create functions for adding scores to daily, weekly, and all-time leaderboards
-    - Implement leaderboard retrieval with ranking and user position lookup
-    - Add atomic score update operations to prevent race conditions
-    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+The following tasks implement the new requirements for enhanced gameplay:
 
-- [x] 3. Create daily game content management system
+- [x] 1. Update core game configuration for 6 rounds and 15-second timer
 
-  - [x] 3.1 Implement image data structure and metadata management
+  - [x] 1.1 Update shared types and interfaces
 
-    - Create image asset organization system with categories
-    - Implement image metadata storage including AI/human classification
-    - Create image validation functions to ensure proper format and metadata
-    - _Requirements: 6.3, 6.4_
+    - Add Science category to ImageCategory enum
+    - Modify GameSession interface to include attemptNumber and showedEducationalContent
+    - Update GameRound interface for 15-second timer
+    - Add EducationalContent, InspirationContent, UserPlayLimit, and AudioConfig interfaces
+    - Update badge types to include new "AI Detective" badge for 5/6 correct
+    - _Requirements: 1.1, 2.1, 6.2, 8.1-8.6, 10.1-10.5, 11.1-11.5, 13.1-13.5_
 
-  - [x] 3.2 Implement daily game state initialization
+  - [x] 1.2 Update game logic constants and validation
 
-    - Create function to generate daily game rounds with randomized category order
-    - Implement AI image placement randomization for each round
-    - Add daily game state persistence to Redis with proper expiration
-    - _Requirements: 6.1, 6.2, 6.4, 2.2_
+    - Change round count validation from 5 to 6 rounds in game-logic.ts
+    - Update timer validation from 10 to 15 seconds (10000ms to 15000ms)
+    - Update correctCount validation from max 5 to max 6
+    - Update badge assignment logic for 6-round gameplay
+    - _Requirements: 1.1, 2.1, 8.1-8.6_
 
-  - [x] 3.3 Create scheduled job for daily reset at 00:00 UTC
-    - Implement cron job configuration in devvit.json for daily reset
-    - Create server endpoint to handle daily reset logic
-    - Add error handling and logging for reset job failures
+  - [x] 1.3 Update client components for 6 rounds and 15-second timer
+
+    - Update GameRound component timer from 10 to 15 seconds
+    - Update round display from "Round X of 5" to "Round X of 6"
+    - Update timer progress bar calculation for 15-second duration
+    - Update SplashScreen instructions for 6 rounds and 15-second timer
+    - _Requirements: 2.1, 2.3_
+
+  - [x] 1.4 Update server validation and middleware
+    - Update API endpoint validation for 6 rounds (roundNumber 1-6)
+    - Update timer validation in middleware for 15-second limit
+    - Update security validation for new round and timer limits
+    - _Requirements: 2.1, 2.3, 9.1-9.5_
+
+- [x] 2. Add Science category support
+
+  - [x] 2.1 Update image management for Science category
+
+    - Add Science category to image-loader.ts
+    - Update daily game generation to use all 6 categories
+    - Create Science category folder structure documentation
+    - Update image validation to include Science category
+    - _Requirements: 6.2, 6.3_
+
+  - [x] 2.2 Update daily game state for 6 rounds
+    - Modify daily game state to generate 6 rounds instead of 5
+    - Update category selection to use all 6 categories (including Science)
+    - Ensure proper randomization across 6 categories and 6 rounds
+    - Update image pair selection logic for expanded game
     - _Requirements: 6.1, 6.2_
 
-- [x] 4. Implement core game logic and scoring system
+- [x] 3. Implement educational content system
 
-  - [x] 4.1 Create game initialization and round management
+  - [x] 3.1 Create content file structure and management
 
-    - Implement API endpoint to initialize new game sessions
-    - Create round progression logic with proper state transitions
-    - Add validation to ensure proper game flow and prevent cheating
-    - _Requirements: 1.1, 1.3, 2.1_
+    - Create content directory structure for educational and inspirational content
+    - Design simple text format for easy editing (JSON or plain text with separators)
+    - Create sample educational tips about identifying AI images
+    - Create sample AI facts in accessible language
+    - Create sample inspirational quotes and humorous content
+    - _Requirements: 10.3, 11.2, 11.3, 14.1-14.5_
 
-  - [x] 4.2 Implement answer submission and validation
+  - [x] 3.2 Implement daily content rotation logic
 
-    - Create API endpoint for processing user answer submissions
-    - Implement server-side timer validation and score calculation
-    - Add immediate feedback generation with correct answer revelation
-    - _Requirements: 2.3, 4.1, 4.2, 4.3, 9.1, 9.2, 9.3_
+    - Create content rotation system that reads from config files daily at 00:00 UTC
+    - Implement content selection logic for tips, facts, and inspiration from files
+    - Add content caching and validation for file-based content
+    - Update daily reset job to include content file reading
+    - _Requirements: 10.3, 11.4, 14.1-14.3_
 
-  - [x] 4.3 Create badge assignment system
-    - Implement badge logic based on correct answer count
-    - Create badge assignment function with proper enum handling
-    - Add badge display data for results screen
-    - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
+  - [x] 3.3 Create content loading utilities
+    - Implement file reading utilities for educational and inspirational content
+    - Add content parsing and validation for text config files
+    - Create content caching system for daily rotation
+    - Add error handling for missing or corrupted content files
+    - _Requirements: 10.1-10.5, 11.1-11.5_
 
-- [x] 5. Build game client interface components
+- [x] 4. Implement educational content display system
 
-  - [x] 5.1 Create splash screen with participant counter
+  - [x] 4.1 Create educational content component
 
-    - Implement welcome screen component with current date display
-    - Add real-time participant count display using Devvit Realtime API
-    - Create start game button with proper navigation
-    - _Requirements: 7.1, 7.2, 7.3_
+    - Build EducationalContent component to display after round 3
+    - Implement tips display with clear, accessible formatting from config files
+    - Add AI facts display with everyday language from config files
+    - Create continue button to proceed to remaining rounds
+    - _Requirements: 10.1-10.5_
 
-  - [x] 5.2 Implement game round interface with timer
+  - [x] 4.2 Integrate educational content into game flow
+    - Modify game logic to pause after round 3 completion and load content from files
+    - Add educational content display trigger with file-based content
+    - Update game state management to track educational content display
+    - Ensure smooth transition to rounds 4-6 after content viewing
+    - _Requirements: 10.1, 10.5_
 
-    - Create side-by-side image display component with responsive design
-    - Implement 10-second countdown timer with visual feedback
-    - Add image selection handling with immediate response
-    - Create feedback display showing correct answer after selection
-    - _Requirements: 2.1, 2.2, 2.3, 4.1, 4.2_
+- [x] 5. Implement audio system
 
-  - [x] 5.3 Build results screen with score display and sharing
-    - Create final score display with breakdown of correct answers and time bonus
-    - Implement badge display component with earned badge highlighting
-    - Add leaderboard position display with user rank highlighting
-    - Create share functionality with clipboard integration and toast confirmation
-    - _Requirements: 1.3, 5.1, 5.2, 5.3, 5.4, 8.5_
+  - [x] 5.1 Create audio system architecture
 
-- [x] 6. Implement leaderboard system with multiple views
+    - Design audio file naming conventions and upload instructions
+    - Implement AudioSystem component with volume controls
+    - Add audio loading and error handling with graceful degradation
+    - Create audio configuration management
+    - _Requirements: 12.1-12.5_
 
-  - [x] 6.1 Create leaderboard API endpoints
+  - [x] 5.2 Integrate background music and sound effects
 
-    - Implement endpoints for daily, weekly, and all-time leaderboard retrieval
-    - Add user rank lookup endpoint with position calculation
-    - Create participant count tracking and retrieval endpoint
-    - _Requirements: 3.1, 3.2, 3.4, 7.1_
+    - Add background music playback when game starts
+    - Implement click sound effects for image selection
+    - Add ending sounds based on game completion
+    - Create user controls for audio preferences (volume, mute)
+    - _Requirements: 12.1-12.4_
 
-  - [x] 6.2 Build leaderboard display components
-    - Create tabbed interface for daily, weekly, and all-time views
-    - Implement leaderboard table with username and score columns
-    - Add user highlighting and rank display functionality
-    - _Requirements: 3.3, 3.4, 3.5_
+  - [x] 5.3 Create audio file management system
+    - Document audio file naming conventions for manual upload
+    - Implement audio file validation and loading
+    - Add fallback handling for missing or corrupted audio files
+    - Create audio asset organization structure
+    - _Requirements: 12.4, 12.5_
 
-- [x] 7. Integrate Devvit Realtime API for live features
+- [x] 6. Implement play limit system
 
-  - [x] 7.1 Implement real-time participant counting
+  - [x] 6.1 Create play limit tracking
 
-    - Set up Realtime API connection for participant count updates
-    - Create participant join/leave event handling
-    - Add real-time counter updates on splash screen
-    - _Requirements: 7.1, 7.2, 7.3, 7.4_
+    - Implement UserPlayLimit data model and Redis storage
+    - Add daily attempt counting and validation
+    - Create play limit enforcement (2 attempts in production, unlimited in dev)
+    - Add best score tracking across multiple attempts
+    - _Requirements: 13.4, 13.5_
 
-  - [x] 7.2 Add real-time leaderboard updates
-    - Implement Realtime API integration for leaderboard changes
-    - Create live leaderboard update handling on results screen
-    - Add real-time rank position updates for active users
-    - _Requirements: 3.1, 3.5_
+  - [x] 6.2 Update game initialization for play limits
 
-- [x] 8. Create game flow orchestration and navigation
+    - Modify game initialization to check remaining attempts
+    - Add play limit validation before starting new games
+    - Update session management to track attempt numbers
+    - Display remaining attempts and best scores to users
+    - _Requirements: 13.1-13.5_
 
-  - [x] 8.1 Implement main game container component
+  - [x] 6.3 Create play limit API endpoints
+    - Implement GET /api/game/play-attempts endpoint
+    - Add POST /api/game/increment-attempts endpoint
+    - Update game initialization endpoints to include play limit data
+    - Add play limit validation to all game endpoints
+    - _Requirements: 13.4, 13.5_
 
-    - Create game state management with proper flow control
-    - Implement navigation between splash, game, and results screens
-    - Add error boundary handling for graceful error recovery
-    - _Requirements: 1.1, 1.3, 1.4_
+- [x] 7. Enhance sharing system with friends feature
 
-  - [x] 8.2 Add game completion and session management
-    - Implement game completion detection and final score calculation
-    - Create session cleanup and result persistence
-    - Add proper game state transitions and validation
-    - _Requirements: 1.3, 9.4, 9.5_
+  - [x] 7.1 Update sharing component and functionality
 
-- [x] 9. Implement error handling and data validation
+    - Modify share component to include "share with friends" option
+    - Update share message templates to include friend invitations
+    - Add logic to update share messages with new scores after replays
+    - Implement enhanced clipboard integration with multiple share options
+    - _Requirements: 13.1-13.3_
 
-  - [x] 9.1 Add client-side error handling and retry logic
+  - [x] 7.2 Integrate sharing with play limit system
+    - Connect sharing functionality with multiple attempt tracking
+    - Display best scores and improvement in share messages
+    - Add replay encouragement in share messages when attempts remain
+    - Update share message generation based on attempt number
+    - _Requirements: 13.1-13.3_
 
-    - Implement network failure handling with exponential backoff retry
-    - Create user-friendly error messages and recovery suggestions
-    - Add offline state handling with local caching
-    - _Requirements: All requirements for robustness_
+- [x] 8. Update results screen with inspirational content
 
-  - [x] 9.2 Create server-side validation and security measures
-    - Implement comprehensive input validation for all API endpoints
-    - Add rate limiting and anti-cheat detection
-    - Create server-side timer validation and score verification
-    - _Requirements: 2.3, 4.2, 9.1, 9.2_
+  - [x] 8.1 Enhance results screen component
 
-- [x] 10. Set up development workflow and deployment configuration
+    - Add inspirational content display alongside badge and scores from config files
+    - Implement daily rotating quotes and jokes from editable text files
+    - Update results layout to accommodate new content
+    - Add play again button when attempts remain
+    - _Requirements: 11.1-11.5_
 
-  - [x] 10.1 Configure Devvit app settings and permissions
+  - [x] 8.2 Update badge system for 6 rounds
+    - Modify badge assignment logic for 6-round gameplay
+    - Add new "AI Detective" badge for 5/6 correct answers
+    - Update badge display and descriptions
+    - Test badge assignment with new scoring system
+    - _Requirements: 8.1-8.6_
 
-    - Update devvit.json with required capabilities (redis, realtime, scheduler)
-    - Configure post creation and menu actions for game deployment
-    - Add proper app metadata and splash screen configuration
-    - _Requirements: All requirements for platform integration_
+- [x] 9. Update all hardcoded references to 5 rounds and 10 seconds
 
-  - [x] 10.2 Create build and deployment scripts
-    - Ensure proper build configuration for client and server bundles
-    - Add development workflow scripts for testing and debugging
-    - Create deployment checklist and validation steps
-    - _Requirements: Platform deployment requirements_
+  - [x] 9.1 Update client-side references
 
-- [x] 11. Add comprehensive testing suite
+    - Update all "5 rounds" references to "6 rounds" in components
+    - Update all "10 seconds" references to "15 seconds" in UI text
+    - Update progress calculations and display logic
+    - Update share messages and result displays
+    - _Requirements: 1.1, 2.1_
 
-  - [x]\* 11.1 Create unit tests for game logic and scoring
+  - [x] 9.2 Update server-side references
+    - Update all validation logic for 6 rounds and 15-second timer
+    - Update badge achievement messages for 6-round gameplay
+    - Update leaderboard display logic for new scoring
+    - Update API documentation and error messages
+    - _Requirements: 1.1, 2.1, 8.1-8.6_
 
-    - Write tests for score calculation and badge assignment logic
-    - Test Redis operations and data persistence functions
-    - Add tests for image randomization and round generation
-    - _Requirements: 9.1, 9.2, 8.1-8.5_
+- [ ] 10. Create comprehensive testing for enhanced features
 
-  - [x]\* 11.2 Implement integration tests for API endpoints
+  - [ ]\* 10.1 Test educational content system
 
-    - Test complete game flow from initialization to completion
-    - Add tests for leaderboard operations and real-time features
-    - Create tests for daily reset functionality and scheduler integration
-    - _Requirements: 1.1-1.4, 3.1-3.5, 6.1-6.4_
+    - Test content file loading and parsing from text config files
+    - Verify daily content rotation functionality with file-based content
+    - Test educational content display after round 3
+    - Validate content file reading and error handling
+    - _Requirements: 10.1-10.5, 14.1-14.5_
 
-  - [x]\* 11.3 Add end-to-end testing for user workflows
-    - Test complete user journey from splash screen to results
-    - Add multi-user concurrent testing scenarios
-    - Create performance tests for high-load situations
-    - _Requirements: All user-facing requirements_
+  - [ ]\* 10.2 Test audio system functionality
+
+    - Test audio loading and playback across different browsers
+    - Verify graceful degradation when audio fails
+    - Test user controls and volume management
+    - Validate audio file naming conventions and upload process
+    - _Requirements: 12.1-12.5_
+
+  - [ ]\* 10.3 Test play limit system
+
+    - Test daily attempt tracking and enforcement
+    - Verify play limit validation across all endpoints
+    - Test best score tracking and display
+    - Validate development vs production mode differences
+    - _Requirements: 13.1-13.5_
+
+  - [ ]\* 10.4 Test enhanced sharing functionality
+
+    - Test share with friends feature and message generation
+    - Verify share message updates after multiple attempts
+    - Test clipboard integration with enhanced sharing
+    - Validate sharing integration with play limit system
+    - _Requirements: 13.1-13.3_
+
+  - [ ]\* 10.5 Test complete 6-round gameplay with all enhancements
+    - Test full game flow with 6 rounds and 15-second timer
+    - Verify educational content display after round 3
+    - Test audio integration throughout gameplay
+    - Validate inspirational content display with results
+    - Test Science category integration and randomization
+    - _Requirements: All enhanced gameplay requirements_
+
+## Implementation Notes
+
+- **Development Mode**: The current implementation allows multiple plays per day in development mode for testing
+- **Production Deployment**: Play limits (2 attempts per day) should be enforced when deploying to production
+- **Content Management**: Educational and inspirational content should be stored in easily editable text files
+- **Audio Assets**: Audio files will need to be manually uploaded following specific naming conventions
+- **Science Category**: Image assets for the Science category will need to be uploaded to complete the 6-category system
+- **Backward Compatibility**: Existing game sessions and leaderboard data will remain functional during the transition

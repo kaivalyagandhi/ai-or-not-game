@@ -4,3 +4,5 @@ export { ResultsScreen } from './ResultsScreen';
 export { LeaderboardTabs } from './LeaderboardTabs';
 export { ErrorBoundary } from './ErrorBoundary';
 export { LoadingScreen } from './LoadingScreen';
+export { EducationalContent } from './EducationalContent';
+export { AudioSystem } from './AudioSystem';

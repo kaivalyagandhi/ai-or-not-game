@@ -59,7 +59,7 @@ architecture/
 The game works as follows:
 
 1. **Daily Selection**: Each day, the game randomly selects one image pair from each category
-2. **Round Structure**: Creates 5 rounds (one per category) in randomized order
+2. **Round Structure**: Creates 6 rounds (one per category) in randomized order
 3. **AI Placement**: Randomly places AI images on left or right side
 4. **Scoring**: Players get points for correctly identifying the human-created image
 

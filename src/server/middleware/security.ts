@@ -113,7 +113,7 @@ export function validateGameTiming() {
     const { timeRemaining } = req.body;
     
     // Basic time validation
-    if (timeRemaining < 0 || timeRemaining > 10000) {
+    if (timeRemaining < 0 || timeRemaining > 15000) {
       if (req.abuseDetectionKey) {
         abuseDetector.recordSuspiciousActivity(
           req.abuseDetectionKey, 
@@ -154,13 +154,13 @@ export function antiCheatValidation() {
       // In a real implementation, you'd track submission timestamps
       
       // Validate round progression
-      if (roundNumber < 1 || roundNumber > 5) {
+      if (roundNumber < 1 || roundNumber > 6) {
         flags.push('invalid_round_number');
         riskScore += 5;
       }
       
       // Check for impossible timing
-      if (timeRemaining > 10000) {
+      if (timeRemaining > 15000) {
         flags.push('impossible_timing');
         riskScore += 10;
       }

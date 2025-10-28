@@ -29,7 +29,7 @@
 ### Functional Testing
 - [ ] Test development environment with `npm run dev`
 - [ ] Verify playtest URL works: `https://www.reddit.com/r/spot_the_bot_dev?playtest=spot-the-bot`
-- [ ] Test complete game flow (5 rounds)
+- [ ] Test complete game flow (6 rounds)
 - [ ] Verify leaderboard functionality
 - [ ] Test real-time participant counting
 - [ ] Confirm daily reset scheduler works

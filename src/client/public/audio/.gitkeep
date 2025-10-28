@@ -1,0 +1,10 @@
+# This file ensures the audio directory is tracked by git
+# Remove this file once you add your audio files
+
+# Required audio files:
+# - background-music.mp3
+# - click-sound.wav  
+# - success-sound.wav
+# - failure-sound.wav
+
+# See README.md in this directory for detailed setup instructions

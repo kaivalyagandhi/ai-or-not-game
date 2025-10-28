@@ -55,6 +55,7 @@ describe('Game Logic - Session Validation', () => {
         createMockGameRound(3),
         createMockGameRound(4),
         createMockGameRound(5),
+        createMockGameRound(6),
       ],
       totalScore: 0,
       correctCount: 0,
@@ -88,7 +89,7 @@ describe('Game Logic - Session Validation', () => {
     validSession.rounds = [createMockGameRound(1)];
     const result = validateGameSession(validSession);
     expect(result.isValid).toBe(false);
-    expect(result.errors).toContain('Session must have exactly 5 rounds');
+    expect(result.errors).toContain('Session must have exactly 6 rounds');
   });
 
   it('should reject session with incorrect round numbers', () => {
@@ -127,7 +128,7 @@ describe('Game Logic - Session Validation', () => {
   });
 
   it('should reject session with invalid correct count', () => {
-    validSession.correctCount = 6;
+    validSession.correctCount = 7;
     const result = validateGameSession(validSession);
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain('Invalid correct count');
@@ -152,6 +153,7 @@ describe('Game Logic - Session Playability', () => {
       createMockGameRound(3),
       createMockGameRound(4),
       createMockGameRound(5),
+      createMockGameRound(6),
     ];
   });
 
@@ -189,6 +191,7 @@ describe('Game Logic - Game Progress', () => {
       createMockGameRound(3),
       createMockGameRound(4),
       createMockGameRound(5),
+      createMockGameRound(6),
     ];
   });
 
@@ -196,9 +199,9 @@ describe('Game Logic - Game Progress', () => {
     const progress = getGameProgress(session);
     expect(progress).toEqual({
       currentRoundNumber: 1,
-      totalRounds: 5,
+      totalRounds: 6,
       answeredRounds: 0,
-      remainingRounds: 5,
+      remainingRounds: 6,
       isComplete: false,
     });
   });
@@ -210,9 +213,9 @@ describe('Game Logic - Game Progress', () => {
     const progress = getGameProgress(session);
     expect(progress).toEqual({
       currentRoundNumber: 3,
-      totalRounds: 5,
+      totalRounds: 6,
       answeredRounds: 2,
-      remainingRounds: 3,
+      remainingRounds: 4,
       isComplete: false,
     });
   });
@@ -224,9 +227,9 @@ describe('Game Logic - Game Progress', () => {
     
     const progress = getGameProgress(session);
     expect(progress).toEqual({
-      currentRoundNumber: 5,
-      totalRounds: 5,
-      answeredRounds: 5,
+      currentRoundNumber: 6,
+      totalRounds: 6,
+      answeredRounds: 6,
       remainingRounds: 0,
       isComplete: true,
     });
@@ -266,6 +269,7 @@ describe('Game Logic - Session Age Validation', () => {
       createMockGameRound(3),
       createMockGameRound(4),
       createMockGameRound(5),
+      createMockGameRound(6),
     ];
     
     // Test session age validation logic

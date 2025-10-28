@@ -208,6 +208,13 @@ function getKnownPairsForCategory(category: ImageCategory): Array<{
         { pairNumber: 2, humanFilename: 'pair2-human.jpg', aiFilename: 'pair2-ai.png' },
       ];
     
+    case ImageCategory.SCIENCE:
+      return [
+        // Science category image pairs will be added when images are uploaded
+        // Expected format: pair1-human.jpg, pair1-ai.jpg, etc.
+        // Currently empty - images need to be uploaded to src/client/public/images/science/
+      ];
+    
     default:
       return [];
   }
@@ -225,6 +232,7 @@ export function loadAllImagePairs(
     [ImageCategory.NATURE]: [],
     [ImageCategory.FOOD]: [],
     [ImageCategory.PRODUCTS]: [],
+    [ImageCategory.SCIENCE]: [],
   };
 
   // Discover pairs for each category

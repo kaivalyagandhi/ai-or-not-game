@@ -8,6 +8,7 @@ import {
   validateImageCollection,
 } from './image-manager.js';
 import { DailyGameKeys, getCurrentDateUTC, KEY_EXPIRATION } from './redis-keys.js';
+import { contentManager } from './content-manager.js';
 
 /**
  * Daily Game State Management
@@ -135,8 +136,8 @@ export function generateDailyGameRounds(
 
   const rounds: GameRound[] = [];
 
-  // Generate 5 rounds (one per category)
-  for (let i = 0; i < 5 && i < categoryOrder.length; i++) {
+  // Generate 6 rounds (one per category)
+  for (let i = 0; i < 6 && i < categoryOrder.length; i++) {
     const category = categoryOrder[i]!;
     const round = generateGameRound(collection, category, i + 1);
 
@@ -145,9 +146,9 @@ export function generateDailyGameRounds(
     }
   }
 
-  // Ensure we have exactly 5 rounds
-  if (rounds.length < 5) {
-    throw new Error(`Failed to generate 5 rounds. Only generated ${rounds.length} rounds.`);
+  // Ensure we have exactly 6 rounds
+  if (rounds.length < 6) {
+    throw new Error(`Failed to generate 6 rounds. Only generated ${rounds.length} rounds.`);
   }
 
   // Optional: Ensure balanced AI placement across rounds
@@ -165,8 +166,8 @@ function ensureBalancedAIPlacement(rounds: GameRound[]): void {
   const aiOnLeftCount = rounds.filter((round) => round.aiImagePosition === 'A').length;
   const aiOnRightCount = rounds.filter((round) => round.aiImagePosition === 'B').length;
 
-  // If too imbalanced (more than 4-1 split), rebalance
-  if (Math.abs(aiOnLeftCount - aiOnRightCount) > 3) {
+  // If too imbalanced (more than 5-1 split for 6 rounds), rebalance
+  if (Math.abs(aiOnLeftCount - aiOnRightCount) > 4) {
     // Find rounds to swap
     const needsRebalancing = aiOnLeftCount > aiOnRightCount ? 'A' : 'B';
     const targetPosition = needsRebalancing === 'A' ? 'B' : 'A';
@@ -191,7 +192,7 @@ function ensureBalancedAIPlacement(rounds: GameRound[]): void {
 }
 
 /**
- * Creates daily game state with generated rounds
+ * Creates daily game state with generated rounds and content
  */
 export function createDailyGameState(
   collection: ImageCollection,
@@ -216,11 +217,19 @@ export function createDailyGameState(
   const imageSet = generateDailyGameRounds(collection, { ...options, categoryOrder });
   console.log('createDailyGameState: Generated', imageSet.length, 'rounds');
 
+  // Load daily educational and inspirational content
+  console.log('createDailyGameState: Loading daily content...');
+  const educationalContent = contentManager.getDailyEducationalContent();
+  const inspirationalContent = contentManager.getDailyInspirationContent();
+  console.log('createDailyGameState: Content loaded successfully');
+
   return {
     date: gameDate,
     imageSet,
     participantCount: 0,
     categoryOrder,
+    educationalContent,
+    inspirationalContent,
   };
 }
 
@@ -390,8 +399,8 @@ export function validateDailyGameState(gameState: DailyGameState): {
   if (!gameState.imageSet || !Array.isArray(gameState.imageSet)) {
     errors.push('Image set is required and must be an array');
   } else {
-    if (gameState.imageSet.length !== 5) {
-      errors.push('Image set must contain exactly 5 rounds');
+    if (gameState.imageSet.length !== 6) {
+      errors.push('Image set must contain exactly 6 rounds');
     }
 
     // Validate each round

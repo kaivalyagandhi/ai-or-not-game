@@ -5,10 +5,12 @@ export enum ImageCategory {
   NATURE = 'nature',
   FOOD = 'food',
   PRODUCTS = 'products',
+  SCIENCE = 'science',
 }
 
 export enum BadgeType {
-  AI_WHISPERER = 'ai_whisperer', // 5 correct
+  AI_WHISPERER = 'ai_whisperer', // 6 correct
+  AI_DETECTIVE = 'ai_detective', // 5 correct
   GOOD_SAMARITAN = 'good_samaritan', // 4 correct
   JUST_HUMAN = 'just_human', // 3 correct
   HUMAN_IN_TRAINING = 'human_in_training', // 2 or fewer correct
@@ -48,6 +50,8 @@ export interface GameSession {
   totalTimeBonus: number;
   badge: BadgeType;
   completed: boolean;
+  attemptNumber: number; // 1 or 2 for daily limit tracking
+  showedEducationalContent: boolean;
 }
 
 export interface LeaderboardEntry {
@@ -65,6 +69,43 @@ export interface DailyGameState {
   imageSet: GameRound[];
   participantCount: number;
   categoryOrder: ImageCategory[];
+  educationalContent: EducationalContent;
+  inspirationalContent: InspirationContent;
+}
+
+// Educational and Inspirational Content
+export interface EducationalContent {
+  tips: string[];
+  facts: string[];
+  currentTipIndex: number;
+  currentFactIndex: number;
+}
+
+export interface InspirationContent {
+  quotes: string[];
+  jokes: string[];
+  currentIndex: number;
+  type: 'quote' | 'joke';
+}
+
+// Play Limit Tracking
+export interface UserPlayLimit {
+  userId: string;
+  date: string;
+  attempts: number;
+  maxAttempts: number; // 2 in production, unlimited in dev
+  bestScore: number;
+  bestAttempt: GameSession;
+}
+
+// Audio Configuration
+export interface AudioConfig {
+  backgroundMusic: string; // File path/URL
+  clickSound: string;
+  successSound: string;
+  failureSound: string;
+  enabled: boolean;
+  volume: number; // 0-1
 }
 
 // API Request Types
@@ -87,6 +128,14 @@ export interface GetLeaderboardRequest {
 export interface GetUserRankRequest {
   userId: string;
   type: 'daily' | 'weekly' | 'all-time';
+}
+
+export interface GetPlayAttemptsRequest {
+  userId: string;
+}
+
+export interface IncrementAttemptsRequest {
+  userId: string;
 }
 
 // API Response Types
@@ -139,6 +188,41 @@ export interface UserRankResponse {
 export interface ParticipantCountResponse {
   success: boolean;
   count?: number;
+  error?: string;
+}
+
+export interface PlayAttemptsResponse {
+  success: boolean;
+  attempts?: number;
+  maxAttempts?: number;
+  remainingAttempts?: number;
+  bestScore?: number;
+  error?: string;
+}
+
+export interface EducationalContentResponse {
+  success: boolean;
+  tips?: string[];
+  facts?: string[];
+  currentTip?: string;
+  currentFact?: string;
+  error?: string;
+}
+
+export interface InspirationalContentResponse {
+  success: boolean;
+  quotes?: string[];
+  jokes?: string[];
+  currentContent?: string;
+  contentType?: 'quote' | 'joke';
+  error?: string;
+}
+
+export interface CurrentContentResponse {
+  success: boolean;
+  tip?: string;
+  fact?: string;
+  inspiration?: string;
   error?: string;
 }
 

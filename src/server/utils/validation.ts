@@ -164,7 +164,7 @@ export const gameValidationRules = {
       required: true,
       type: 'number' as const,
       min: 1,
-      max: 5,
+      max: 6,
     },
     {
       field: 'userAnswer',
@@ -177,7 +177,7 @@ export const gameValidationRules = {
       required: true,
       type: 'number' as const,
       min: 0,
-      max: 10000, // 10 seconds in milliseconds
+      max: 15000, // 15 seconds in milliseconds
     },
   ],
 
@@ -241,7 +241,7 @@ export const sessionValidation = {
    */
   isValidRoundTiming(startTime: number, timeRemaining: number): boolean {
     const elapsed = Date.now() - startTime;
-    const maxRoundTime = 15000; // 15 seconds max (10 + 5 buffer)
+    const maxRoundTime = 20000; // 20 seconds max (15 + 5 buffer)
     
     // Check if elapsed time is reasonable
     if (elapsed > maxRoundTime) {
@@ -249,7 +249,7 @@ export const sessionValidation = {
     }
     
     // Check if time remaining makes sense
-    const expectedTimeRemaining = 10000 - elapsed; // 10 seconds minus elapsed
+    const expectedTimeRemaining = 15000 - elapsed; // 15 seconds minus elapsed
     const tolerance = 2000; // 2 second tolerance
     
     return Math.abs(timeRemaining - expectedTimeRemaining) <= tolerance;
@@ -349,17 +349,17 @@ export const antiCheatValidation = {
     // Check for impossible timing
     let totalTime = 0;
     for (const round of rounds) {
-      if (round.timeRemaining > 10000) {
+      if (round.timeRemaining > 15000) {
         errors.push(`Impossible time remaining: ${round.timeRemaining}ms`);
       }
-      totalTime += (10000 - (round.timeRemaining || 0));
+      totalTime += (15000 - (round.timeRemaining || 0));
     }
     
-    // Total game time should be reasonable (at least 5 seconds, at most 60 seconds)
-    if (totalTime < 5000) {
+    // Total game time should be reasonable (at least 6 seconds, at most 90 seconds)
+    if (totalTime < 6000) {
       errors.push(`Game completed too quickly: ${totalTime}ms`);
     }
-    if (totalTime > 60000) {
+    if (totalTime > 90000) {
       errors.push(`Game took too long: ${totalTime}ms`);
     }
     

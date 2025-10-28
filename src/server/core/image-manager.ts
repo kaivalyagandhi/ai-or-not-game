@@ -33,6 +33,7 @@ export interface ImageCollection {
   [ImageCategory.NATURE]: ImageAsset[];
   [ImageCategory.FOOD]: ImageAsset[];
   [ImageCategory.PRODUCTS]: ImageAsset[];
+  [ImageCategory.SCIENCE]: ImageAsset[];
 }
 
 /**
@@ -363,6 +364,34 @@ export function createSampleImageCollection(): ImageCollection {
           description: 'Real photograph of running shoes',
           dateAdded: new Date().toISOString(),
           resolution: '1800x1200',
+        },
+      },
+    ],
+    [ImageCategory.SCIENCE]: [
+      {
+        id: 'science_ai_1',
+        filename: 'molecule_ai.jpg',
+        category: ImageCategory.SCIENCE,
+        isAI: true,
+        url: `${baseUrl}/science/molecule_ai.jpg`,
+        metadata: {
+          source: 'AI Generated - DALL-E',
+          description: 'AI generated molecular structure visualization',
+          dateAdded: new Date().toISOString(),
+          resolution: '1024x1024',
+        },
+      },
+      {
+        id: 'science_human_1',
+        filename: 'lab_real.jpg',
+        category: ImageCategory.SCIENCE,
+        isAI: false,
+        url: `${baseUrl}/science/lab_real.jpg`,
+        metadata: {
+          source: 'Science Photographer: Lab Tech',
+          description: 'Real photograph of laboratory equipment',
+          dateAdded: new Date().toISOString(),
+          resolution: '1920x1080',
         },
       },
     ],

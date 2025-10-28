@@ -2,7 +2,7 @@
 
 ## Overview
 
-Spot the Bot is a daily image identification game built on Reddit's Devvit platform. The game challenges players to distinguish between AI-generated and human-captured images across 5 rounds, with each round featuring a 10-second time limit. The system leverages Devvit's Redis capabilities for leaderboards and data persistence, realtime API for live participant counts, and scheduler for daily content rotation.
+Spot the Bot is a daily image identification game built on Reddit's Devvit platform. The game challenges players to distinguish between AI-generated and human-captured images across 6 rounds, with each round featuring a 15-second time limit. The system leverages Devvit's Redis capabilities for leaderboards and data persistence, realtime API for live participant counts, scheduler for daily content rotation, and includes educational content, audio feedback, and enhanced social sharing features. Players can attempt the game up to 2 times per day in production mode.
 
 ## Architecture
 
@@ -14,7 +14,9 @@ graph TB
         UI[Game UI]
         Timer[Round Timer]
         Leaderboard[Leaderboard Display]
-        Share[Share Component]
+        Share[Enhanced Share Component]
+        Audio[Audio System]
+        Education[Educational Content Display]
     end
 
     subgraph "Server (Express)"
@@ -22,6 +24,8 @@ graph TB
         GameLogic[Game Logic]
         ScoreCalc[Score Calculator]
         ImageMgmt[Image Management]
+        ContentMgmt[Daily Content Management]
+        PlayLimit[Play Limit Tracking]
     end
 
     subgraph "Devvit Platform"
@@ -33,33 +37,45 @@ graph TB
 
     subgraph "External"
         ImageAssets[Image Assets]
+        AudioAssets[Audio Files]
+        ContentFiles[Educational & Inspirational Content]
     end
 
     UI --> API
     Timer --> API
     Leaderboard --> API
     Share --> Reddit
+    Audio --> AudioAssets
+    Education --> API
 
     API --> GameLogic
     API --> ScoreCalc
     API --> ImageMgmt
+    API --> PlayLimit
 
     GameLogic --> Redis
     ScoreCalc --> Redis
     ImageMgmt --> Redis
+    PlayLimit --> Redis
 
     API --> Realtime
     Scheduler --> Redis
     Scheduler --> ImageAssets
+    Scheduler --> ContentFiles
+    ContentMgmt --> ContentFiles
 ```
 
 ### Data Flow
 
-1. **Game Initialization**: Client requests daily game data from server
-2. **Round Management**: Server provides image pairs with metadata for each round
-3. **Score Tracking**: Real-time score calculation and persistence to Redis
-4. **Leaderboard Updates**: Live leaderboard updates via Realtime API
-5. **Daily Reset**: Scheduled job resets game state and loads new images
+1. **Game Initialization**: Client requests daily game data from server, checks play limits
+2. **Round Management**: Server provides image pairs with metadata for each of 6 rounds across 6 categories (Animals, Architecture, Nature, Food, Products, Science)
+3. **Educational Content**: After round 3, display daily rotating tips and AI facts from config files
+4. **Audio Feedback**: Background music and sound effects enhance gameplay experience
+5. **Score Tracking**: Real-time score calculation and persistence to Redis
+6. **Leaderboard Updates**: Live leaderboard updates via Realtime API
+7. **Results Enhancement**: Display inspirational content from config files with final results
+8. **Enhanced Sharing**: Share with friends feature and replay tracking
+9. **Daily Reset**: Scheduled job resets game state, loads new images and content
 
 ## Components and Interfaces
 
@@ -82,18 +98,37 @@ graph TB
 - **Purpose**: Individual round gameplay interface
 - **Features**:
   - Side-by-side image display with randomized AI placement
-  - 10-second countdown timer
-  - Image selection handling
+  - 15-second countdown timer
+  - Image selection handling with audio feedback
   - Immediate feedback display highlighting the AI image
+
+#### EducationalContent
+
+- **Purpose**: Midgame educational display after round 3
+- **Features**:
+  - Daily rotating tips for identifying AI images
+  - Fun facts about AI image generation in accessible language
+  - Continue button to proceed to remaining rounds
+
+#### AudioSystem
+
+- **Purpose**: Audio feedback and atmosphere management
+- **Features**:
+  - Background music during gameplay
+  - Click sound effects for image selection
+  - Ending sounds based on performance
+  - Volume controls and mute options
 
 #### ResultsScreen
 
 - **Purpose**: Post-game results and social sharing
 - **Features**:
-  - Final score display
-  - Badge presentation
+  - Final score display with updated badge system (6 rounds)
+  - Badge presentation with inspirational/humorous content
   - Leaderboard position
-  - Share functionality with clipboard integration
+  - Enhanced share functionality with "share with friends" option
+  - Daily rotating inspirational quotes and humor
+  - Play again option (if under daily limit)
 
 #### LeaderboardTabs
 
@@ -109,6 +144,8 @@ GET / api / game / init;
 POST / api / game / start;
 POST / api / game / submit - answer;
 GET / api / game / results;
+GET / api / game / play - attempts;
+POST / api / game / increment - attempts;
 ```
 
 #### Leaderboard Operations
@@ -127,6 +164,8 @@ GET / api / participants / count;
 POST / api / participants / join;
 ```
 
+
+
 #### Administrative
 
 ```typescript
@@ -144,12 +183,14 @@ interface GameSession {
   userId: string;
   sessionId: string;
   startTime: number;
-  rounds: GameRound[];
+  rounds: GameRound[]; // Now contains 6 rounds
   totalScore: number;
   correctCount: number;
   totalTimeBonus: number;
   badge: BadgeType;
   completed: boolean;
+  attemptNumber: number; // 1 or 2 for daily limit tracking
+  showedEducationalContent: boolean;
 }
 ```
 
@@ -157,14 +198,14 @@ interface GameSession {
 
 ```typescript
 interface GameRound {
-  roundNumber: number;
+  roundNumber: number; // 1-6 instead of 1-5
   category: ImageCategory;
   imageA: ImageData;
   imageB: ImageData;
   correctAnswer: 'A' | 'B'; // Randomized placement of human image
   aiImagePosition: 'A' | 'B'; // Which position contains the AI image
   userAnswer?: 'A' | 'B';
-  timeRemaining?: number;
+  timeRemaining?: number; // Based on 15-second timer
   isCorrect?: boolean;
 }
 ```
@@ -175,7 +216,7 @@ interface GameRound {
 interface ImageData {
   id: string;
   url: string;
-  category: ImageCategory;
+  category: ImageCategory; // Animals, Architecture, Nature, Food, Products, Science
   isAI: boolean;
   metadata: {
     source: string;
@@ -203,9 +244,55 @@ interface LeaderboardEntry {
 ```typescript
 interface DailyGameState {
   date: string; // YYYY-MM-DD format
-  imageSet: GameRound[];
+  imageSet: GameRound[]; // Now contains 6 rounds
   participantCount: number;
   categoryOrder: ImageCategory[];
+  educationalContent: EducationalContent;
+  inspirationalContent: InspirationContent;
+}
+
+### Educational Content
+
+```typescript
+interface EducationalContent {
+  tips: string[];
+  facts: string[];
+  currentTipIndex: number;
+  currentFactIndex: number;
+}
+
+### Inspiration Content
+
+```typescript
+interface InspirationContent {
+  quotes: string[];
+  jokes: string[];
+  currentIndex: number;
+  type: 'quote' | 'joke';
+}
+
+### Play Limit Tracking
+
+```typescript
+interface UserPlayLimit {
+  userId: string;
+  date: string;
+  attempts: number;
+  maxAttempts: number; // 2 in production, unlimited in dev
+  bestScore: number;
+  bestAttempt: GameSession;
+}
+
+### Audio Configuration
+
+```typescript
+interface AudioConfig {
+  backgroundMusic: string; // File path/URL
+  clickSound: string;
+  successSound: string;
+  failureSound: string;
+  enabled: boolean;
+  volume: number; // 0-1
 }
 ```
 
@@ -221,8 +308,14 @@ interface DailyGameState {
 
 #### Timer Issues
 
-- **Sync Validation**: Server-side validation of client timer submissions
+- **Sync Validation**: Server-side validation of client timer submissions (15-second limit)
 - **Fallback Mechanism**: Server timeout if client fails to submit within time limit
+
+#### Audio System Failures
+
+- **Graceful Degradation**: Game continues to function if audio fails to load
+- **User Controls**: Allow users to disable audio if experiencing issues
+- **File Validation**: Validate audio file formats and sizes before loading
 
 ### Server-Side Error Handling
 
@@ -239,19 +332,27 @@ interface DailyGameState {
 - **Fallback Images**: Backup image sets for each category
 - **Error Logging**: Comprehensive logging for debugging image issues
 
+#### Content Management Failures
+
+- **Content Fallbacks**: Default educational and inspirational content if files fail to load
+- **File Validation**: Validate content file formats and encoding
+- **Update Handling**: Graceful handling of content updates during active games
+
 ### Data Validation
 
 #### Score Integrity
 
 - **Server Validation**: All score calculations performed server-side
-- **Timestamp Verification**: Validate round completion times against server clock
+- **Timestamp Verification**: Validate round completion times against server clock (15-second limit)
 - **Anti-Cheat**: Rate limiting and suspicious activity detection
+- **Play Limit Enforcement**: Strict validation of daily attempt limits
 
 #### User Input Validation
 
 - **Answer Validation**: Ensure answers are valid ('A' or 'B')
-- **Session Validation**: Verify user can only play once per day
-- **Timing Validation**: Reject submissions outside valid time windows
+- **Session Validation**: Verify user respects daily play limits (2 attempts max in production)
+- **Timing Validation**: Reject submissions outside valid time windows (15 seconds per round)
+- **Content Validation**: Validate educational and inspirational content before display
 
 ## Testing Strategy
 
@@ -259,21 +360,26 @@ interface DailyGameState {
 
 #### Client Components
 
-- **Component Rendering**: Test all UI components render correctly
-- **State Management**: Verify game state transitions and timer functionality
-- **User Interactions**: Test image selection and navigation flows
+- **Component Rendering**: Test all UI components render correctly including new educational and audio components
+- **State Management**: Verify game state transitions and 15-second timer functionality
+- **User Interactions**: Test image selection, navigation flows, and audio controls
+- **Educational Content**: Test midgame educational content display after round 3
+- **Audio System**: Test audio playback, volume controls, and graceful degradation
 
 #### Server Logic
 
-- **API Endpoints**: Test all endpoint responses and error conditions
-- **Score Calculation**: Verify accuracy and time bonus calculations
-- **Game Logic**: Test round progression and completion detection
+- **API Endpoints**: Test all endpoint responses and error conditions including new content and play limit endpoints
+- **Score Calculation**: Verify accuracy and time bonus calculations for 6-round games
+- **Game Logic**: Test round progression, completion detection, and play limit enforcement
+- **Content Management**: Test daily content rotation for educational and inspirational content
 
 #### Utility Functions
 
 - **Date Handling**: Test UTC date calculations and timezone handling
 - **Image Processing**: Test image metadata parsing and validation
-- **Badge Logic**: Test badge assignment based on correct answers
+- **Badge Logic**: Test badge assignment based on correct answers (updated for 6 rounds)
+- **Content Rotation**: Test daily rotation logic for educational and inspirational content
+- **Play Limit Logic**: Test daily attempt tracking and limit enforcement
 
 ### Integration Testing
 
@@ -299,9 +405,12 @@ interface DailyGameState {
 
 #### Complete Game Flow
 
-- **Full Playthrough**: Test complete 5-round game session
+- **Full Playthrough**: Test complete 6-round game session with educational content after round 3
+- **Audio Integration**: Test complete game flow with background music and sound effects
 - **Score Persistence**: Verify scores appear correctly on leaderboards
-- **Daily Transition**: Test behavior across daily reset boundary
+- **Play Limits**: Test multiple attempts per day and limit enforcement
+- **Enhanced Sharing**: Test share with friends functionality and updated messages
+- **Daily Transition**: Test behavior across daily reset boundary including content rotation
 
 #### Multi-User Scenarios
 
@@ -332,5 +441,6 @@ interface DailyGameState {
 #### Motor Accessibility
 
 - **Touch Targets**: Ensure touch targets meet minimum size requirements
-- **Timing**: Provide options for users who need more time
+- **Timing**: Provide options for users who need more time (15-second timer consideration)
 - **Alternative Inputs**: Support for various input methods
+- **Audio Controls**: Accessible audio controls for users with different needs

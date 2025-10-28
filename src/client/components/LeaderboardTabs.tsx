@@ -320,7 +320,7 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
                           </span>
                         </div>
                         <div className="flex items-center space-x-4 text-xs text-gray-500">
-                          <span>✅ {entry.correctCount}/5</span>
+                          <span>✅ {entry.correctCount}/6</span>
                           <span>⚡ +{entry.timeBonus.toFixed(2)}</span>
                         </div>
                       </div>

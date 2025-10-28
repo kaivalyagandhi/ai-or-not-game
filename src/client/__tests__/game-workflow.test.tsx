@@ -8,10 +8,11 @@ import { App } from '../App.js';
 import { BadgeType } from '../../shared/types/api.js';
 
 // Mock network calls
-const mockApiCall = vi.fn();
-vi.mock('../utils/network.js', () => ({
-  apiCall: mockApiCall,
-}));
+vi.mock('../utils/network.js');
+
+// Import the mocked module
+import * as networkModule from '../utils/network.js';
+const mockApiCall = vi.mocked(networkModule.apiCall);
 
 // Mock storage
 const mockGameStorage = {
@@ -54,7 +55,7 @@ describe('Game Workflow - Complete User Journey', () => {
         sessionId: 'test-session-123',
         currentRound: createMockGameRound(1),
       })
-      // Submit answers for 5 rounds
+      // Submit answers for 6 rounds
       .mockResolvedValueOnce({
         success: true,
         isCorrect: true,
@@ -97,12 +98,21 @@ describe('Game Workflow - Complete User Journey', () => {
         correctAnswer: 'A',
         aiImagePosition: 'B',
         roundScore: 21,
+        gameComplete: false,
+        nextRound: createMockGameRound(6),
+      })
+      .mockResolvedValueOnce({
+        success: true,
+        isCorrect: true,
+        correctAnswer: 'A',
+        aiImagePosition: 'B',
+        roundScore: 11,
         gameComplete: true,
         finalResults: {
-          totalScore: 144,
-          correctCount: 4,
-          timeBonus: 140,
-          badge: BadgeType.GOOD_SAMARITAN,
+          totalScore: 155,
+          correctCount: 5,
+          timeBonus: 150,
+          badge: BadgeType.AI_DETECTIVE,
         },
       });
 
@@ -118,17 +128,17 @@ describe('Game Workflow - Complete User Journey', () => {
 
     // Wait for game to initialize and start
     await waitFor(() => {
-      expect(screen.getByText(/round 1 of 5/i)).toBeInTheDocument();
+      expect(screen.getByText(/round 1 of 6/i)).toBeInTheDocument();
     });
 
-    // 3. Play through all 5 rounds
-    for (let round = 1; round <= 5; round++) {
+    // 3. Play through all 6 rounds
+    for (let round = 1; round <= 6; round++) {
       // Should show round info
-      expect(screen.getByText(new RegExp(`round ${round} of 5`, 'i'))).toBeInTheDocument();
+      expect(screen.getByText(new RegExp(`round ${round} of 6`, 'i'))).toBeInTheDocument();
       expect(screen.getByText(/which image is real/i)).toBeInTheDocument();
 
       // Should show timer
-      expect(screen.getByText('10')).toBeInTheDocument();
+      expect(screen.getByText('15')).toBeInTheDocument();
 
       // Should show images
       const imageButtons = screen.getAllByRole('button');
@@ -143,8 +153,8 @@ describe('Game Workflow - Complete User Journey', () => {
 
       // Wait for feedback
       await waitFor(() => {
-        if (round < 5) {
-          expect(screen.getByText(new RegExp(`round ${round + 1} of 5`, 'i'))).toBeInTheDocument();
+        if (round < 6) {
+          expect(screen.getByText(new RegExp(`round ${round + 1} of 6`, 'i'))).toBeInTheDocument();
         }
       });
     }
@@ -152,9 +162,9 @@ describe('Game Workflow - Complete User Journey', () => {
     // 4. Should show results screen after completing all rounds
     await waitFor(() => {
       expect(screen.getByText(/game complete/i)).toBeInTheDocument();
-      expect(screen.getByText(/144/)).toBeInTheDocument(); // Total score
-      expect(screen.getByText(/4.*5/)).toBeInTheDocument(); // 4 out of 5 correct
-      expect(screen.getByText(/good samaritan/i)).toBeInTheDocument(); // Badge
+      expect(screen.getByText(/155/)).toBeInTheDocument(); // Total score
+      expect(screen.getByText(/5.*6/)).toBeInTheDocument(); // 5 out of 6 correct
+      expect(screen.getByText(/ai detective/i)).toBeInTheDocument(); // Badge
     });
 
     // 5. Should show leaderboard button
@@ -315,17 +325,17 @@ describe('Game Workflow - Edge Cases', () => {
     fireEvent.click(playButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/round 1 of 5/i)).toBeInTheDocument();
+      expect(screen.getByText(/round 1 of 6/i)).toBeInTheDocument();
     });
 
     // Wait for timer to run down (simulate timeout)
     // Note: In a real test, you might want to mock timers
     await waitFor(() => {
-      expect(screen.getByText(/round 2 of 5/i)).toBeInTheDocument();
-    }, { timeout: 12000 });
+      expect(screen.getByText(/round 2 of 6/i)).toBeInTheDocument();
+    }, { timeout: 17000 });
   });
 
-  it('should handle perfect score (5/5 correct)', async () => {
+  it('should handle perfect score (6/6 correct)', async () => {
     // Mock perfect game
     mockApiCall
       .mockResolvedValueOnce({
@@ -338,8 +348,8 @@ describe('Game Workflow - Edge Cases', () => {
         currentRound: createMockGameRound(1),
       });
 
-    // Mock 5 correct answers
-    for (let i = 0; i < 4; i++) {
+    // Mock 6 correct answers
+    for (let i = 0; i < 5; i++) {
       mockApiCall.mockResolvedValueOnce({
         success: true,
         isCorrect: true,
@@ -360,9 +370,9 @@ describe('Game Workflow - Edge Cases', () => {
       roundScore: 51,
       gameComplete: true,
       finalResults: {
-        totalScore: 255,
-        correctCount: 5,
-        timeBonus: 250,
+        totalScore: 306,
+        correctCount: 6,
+        timeBonus: 300,
         badge: BadgeType.AI_WHISPERER,
       },
     });
@@ -374,18 +384,18 @@ describe('Game Workflow - Edge Cases', () => {
     fireEvent.click(playButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/round 1 of 5/i)).toBeInTheDocument();
+      expect(screen.getByText(/round 1 of 6/i)).toBeInTheDocument();
     });
 
     // Click through all rounds quickly
-    for (let round = 1; round <= 5; round++) {
+    for (let round = 1; round <= 6; round++) {
       const imageButtons = screen.getAllByRole('button');
       const imageA = imageButtons.find(btn => btn.textContent?.includes('A'));
       fireEvent.click(imageA!);
 
-      if (round < 5) {
+      if (round < 6) {
         await waitFor(() => {
-          expect(screen.getByText(new RegExp(`round ${round + 1} of 5`, 'i'))).toBeInTheDocument();
+          expect(screen.getByText(new RegExp(`round ${round + 1} of 6`, 'i'))).toBeInTheDocument();
         });
       }
     }
@@ -393,12 +403,12 @@ describe('Game Workflow - Edge Cases', () => {
     // Should show perfect score results
     await waitFor(() => {
       expect(screen.getByText(/ai whisperer/i)).toBeInTheDocument();
-      expect(screen.getByText(/255/)).toBeInTheDocument();
-      expect(screen.getByText(/5.*5/)).toBeInTheDocument();
+      expect(screen.getByText(/306/)).toBeInTheDocument();
+      expect(screen.getByText(/6.*6/)).toBeInTheDocument();
     });
   });
 
-  it('should handle poor score (0/5 correct)', async () => {
+  it('should handle poor score (0/6 correct)', async () => {
     // Mock poor performance game
     mockApiCall
       .mockResolvedValueOnce({
@@ -411,8 +421,8 @@ describe('Game Workflow - Edge Cases', () => {
         currentRound: createMockGameRound(1),
       });
 
-    // Mock 5 incorrect answers
-    for (let i = 0; i < 4; i++) {
+    // Mock 6 incorrect answers
+    for (let i = 0; i < 5; i++) {
       mockApiCall.mockResolvedValueOnce({
         success: true,
         isCorrect: false,
@@ -447,18 +457,18 @@ describe('Game Workflow - Edge Cases', () => {
     fireEvent.click(playButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/round 1 of 5/i)).toBeInTheDocument();
+      expect(screen.getByText(/round 1 of 6/i)).toBeInTheDocument();
     });
 
     // Click wrong answers for all rounds
-    for (let round = 1; round <= 5; round++) {
+    for (let round = 1; round <= 6; round++) {
       const imageButtons = screen.getAllByRole('button');
       const imageB = imageButtons.find(btn => btn.textContent?.includes('B'));
       fireEvent.click(imageB!);
 
-      if (round < 5) {
+      if (round < 6) {
         await waitFor(() => {
-          expect(screen.getByText(new RegExp(`round ${round + 1} of 5`, 'i'))).toBeInTheDocument();
+          expect(screen.getByText(new RegExp(`round ${round + 1} of 6`, 'i'))).toBeInTheDocument();
         });
       }
     }
@@ -466,7 +476,7 @@ describe('Game Workflow - Edge Cases', () => {
     // Should show poor score results
     await waitFor(() => {
       expect(screen.getByText(/human in training/i)).toBeInTheDocument();
-      expect(screen.getByText(/0.*5/)).toBeInTheDocument();
+      expect(screen.getByText(/0.*6/)).toBeInTheDocument();
     });
   });
 });
@@ -514,7 +524,7 @@ describe('Game Workflow - Accessibility', () => {
     fireEvent.keyDown(playButton, { key: 'Enter' });
     
     await waitFor(() => {
-      expect(screen.getByText(/round 1 of 5/i)).toBeInTheDocument();
+      expect(screen.getByText(/round 1 of 6/i)).toBeInTheDocument();
     });
   });
 
@@ -536,7 +546,7 @@ describe('Game Workflow - Accessibility', () => {
     fireEvent.click(playButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/round 1 of 5/i)).toBeInTheDocument();
+      expect(screen.getByText(/round 1 of 6/i)).toBeInTheDocument();
     });
 
     // Check that images have proper alt text
@@ -547,3 +557,33 @@ describe('Game Workflow - Accessibility', () => {
     });
   });
 });
+
+// Helper function to create mock game rounds
+function createMockGameRound(roundNumber: number) {
+  return {
+    roundNumber,
+    category: 'Animals' as const,
+    imageA: {
+      id: `img-a-${roundNumber}`,
+      url: `https://example.com/image-a-${roundNumber}.jpg`,
+      category: 'Animals' as const,
+      isAI: false,
+      metadata: {
+        source: 'human',
+        description: `A real photo of an animal - round ${roundNumber}`,
+      },
+    },
+    imageB: {
+      id: `img-b-${roundNumber}`,
+      url: `https://example.com/image-b-${roundNumber}.jpg`,
+      category: 'Animals' as const,
+      isAI: true,
+      metadata: {
+        source: 'ai',
+        description: `An AI-generated image of an animal - round ${roundNumber}`,
+      },
+    },
+    correctAnswer: 'A' as const,
+    aiImagePosition: 'B' as const,
+  };
+}

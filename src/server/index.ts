@@ -18,6 +18,11 @@ import { resetDailyGameState } from './core/daily-game-manager.js';
 import { createImageCollection } from './core/image-loader.js';
 import { executeSchedulerJob } from './core/scheduler-manager.js';
 import { initializeGame, startGame, submitAnswer, getCurrentUsername } from './core/game-logic.js';
+import { 
+  getUserPlayStats,
+  canUserPlay,
+  incrementUserAttempts,
+} from './core/play-limit-manager.js';
 import { getAllBadgeDisplayInfo, calculateBadgeProgress } from './core/badge-manager.js';
 import { 
   getLeaderboard, 
@@ -131,6 +136,21 @@ router.get<object, GameInitResponse>('/api/game/init', async (_req, res): Promis
     console.log('Calling initializeGame with userId:', userId);
     const result = await initializeGame(userId);
     console.log('initializeGame result:', result);
+    
+    // Add play limit information to the response
+    try {
+      const playStats = await getUserPlayStats(userId);
+      (result as any).playLimitInfo = {
+        attempts: playStats.attempts,
+        maxAttempts: playStats.maxAttempts,
+        remainingAttempts: playStats.remainingAttempts,
+        bestScore: playStats.bestScore,
+      };
+    } catch (playLimitError) {
+      console.error('Error getting play limit info:', playLimitError);
+      // Don't fail the entire request if play limit info fails
+    }
+    
     res.json(result);
   } catch (error) {
     console.error('Error in /api/game/init:', error);
@@ -150,6 +170,16 @@ router.post<object, StartGameResponse, StartGameRequest>(
       const username = await getCurrentUsername();
       console.log('Got username for start game:', username);
       const userId = username; // Use username as user ID
+
+      // Check play limits before starting game
+      const playCheck = await canUserPlay(userId);
+      if (!playCheck.canPlay) {
+        res.status(400).json({
+          success: false,
+          error: playCheck.reason || 'Cannot start new game',
+        });
+        return;
+      }
 
       console.log('Calling startGame with userId:', userId);
       const result = await startGame(userId);
@@ -215,7 +245,7 @@ router.post<object, SubmitAnswerResponse, SubmitAnswerRequest>(
         return;
       }
       
-      if (typeof roundNumber !== 'number' || roundNumber < 1 || roundNumber > 5) {
+      if (typeof roundNumber !== 'number' || roundNumber < 1 || roundNumber > 6) {
         res.status(400).json({
           success: false,
           error: 'Invalid round number',
@@ -231,7 +261,7 @@ router.post<object, SubmitAnswerResponse, SubmitAnswerRequest>(
         return;
       }
       
-      if (typeof timeRemaining !== 'number' || timeRemaining < 0 || timeRemaining > 10000) {
+      if (typeof timeRemaining !== 'number' || timeRemaining < 0 || timeRemaining > 15000) {
         res.status(400).json({
           success: false,
           error: 'Invalid time remaining',
@@ -242,6 +272,16 @@ router.post<object, SubmitAnswerResponse, SubmitAnswerRequest>(
       // Get current user ID from Reddit context
       const username = await getCurrentUsername();
       const userId = username; // Use username as user ID
+
+      // Additional validation: Check if user still has valid play session
+      const playCheck = await canUserPlay(userId);
+      if (!playCheck.canPlay && playCheck.remainingAttempts === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'Play session expired - daily limit reached',
+        });
+        return;
+      }
 
       const result = await submitAnswer(userId, sessionId, roundNumber, userAnswer, timeRemaining);
       res.json(result);
@@ -254,6 +294,66 @@ router.post<object, SubmitAnswerResponse, SubmitAnswerRequest>(
     }
   }
 );
+
+// Play Limit API Endpoints
+
+router.get('/api/game/play-attempts', async (_req, res): Promise<void> => {
+  try {
+    // Get current user ID from Reddit context
+    const username = await getCurrentUsername();
+    const userId = username; // Use username as user ID
+
+    const playStats = await getUserPlayStats(userId);
+
+    res.json({
+      success: true,
+      attempts: playStats.attempts,
+      maxAttempts: playStats.maxAttempts,
+      remainingAttempts: playStats.remainingAttempts,
+      bestScore: playStats.bestScore,
+    });
+  } catch (error) {
+    console.error('Error in /api/game/play-attempts:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+router.post('/api/game/increment-attempts', async (_req, res): Promise<void> => {
+  try {
+    // Get current user ID from Reddit context
+    const username = await getCurrentUsername();
+    const userId = username; // Use username as user ID
+
+    // Check if user can play first
+    const playCheck = await canUserPlay(userId);
+    if (!playCheck.canPlay) {
+      res.status(400).json({
+        success: false,
+        error: playCheck.reason || 'Cannot increment attempts',
+      });
+      return;
+    }
+
+    // Increment attempts
+    const updatedPlayLimit = await incrementUserAttempts(userId);
+
+    res.json({
+      success: true,
+      attempts: updatedPlayLimit.attempts,
+      maxAttempts: updatedPlayLimit.maxAttempts,
+      remainingAttempts: Math.max(0, updatedPlayLimit.maxAttempts - updatedPlayLimit.attempts),
+    });
+  } catch (error) {
+    console.error('Error in /api/game/increment-attempts:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
 
 router.get('/api/badges/all', async (_req, res): Promise<void> => {
   try {
@@ -276,10 +376,10 @@ router.get('/api/badges/progress/:correctCount', async (req, res): Promise<void>
   try {
     const correctCount = parseInt(req.params.correctCount, 10);
 
-    if (isNaN(correctCount) || correctCount < 0 || correctCount > 5) {
+    if (isNaN(correctCount) || correctCount < 0 || correctCount > 6) {
       res.status(400).json({
         success: false,
-        error: 'Invalid correct count. Must be between 0 and 5.',
+        error: 'Invalid correct count. Must be between 0 and 6.',
       });
       return;
     }
@@ -545,6 +645,68 @@ router.post('/api/participants/join', async (_req, res): Promise<void> => {
   }
 });
 
+// Educational Content API Endpoints
+router.get('/api/content/educational', async (_req, res): Promise<void> => {
+  try {
+    const { contentManager } = await import('./core/content-manager.js');
+    const educationalContent = contentManager.getDailyEducationalContent();
+    
+    res.json({
+      success: true,
+      tips: educationalContent.tips,
+      facts: educationalContent.facts,
+      currentTip: contentManager.getCurrentTip(),
+      currentFact: contentManager.getCurrentFact(),
+    });
+  } catch (error) {
+    console.error('Error fetching educational content:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load educational content',
+    });
+  }
+});
+
+router.get('/api/content/inspirational', async (_req, res): Promise<void> => {
+  try {
+    const { contentManager } = await import('./core/content-manager.js');
+    const inspirationalContent = contentManager.getDailyInspirationContent();
+    
+    res.json({
+      success: true,
+      quotes: inspirationalContent.quotes,
+      jokes: inspirationalContent.jokes,
+      currentContent: contentManager.getCurrentInspiration(),
+      contentType: inspirationalContent.type,
+    });
+  } catch (error) {
+    console.error('Error fetching inspirational content:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load inspirational content',
+    });
+  }
+});
+
+router.get('/api/content/current', async (_req, res): Promise<void> => {
+  try {
+    const { contentManager } = await import('./core/content-manager.js');
+    
+    res.json({
+      success: true,
+      tip: contentManager.getCurrentTip(),
+      fact: contentManager.getCurrentFact(),
+      inspiration: contentManager.getCurrentInspiration(),
+    });
+  } catch (error) {
+    console.error('Error fetching current content:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load current content',
+    });
+  }
+});
+
 router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
   try {
     const post = await createPost();
@@ -582,6 +744,10 @@ router.post('/internal/scheduler/daily-reset', async (_req, res): Promise<void> 
   const jobResult = await executeSchedulerJob(
     'daily-reset',
     async () => {
+      // Force reload of daily content files
+      const { contentManager } = await import('./core/content-manager.js');
+      contentManager.forceReload();
+
       // Load image collection from organized folder structure
       const imageCollection = createImageCollection();
 
@@ -609,6 +775,7 @@ router.post('/internal/scheduler/daily-reset', async (_req, res): Promise<void> 
         categoryOrder: resetResult.gameState?.categoryOrder,
         roundCount: resetResult.gameState?.imageSet.length,
         participantCount: 0, // Reset to 0 for new day
+        contentReloaded: true, // Indicate content was refreshed
       };
     },
     {
@@ -713,10 +880,11 @@ router.post('/api/game/results', async (req, res): Promise<void> => {
     const { sessionId, userId, totalScore, correctCount, badge } = req.body;
     
     if (!sessionId || !userId || typeof totalScore !== 'number' || typeof correctCount !== 'number') {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Missing required fields',
       });
+      return;
     }
     
     console.log('Game results received:', {
@@ -747,6 +915,10 @@ router.post('/api/test/daily-reset', async (_req, res): Promise<void> => {
   const jobResult = await executeSchedulerJob(
     'daily-reset-test',
     async () => {
+      // Force reload of daily content files
+      const { contentManager } = await import('./core/content-manager.js');
+      contentManager.forceReload();
+
       const imageCollection = createImageCollection();
       const resetResult = await resetDailyGameState(redis, imageCollection);
 
@@ -771,6 +943,7 @@ router.post('/api/test/daily-reset', async (_req, res): Promise<void> => {
         categoryOrder: resetResult.gameState?.categoryOrder,
         roundCount: resetResult.gameState?.imageSet.length,
         participantCount: 0, // Reset to 0 for new day
+        contentReloaded: true, // Indicate content was refreshed
       };
     },
     {

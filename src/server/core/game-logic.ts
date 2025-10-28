@@ -31,6 +31,12 @@ import {
 import { createImageCollection } from './image-loader.js';
 import { addScoreToLeaderboards } from './leaderboard-manager.js';
 import { determineBadge } from './badge-manager.js';
+import {
+  canUserPlay,
+  incrementUserAttempts,
+  updateBestScore,
+  getUserPlayStats,
+} from './play-limit-manager.js';
 
 /**
  * Game Logic Errors
@@ -69,7 +75,25 @@ export async function initializeGame(userId: string): Promise<GameInitResponse> 
       };
     }
 
-    // Check if user has already played today
+    // Check play limits first
+    const playLimitCheck = await canUserPlay(userId);
+    if (!playLimitCheck.canPlay && playLimitCheck.remainingAttempts === 0) {
+      // User has reached daily limit, return their best results
+      const playStats = await getUserPlayStats(userId);
+      if (playStats.bestAttempt && playStats.bestScore > 0) {
+        return {
+          success: true,
+          session: playStats.bestAttempt,
+        };
+      } else {
+        return {
+          success: false,
+          error: 'Daily play limit reached. Try again tomorrow!',
+        };
+      }
+    }
+
+    // Check if user has already played today (legacy check for backward compatibility)
     const hasPlayed = await hasUserPlayedToday(userId);
     if (hasPlayed) {
       // Return their existing completion data
@@ -94,6 +118,8 @@ export async function initializeGame(userId: string): Promise<GameInitResponse> 
           totalTimeBonus: 0, // Will be calculated from totalScore - correctCount
           badge: data.badge,
           completed: true,
+          attemptNumber: 1, // Default to first attempt for existing completions
+          showedEducationalContent: false, // Default for existing completions
         };
 
         return {
@@ -203,19 +229,24 @@ export async function startGame(userId: string): Promise<StartGameResponse> {
       };
     }
 
-    // Check if user has already played today
-    // TEMPORARY: Allow multiple plays for testing (remove in production)
-    const isDevelopmentMode = true; // Set to false for production
-    const hasPlayed = await hasUserPlayedToday(userId);
-    if (hasPlayed && !isDevelopmentMode) {
+    // Check play limits
+    const playLimitCheck = await canUserPlay(userId);
+    if (!playLimitCheck.canPlay) {
       return {
         success: false,
-        error: "You have already completed today's challenge",
+        error: playLimitCheck.reason || 'Cannot start new game',
       };
     }
 
-    if (hasPlayed && isDevelopmentMode) {
-      console.log('Development mode: Allowing multiple plays per day for testing');
+    // Increment user's attempt count
+    try {
+      await incrementUserAttempts(userId);
+    } catch (error) {
+      console.error('Error incrementing user attempts:', error);
+      return {
+        success: false,
+        error: 'Failed to start game. Please try again.',
+      };
     }
 
     // Get daily game state, initialize if needed
@@ -379,8 +410,8 @@ export function validateGameSession(session: GameSession): { isValid: boolean; e
   if (!Array.isArray(session.rounds)) {
     errors.push('Rounds must be an array');
   } else {
-    if (session.rounds.length !== 5) {
-      errors.push('Session must have exactly 5 rounds');
+    if (session.rounds.length !== 6) {
+      errors.push('Session must have exactly 6 rounds');
     }
 
     // Validate each round
@@ -411,7 +442,7 @@ export function validateGameSession(session: GameSession): { isValid: boolean; e
   if (
     typeof session.correctCount !== 'number' ||
     session.correctCount < 0 ||
-    session.correctCount > 5
+    session.correctCount > 6
   ) {
     errors.push('Invalid correct count');
   }
@@ -564,12 +595,12 @@ async function validateRoundTiming(
     if (!roundStartTime) {
       // If no start time recorded, this might be the first submission for this round
       // Record the current time as an approximate start time
-      const approximateStartTime = Date.now() - (10000 - timeRemaining);
+      const approximateStartTime = Date.now() - (15000 - timeRemaining);
       await redis.set(roundStartKey, approximateStartTime.toString());
       await redis.expire(roundStartKey, 300); // 5 minute expiry
 
       // Allow this submission but validate the time is reasonable
-      if (timeRemaining < 0 || timeRemaining > 10000) {
+      if (timeRemaining < 0 || timeRemaining > 15000) {
         return { isValid: false, error: 'Invalid time remaining' };
       }
 
@@ -579,7 +610,7 @@ async function validateRoundTiming(
     const startTime = parseInt(roundStartTime, 10);
     const currentTime = Date.now();
     const elapsedTime = currentTime - startTime;
-    const maxRoundTime = 15000; // 15 seconds max (10 + 5 buffer for network delays)
+    const maxRoundTime = 20000; // 20 seconds max (15 + 5 buffer for network delays)
 
     // Check if too much time has elapsed
     if (elapsedTime > maxRoundTime) {
@@ -591,7 +622,7 @@ async function validateRoundTiming(
     }
 
     // Calculate expected time remaining
-    const expectedTimeRemaining = Math.max(0, 10000 - elapsedTime);
+    const expectedTimeRemaining = Math.max(0, 15000 - elapsedTime);
     const timeDifference = Math.abs(timeRemaining - expectedTimeRemaining);
     const tolerance = 3000; // 3 second tolerance for network delays and client-server sync
 
@@ -665,7 +696,7 @@ export async function submitAnswer(
       };
     }
 
-    if (typeof roundNumber !== 'number' || roundNumber < 1 || roundNumber > 5) {
+    if (typeof roundNumber !== 'number' || roundNumber < 1 || roundNumber > 6) {
       return {
         success: false,
         error: 'Invalid round number',
@@ -749,7 +780,7 @@ export async function submitAnswer(
 
     // Check if game is complete
     const answeredRounds = session.rounds.filter((r) => r.userAnswer !== undefined).length;
-    const gameComplete = answeredRounds === 5;
+    const gameComplete = answeredRounds === 6;
 
     let finalResults;
     if (gameComplete) {
@@ -766,6 +797,14 @@ export async function submitAnswer(
 
       // Mark daily completion and add to leaderboards
       await markDailyCompleted(userId, session);
+
+      // Update best score in play limit tracking
+      try {
+        await updateBestScore(userId, session);
+      } catch (error) {
+        console.error('Error updating best score:', error);
+        // Don't fail the game completion if best score update fails
+      }
 
       // Add to leaderboards
       const username = await getCurrentUsername();

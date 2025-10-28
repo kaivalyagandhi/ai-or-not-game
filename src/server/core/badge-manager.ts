@@ -43,11 +43,21 @@ export const BADGE_CONFIGS: Record<BadgeType, BadgeConfig> = {
     type: BadgeType.AI_WHISPERER,
     name: 'AI Whisperer',
     description: 'Perfect score! You can spot AI-generated content with incredible accuracy.',
-    minCorrectAnswers: 5,
-    maxCorrectAnswers: 5,
+    minCorrectAnswers: 6,
+    maxCorrectAnswers: 6,
     icon: '🤖',
     color: '#FFD700', // Gold
     rarity: 'legendary',
+  },
+  [BadgeType.AI_DETECTIVE]: {
+    type: BadgeType.AI_DETECTIVE,
+    name: 'AI Detective',
+    description: 'Outstanding! You have excellent skills at detecting AI-generated content.',
+    minCorrectAnswers: 5,
+    maxCorrectAnswers: 5,
+    icon: '🕵️',
+    color: '#E6E6FA', // Lavender
+    rarity: 'rare',
   },
   [BadgeType.GOOD_SAMARITAN]: {
     type: BadgeType.GOOD_SAMARITAN,
@@ -85,8 +95,10 @@ export const BADGE_CONFIGS: Record<BadgeType, BadgeConfig> = {
  * Determine badge based on correct answer count
  */
 export function determineBadge(correctCount: number): BadgeType {
-  if (correctCount >= 5) {
+  if (correctCount >= 6) {
     return BadgeType.AI_WHISPERER;
+  } else if (correctCount >= 5) {
+    return BadgeType.AI_DETECTIVE;
   } else if (correctCount >= 4) {
     return BadgeType.GOOD_SAMARITAN;
   } else if (correctCount >= 3) {
@@ -155,8 +167,8 @@ export function getBadgeRequirementsText(badgeType: BadgeType): string {
   const config = getBadgeConfig(badgeType);
 
   if (config.minCorrectAnswers === config.maxCorrectAnswers) {
-    if (config.minCorrectAnswers === 5) {
-      return 'Get all 5 answers correct';
+    if (config.minCorrectAnswers === 6) {
+      return 'Get all 6 answers correct';
     } else if (config.minCorrectAnswers === 0) {
       return 'Complete the daily challenge';
     } else {
@@ -192,15 +204,17 @@ export function getBadgeAchievementMessage(badgeType: BadgeType, correctCount: n
 
   switch (badgeType) {
     case BadgeType.AI_WHISPERER:
-      return `🎉 Perfect! You earned the "${config.name}" badge with ${correctCount}/5 correct answers!`;
+      return `🎉 Perfect! You earned the "${config.name}" badge with ${correctCount}/6 correct answers!`;
+    case BadgeType.AI_DETECTIVE:
+      return `🕵️ Outstanding! You earned the "${config.name}" badge with ${correctCount}/6 correct answers!`;
     case BadgeType.GOOD_SAMARITAN:
-      return `🌟 Great job! You earned the "${config.name}" badge with ${correctCount}/5 correct answers!`;
+      return `🌟 Great job! You earned the "${config.name}" badge with ${correctCount}/6 correct answers!`;
     case BadgeType.JUST_HUMAN:
-      return `👍 Nice work! You earned the "${config.name}" badge with ${correctCount}/5 correct answers!`;
+      return `👍 Nice work! You earned the "${config.name}" badge with ${correctCount}/6 correct answers!`;
     case BadgeType.HUMAN_IN_TRAINING:
-      return `📚 Keep learning! You earned the "${config.name}" badge with ${correctCount}/5 correct answers!`;
+      return `📚 Keep learning! You earned the "${config.name}" badge with ${correctCount}/6 correct answers!`;
     default:
-      return `You earned the "${config.name}" badge with ${correctCount}/5 correct answers!`;
+      return `You earned the "${config.name}" badge with ${correctCount}/6 correct answers!`;
   }
 }
 
