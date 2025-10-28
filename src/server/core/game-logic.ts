@@ -594,16 +594,24 @@ async function validateRoundTiming(
 
     if (!roundStartTime) {
       // If no start time recorded, this might be the first submission for this round
-      // Record the current time as an approximate start time
-      const approximateStartTime = Date.now() - (15000 - timeRemaining);
-      await redis.set(roundStartKey, approximateStartTime.toString());
+      // This can happen after educational content when the client resumes
+      console.log(`No start time recorded for round ${roundNumber}, allowing submission`);
+
+      // Record the current time as the start time for future validations
+      const currentTime = Date.now();
+      await redis.set(roundStartKey, currentTime.toString());
       await redis.expire(roundStartKey, 300); // 5 minute expiry
 
-      // Allow this submission but validate the time is reasonable
+      // Allow this submission with basic time validation
       if (timeRemaining < 0 || timeRemaining > 15000) {
-        return { isValid: false, error: 'Invalid time remaining' };
+        return {
+          isValid: false,
+          error: 'Invalid time remaining',
+          adjustedTime: Math.max(0, Math.min(15000, timeRemaining)),
+        };
       }
 
+      // Return valid with the submitted time
       return { isValid: true, adjustedTime: timeRemaining };
     }
 
@@ -827,9 +835,15 @@ export async function submitAnswer(
     if (!gameComplete) {
       nextRound = session.rounds.find((r) => r.userAnswer === undefined);
 
-      // Record start time for the next round
+      // Record start time for the next round, but skip round 4 if educational content will be shown
       if (nextRound) {
-        await recordRoundStart(session.sessionId, nextRound.roundNumber);
+        const shouldShowEducational =
+          roundNumber === 3 && nextRound.roundNumber === 4 && !session.showedEducationalContent;
+        if (!shouldShowEducational) {
+          await recordRoundStart(session.sessionId, nextRound.roundNumber);
+        } else {
+          console.log('Skipping round start time recording for round 4 due to educational content');
+        }
       }
     }
 
