@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
 import { useAudio, useAudioRef, AudioContext, AudioControls } from '../useAudio.js';
 
 describe('useAudio Hook', () => {
@@ -44,9 +44,10 @@ describe('useAudio Hook', () => {
     const mockAudioControls: AudioControls = {
       playBackgroundMusic: vi.fn(),
       stopBackgroundMusic: vi.fn(),
-      playClickSound: vi.fn(),
       playSuccessSound: vi.fn(),
       playFailureSound: vi.fn(),
+      setAudioEnabled: vi.fn(),
+      isAudioEnabled: vi.fn(() => true),
     };
 
     const mockAudioRef = { current: mockAudioControls };
@@ -66,9 +67,10 @@ describe('useAudio Hook', () => {
     const mockAudioControls: AudioControls = {
       playBackgroundMusic: vi.fn(),
       stopBackgroundMusic: vi.fn(),
-      playClickSound: vi.fn(),
       playSuccessSound: vi.fn(),
       playFailureSound: vi.fn(),
+      setAudioEnabled: vi.fn(),
+      isAudioEnabled: vi.fn(() => true),
     };
 
     const mockAudioRef = { current: mockAudioControls };
@@ -87,9 +89,10 @@ describe('useAudio Hook', () => {
     if (audioControls) {
       expect(typeof audioControls.playBackgroundMusic).toBe('function');
       expect(typeof audioControls.stopBackgroundMusic).toBe('function');
-      expect(typeof audioControls.playClickSound).toBe('function');
       expect(typeof audioControls.playSuccessSound).toBe('function');
       expect(typeof audioControls.playFailureSound).toBe('function');
+      expect(typeof audioControls.setAudioEnabled).toBe('function');
+      expect(typeof audioControls.isAudioEnabled).toBe('function');
     }
   });
 
@@ -97,9 +100,10 @@ describe('useAudio Hook', () => {
     const mockAudioControls: AudioControls = {
       playBackgroundMusic: vi.fn(),
       stopBackgroundMusic: vi.fn(),
-      playClickSound: vi.fn(),
       playSuccessSound: vi.fn(),
       playFailureSound: vi.fn(),
+      setAudioEnabled: vi.fn(),
+      isAudioEnabled: vi.fn(() => true),
     };
 
     const mockAudioRef = { current: mockAudioControls };
@@ -117,15 +121,18 @@ describe('useAudio Hook', () => {
     if (audioControls) {
       audioControls.playBackgroundMusic();
       audioControls.stopBackgroundMusic();
-      audioControls.playClickSound();
       audioControls.playSuccessSound();
       audioControls.playFailureSound();
+      audioControls.setAudioEnabled(false);
+      const isEnabled = audioControls.isAudioEnabled();
 
       expect(mockAudioControls.playBackgroundMusic).toHaveBeenCalledTimes(1);
       expect(mockAudioControls.stopBackgroundMusic).toHaveBeenCalledTimes(1);
-      expect(mockAudioControls.playClickSound).toHaveBeenCalledTimes(1);
       expect(mockAudioControls.playSuccessSound).toHaveBeenCalledTimes(1);
       expect(mockAudioControls.playFailureSound).toHaveBeenCalledTimes(1);
+      expect(mockAudioControls.setAudioEnabled).toHaveBeenCalledWith(false);
+      expect(mockAudioControls.isAudioEnabled).toHaveBeenCalledTimes(1);
+      expect(isEnabled).toBe(true);
     }
   });
 });
@@ -143,9 +150,10 @@ describe('useAudioRef Hook', () => {
     const mockAudioControls: AudioControls = {
       playBackgroundMusic: vi.fn(),
       stopBackgroundMusic: vi.fn(),
-      playClickSound: vi.fn(),
       playSuccessSound: vi.fn(),
       playFailureSound: vi.fn(),
+      setAudioEnabled: vi.fn(),
+      isAudioEnabled: vi.fn(() => true),
     };
 
     result.current.current = mockAudioControls;
@@ -159,9 +167,10 @@ describe('useAudioRef Hook', () => {
     const mockAudioControls: AudioControls = {
       playBackgroundMusic: vi.fn(),
       stopBackgroundMusic: vi.fn(),
-      playClickSound: vi.fn(),
       playSuccessSound: vi.fn(),
       playFailureSound: vi.fn(),
+      setAudioEnabled: vi.fn(),
+      isAudioEnabled: vi.fn(() => true),
     };
 
     result.current.current = mockAudioControls;
@@ -214,9 +223,10 @@ describe('Audio Hook Integration', () => {
     const mockAudioControls: AudioControls = {
       playBackgroundMusic: vi.fn(),
       stopBackgroundMusic: vi.fn(),
-      playClickSound: vi.fn(),
       playSuccessSound: vi.fn(),
       playFailureSound: vi.fn(),
+      setAudioEnabled: vi.fn(),
+      isAudioEnabled: vi.fn(() => true),
     };
 
     const mockAudioRef = { current: mockAudioControls };
@@ -246,17 +256,19 @@ describe('Audio Hook Integration', () => {
     const initialAudioControls: AudioControls = {
       playBackgroundMusic: vi.fn(),
       stopBackgroundMusic: vi.fn(),
-      playClickSound: vi.fn(),
       playSuccessSound: vi.fn(),
       playFailureSound: vi.fn(),
+      setAudioEnabled: vi.fn(),
+      isAudioEnabled: vi.fn(() => true),
     };
 
     const updatedAudioControls: AudioControls = {
       playBackgroundMusic: vi.fn(),
       stopBackgroundMusic: vi.fn(),
-      playClickSound: vi.fn(),
       playSuccessSound: vi.fn(),
       playFailureSound: vi.fn(),
+      setAudioEnabled: vi.fn(),
+      isAudioEnabled: vi.fn(() => false),
     };
 
     const mockAudioRef = { current: initialAudioControls };

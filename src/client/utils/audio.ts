@@ -3,7 +3,6 @@ import type { AudioConfig } from '../../shared/types/index.js';
 // Audio file naming conventions and paths
 export const AUDIO_PATHS = {
   BACKGROUND_MUSIC: '/audio/background-music.mp3',
-  CLICK_SOUND: '/audio/click-sound.wav',
   SUCCESS_SOUND: '/audio/success-sound.wav',
   FAILURE_SOUND: '/audio/failure-sound.wav',
 } as const;
@@ -11,7 +10,6 @@ export const AUDIO_PATHS = {
 // Default audio configuration
 export const DEFAULT_AUDIO_CONFIG: AudioConfig = {
   backgroundMusic: AUDIO_PATHS.BACKGROUND_MUSIC,
-  clickSound: AUDIO_PATHS.CLICK_SOUND,
   successSound: AUDIO_PATHS.SUCCESS_SOUND,
   failureSound: AUDIO_PATHS.FAILURE_SOUND,
   enabled: true,
@@ -137,18 +135,14 @@ export const createAudioConfig = async (
   // Validate audio files
   const validationResults = await Promise.all([
     validateAudioFile(paths.BACKGROUND_MUSIC),
-    validateAudioFile(paths.CLICK_SOUND),
     validateAudioFile(paths.SUCCESS_SOUND),
     validateAudioFile(paths.FAILURE_SOUND),
   ]);
   
-  const [bgMusicValid, clickValid, successValid, failureValid] = validationResults;
+  const [bgMusicValid, successValid, failureValid] = validationResults;
   
   if (!bgMusicValid) {
     console.warn('Background music file not found or invalid:', paths.BACKGROUND_MUSIC);
-  }
-  if (!clickValid) {
-    console.warn('Click sound file not found or invalid:', paths.CLICK_SOUND);
   }
   if (!successValid) {
     console.warn('Success sound file not found or invalid:', paths.SUCCESS_SOUND);
@@ -159,7 +153,6 @@ export const createAudioConfig = async (
   
   return {
     backgroundMusic: paths.BACKGROUND_MUSIC,
-    clickSound: paths.CLICK_SOUND,
     successSound: paths.SUCCESS_SOUND,
     failureSound: paths.FAILURE_SOUND,
     enabled: preferences.enabled ?? DEFAULT_AUDIO_CONFIG.enabled,

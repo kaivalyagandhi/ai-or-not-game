@@ -101,7 +101,6 @@ export interface UserPlayLimit {
 // Audio Configuration
 export interface AudioConfig {
   backgroundMusic: string; // File path/URL
-  clickSound: string;
   successSound: string;
   failureSound: string;
   enabled: boolean;

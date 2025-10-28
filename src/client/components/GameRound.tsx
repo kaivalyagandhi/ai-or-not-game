@@ -4,6 +4,7 @@ import { apiCall } from '../utils/network';
 import { useErrorHandler } from '../hooks/useErrorHandler';
 import { useAudio } from '../hooks/useAudio';
 import { triggerConfetti, cleanupConfetti } from '../utils/confetti';
+import { formatRoundLabel } from '../utils/ui';
 
 interface GameRoundProps {
   round: GameRoundType;
@@ -17,6 +18,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackData, setFeedbackData] = useState<SubmitAnswerResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTimeout, setIsTimeout] = useState(false);
   
   // Audio controls
   const audio = useAudio();
@@ -34,6 +36,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
     setShowFeedback(false);
     setFeedbackData(null);
     setIsSubmitting(false);
+    setIsTimeout(false);
     
     // Cleanup any existing confetti animations
     cleanupConfetti();
@@ -83,8 +86,8 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
             audio?.playFailureSound();
           }
           
-          // Trigger confetti animation for positive scores
-          if (data.roundScore && data.roundScore > 0) {
+          // Trigger confetti animation for positive scores (but not on timeout)
+          if (data.roundScore && data.roundScore > 0 && !isTimeout) {
             // Small delay to ensure feedback is visible before confetti
             setTimeout(() => {
               triggerConfetti(data.roundScore!);
@@ -127,8 +130,8 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
           audio?.playFailureSound();
         }
         
-        // Trigger confetti animation for positive scores
-        if (fallbackResponse.roundScore && fallbackResponse.roundScore > 0) {
+        // Trigger confetti animation for positive scores (but not on timeout)
+        if (fallbackResponse.roundScore && fallbackResponse.roundScore > 0 && !isTimeout) {
           // Small delay to ensure feedback is visible before confetti
           setTimeout(() => {
             triggerConfetti(fallbackResponse.roundScore!);
@@ -145,12 +148,35 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
     await executeSubmit();
   }, [sessionId, round.roundNumber, round.correctAnswer, round.aiImagePosition, onRoundComplete, isSubmitting, errorHandler]);
 
+  // Handle timeout scenario
+  const handleTimeout = useCallback(() => {
+    if (selectedAnswer || showFeedback) return;
+    
+    setIsTimeout(true);
+    setShowFeedback(true);
+    
+    // Create timeout feedback data showing correct answer without scoring
+    const timeoutFeedback: SubmitAnswerResponse = {
+      success: true,
+      isCorrect: false, // Always false for timeout
+      correctAnswer: round.correctAnswer,
+      aiImagePosition: round.aiImagePosition,
+      roundScore: 0, // No points for timeout
+    };
+    
+    setFeedbackData(timeoutFeedback);
+    
+    // No sound effects for timeout
+    
+    // Show feedback for 2 seconds before proceeding
+    setTimeout(() => {
+      onRoundComplete(timeoutFeedback);
+    }, 2000);
+  }, [round.correctAnswer, round.aiImagePosition, onRoundComplete, selectedAnswer, showFeedback]);
+
   // Handle image selection
   const handleImageSelect = (answer: 'A' | 'B') => {
     if (selectedAnswer || showFeedback) return;
-    
-    // Play click sound
-    audio?.playClickSound();
     
     submitAnswer(answer, timeRemaining);
   };
@@ -159,12 +185,11 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   useEffect(() => {
     if (showFeedback || selectedAnswer) return;
 
-
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
-          // Time's up - submit with no answer
-          submitAnswer('A', 0); // Default to A when time runs out
+          // Time's up - handle timeout without submitting answer
+          handleTimeout();
           return 0;
         }
         return prev - 1;
@@ -172,7 +197,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [showFeedback, selectedAnswer, submitAnswer, round.roundNumber]); // Added round.roundNumber
+  }, [showFeedback, selectedAnswer, round.roundNumber]); // Removed submitAnswer dependency
 
   // Get timer color based on remaining time
   const getTimerColor = () => {
@@ -193,12 +218,9 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
       <div className="max-w-4xl w-full">
         {/* Header with round info and timer */}
         <div className="text-center mb-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-start mb-4">
             <div className="text-sm text-gray-500">
-              Round {round.roundNumber} of 6
-            </div>
-            <div className="text-sm text-gray-500 capitalize">
-              Category: {round.category}
+              {formatRoundLabel(round.roundNumber, 6, round.category)}
             </div>
           </div>
           
@@ -232,7 +254,11 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
               disabled={selectedAnswer !== null || showFeedback}
               className={`game-image-button ${
                 showFeedback
-                  ? selectedAnswer === 'A'
+                  ? isTimeout
+                    ? feedbackData?.correctAnswer === 'A'
+                      ? 'correct-feedback'
+                      : 'incorrect-feedback'
+                    : selectedAnswer === 'A'
                     ? feedbackData?.isCorrect
                       ? 'selected correct-feedback'
                       : 'selected incorrect-feedback'
@@ -260,8 +286,8 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
                 className="game-image"
               />
               
-              {/* Custom Overlay Indicators - Only show on selected image */}
-              {showFeedback && selectedAnswer === 'A' && (
+              {/* Custom Overlay Indicators - Show on selected image or correct answer on timeout */}
+              {showFeedback && (selectedAnswer === 'A' || (isTimeout && feedbackData?.correctAnswer === 'A')) && (
                 <div className="overlay-indicator">
                   {feedbackData?.aiImagePosition === 'A' ? (
                     <div className="ai-indicator">
@@ -286,7 +312,11 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
               disabled={selectedAnswer !== null || showFeedback}
               className={`game-image-button ${
                 showFeedback
-                  ? selectedAnswer === 'B'
+                  ? isTimeout
+                    ? feedbackData?.correctAnswer === 'B'
+                      ? 'correct-feedback'
+                      : 'incorrect-feedback'
+                    : selectedAnswer === 'B'
                     ? feedbackData?.isCorrect
                       ? 'selected correct-feedback'
                       : 'selected incorrect-feedback'
@@ -314,8 +344,8 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
                 className="game-image"
               />
               
-              {/* Custom Overlay Indicators - Only show on selected image */}
-              {showFeedback && selectedAnswer === 'B' && (
+              {/* Custom Overlay Indicators - Show on selected image or correct answer on timeout */}
+              {showFeedback && (selectedAnswer === 'B' || (isTimeout && feedbackData?.correctAnswer === 'B')) && (
                 <div className="overlay-indicator">
                   {feedbackData?.aiImagePosition === 'B' ? (
                     <div className="ai-indicator">
@@ -334,8 +364,20 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
           </div>
         </div>
 
-        {/* Points Display */}
-        {showFeedback && feedbackData && feedbackData.roundScore !== undefined && (
+        {/* Timeout Message */}
+        {showFeedback && isTimeout && (
+          <div className="text-center mt-6">
+            <div className="text-lg font-semibold text-red-600 mb-2">
+              Time's Up!
+            </div>
+            <div className="text-sm text-gray-600">
+              The correct answer was {feedbackData?.correctAnswer === 'A' ? 'left' : 'right'} image
+            </div>
+          </div>
+        )}
+
+        {/* Points Display - Only show if not timeout and has points */}
+        {showFeedback && feedbackData && feedbackData.roundScore !== undefined && feedbackData.roundScore > 0 && !isTimeout && (
           <div className="text-center mt-6">
             <div className="text-lg font-semibold text-gray-700">
               +{Math.round(feedbackData.roundScore)} points

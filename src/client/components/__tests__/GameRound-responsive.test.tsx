@@ -24,7 +24,6 @@ vi.mock('../../hooks/useErrorHandler.js', () => ({
 // Mock audio hook
 vi.mock('../../hooks/useAudio.js', () => ({
   useAudio: () => ({
-    playClickSound: vi.fn(),
     playSuccessSound: vi.fn(),
     playFailureSound: vi.fn(),
   }),

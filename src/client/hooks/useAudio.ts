@@ -4,9 +4,10 @@ import { createContext, useContext, useRef, MutableRefObject } from 'react';
 export interface AudioControls {
   playBackgroundMusic: () => void;
   stopBackgroundMusic: () => void;
-  playClickSound: () => void;
   playSuccessSound: () => void;
   playFailureSound: () => void;
+  setAudioEnabled: (enabled: boolean) => void;
+  isAudioEnabled: () => boolean;
 }
 
 // Audio context

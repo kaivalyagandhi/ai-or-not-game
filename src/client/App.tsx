@@ -1,4 +1,4 @@
-import { ErrorInfo, useRef, useEffect, useCallback } from 'react';
+import { ErrorInfo, useEffect, useCallback } from 'react';
 import { 
   SplashScreen, 
   GameRound, 
@@ -11,7 +11,7 @@ import {
 } from './components';
 import { useGameState } from './hooks/useGameState';
 import { AudioContextManager } from './utils/audio';
-import { AudioContext, useAudioRef, AudioControls } from './hooks/useAudio';
+import { AudioContext, useAudioRef } from './hooks/useAudio';
 
 export const App = () => {
   const {
@@ -32,23 +32,9 @@ export const App = () => {
   // Audio system ref for controlling audio
   const audioSystemRef = useAudioRef();
 
-  // Audio settings handlers with localStorage persistence
-  const handleVolumeChange = useCallback((volume: number) => {
-    try {
-      localStorage.setItem('spotTheBot_audioVolume', volume.toString());
-      console.log('Volume changed to:', Math.round(volume * 100) + '%');
-    } catch (error) {
-      console.warn('Failed to save volume to localStorage:', error);
-    }
-  }, []);
-
-  const handleMuteToggle = useCallback((muted: boolean) => {
-    try {
-      localStorage.setItem('spotTheBot_audioMuted', muted.toString());
-      console.log('Audio', muted ? 'muted' : 'unmuted');
-    } catch (error) {
-      console.warn('Failed to save mute state to localStorage:', error);
-    }
+  // Audio toggle handler
+  const handleAudioToggle = useCallback((enabled: boolean) => {
+    console.log('Audio', enabled ? 'enabled' : 'disabled');
   }, []);
 
   // Handle start game from splash
@@ -56,15 +42,24 @@ export const App = () => {
     // Unlock audio context on user interaction
     await AudioContextManager.getInstance().unlockAudioContext();
     
-    // Start background music when game begins
-    audioSystemRef.current?.playBackgroundMusic();
-    
+    // Start the game first to initialize session
     startGame();
+    
+    // Start background music immediately when session begins if audio is enabled
+    if (audioSystemRef.current?.isAudioEnabled()) {
+      audioSystemRef.current?.playBackgroundMusic();
+    }
   };
 
   // Handle game state changes for audio
   useEffect(() => {
     switch (gameState) {
+      case 'playing':
+        // Start background music immediately when session begins if audio is enabled
+        if (audioSystemRef.current?.isAudioEnabled()) {
+          audioSystemRef.current?.playBackgroundMusic();
+        }
+        break;
       case 'results':
         // Stop background music when game ends
         audioSystemRef.current?.stopBackgroundMusic();
@@ -150,8 +145,7 @@ export const App = () => {
                 audioSystemRef.current = ref;
               }
             }}
-            onVolumeChange={handleVolumeChange}
-            onMuteToggle={handleMuteToggle}
+            onAudioToggle={handleAudioToggle}
           />
         {(() => {
           switch (gameState) {
