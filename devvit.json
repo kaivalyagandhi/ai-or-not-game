@@ -1,6 +1,6 @@
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-  "name": "spot-the-bot-v5",
+  "name": "spot-the-bot-v6",
   "post": {
     "dir": "dist/client",
     "entrypoints": {
@@ -33,6 +33,6 @@
     "onAppInstall": "/internal/on-app-install"
   },
   "dev": {
-    "subreddit": "spot_the_bot_dev"
+    "subreddit": "spot_the_bot_v6_dev"
   }
 }
