@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GameRound as GameRoundType, SubmitAnswerResponse } from '../../shared/types/api';
 import { apiCall } from '../utils/network';
 import { useErrorHandler } from '../hooks/useErrorHandler';
@@ -20,6 +20,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTimeout, setIsTimeout] = useState(false);
   const [timeoutCountdown, setTimeoutCountdown] = useState<number | null>(null);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // Audio controls
   const audio = useAudio();
@@ -40,14 +41,23 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
     setIsTimeout(false);
     setTimeoutCountdown(null);
     
+    // Clear any existing countdown interval
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+    
     // Cleanup any existing confetti animations
     cleanupConfetti();
   }, [round.roundNumber]); // Reset when round number changes
 
-  // Cleanup confetti on component unmount
+  // Cleanup confetti and intervals on component unmount
   useEffect(() => {
     return () => {
       cleanupConfetti();
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
     };
   }, []);
 
@@ -150,41 +160,127 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
     await executeSubmit();
   }, [sessionId, round.roundNumber, round.correctAnswer, round.aiImagePosition, onRoundComplete, isSubmitting, errorHandler]);
 
-  // Handle timeout scenario
-  const handleTimeout = useCallback(() => {
-    if (selectedAnswer || showFeedback) return;
+  // Submit timeout to server to get proper game state
+  const submitTimeout = useCallback(async () => {
+    console.log('submitTimeout called');
+    if (isSubmitting) return;
     
+    setIsSubmitting(true);
     setIsTimeout(true);
     setShowFeedback(true);
-    
-    // Create timeout feedback data showing correct answer without scoring
-    const timeoutFeedback: SubmitAnswerResponse = {
-      success: true,
-      isCorrect: false, // Always false for timeout
-      correctAnswer: round.correctAnswer,
-      aiImagePosition: round.aiImagePosition,
-      roundScore: 0, // No points for timeout
-    };
-    
-    setFeedbackData(timeoutFeedback);
-    
-    // No sound effects for timeout
-    
-    // Start countdown animation
-    setTimeoutCountdown(3);
-    
-    // Countdown timer
-    const countdownInterval = setInterval(() => {
-      setTimeoutCountdown((prev) => {
-        if (prev === null || prev <= 1) {
-          clearInterval(countdownInterval);
-          onRoundComplete(timeoutFeedback);
-          return null;
-        }
-        return prev - 1;
+    errorHandler.clearError();
+
+    try {
+      // Submit timeout as wrong answer with 0 time remaining
+      // Submit the opposite of the correct answer to ensure it's marked as incorrect
+      const wrongAnswer = round.correctAnswer === 'A' ? 'B' : 'A';
+      const data: SubmitAnswerResponse = await apiCall('/api/game/submit-answer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId,
+          roundNumber: round.roundNumber,
+          userAnswer: wrongAnswer, // Submit wrong answer for timeout
+          timeRemaining: 0, // 0 time = timeout
+        }),
+      }, {
+        maxRetries: 2,
+        baseDelay: 1000,
       });
-    }, 1000);
-  }, [round.correctAnswer, round.aiImagePosition, onRoundComplete, selectedAnswer, showFeedback]);
+      
+      // Override the response to show timeout behavior
+      const timeoutResponse: SubmitAnswerResponse = {
+        ...data,
+        isCorrect: false, // Always show as incorrect for timeout
+        roundScore: 0, // No points for timeout
+      };
+      
+      setFeedbackData(timeoutResponse);
+      
+      // No sound effects for timeout
+      
+      // Start countdown animation
+      setTimeoutCountdown(3);
+      
+      // Clear any existing interval
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
+      
+      let currentCountdown = 3;
+      
+      // Countdown timer
+      countdownIntervalRef.current = setInterval(() => {
+        currentCountdown -= 1;
+        console.log('Countdown tick:', currentCountdown);
+        
+        if (currentCountdown <= 0) {
+          console.log('Countdown finished, calling onRoundComplete');
+          if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
+          setTimeoutCountdown(null);
+          // Use the original server response for proper game state
+          onRoundComplete(data);
+        } else {
+          setTimeoutCountdown(currentCountdown);
+        }
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error submitting timeout:', error);
+      
+      // Fallback timeout response
+      const fallbackResponse: SubmitAnswerResponse = {
+        success: true,
+        isCorrect: false,
+        correctAnswer: round.correctAnswer,
+        aiImagePosition: round.aiImagePosition,
+        roundScore: 0,
+      };
+      
+      setFeedbackData(fallbackResponse);
+      
+      // Start countdown animation even on error
+      setTimeoutCountdown(3);
+      
+      // Clear any existing interval
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
+      
+      let currentCountdown = 3;
+      
+      // Countdown timer
+      countdownIntervalRef.current = setInterval(() => {
+        currentCountdown -= 1;
+        console.log('Countdown tick (fallback):', currentCountdown);
+        
+        if (currentCountdown <= 0) {
+          console.log('Countdown finished (fallback), calling onRoundComplete');
+          if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
+          setTimeoutCountdown(null);
+          onRoundComplete(fallbackResponse);
+        } else {
+          setTimeoutCountdown(currentCountdown);
+        }
+      }, 1000);
+    }
+  }, [sessionId, round.roundNumber, round.correctAnswer, round.aiImagePosition, onRoundComplete, isSubmitting, errorHandler]);
+
+  // Handle timeout scenario
+  const handleTimeout = useCallback(() => {
+    console.log('handleTimeout called', { selectedAnswer, showFeedback });
+    if (selectedAnswer || showFeedback) return;
+    
+    submitTimeout();
+  }, [selectedAnswer, showFeedback, submitTimeout]);
 
   // Handle image selection
   const handleImageSelect = (answer: 'A' | 'B') => {
