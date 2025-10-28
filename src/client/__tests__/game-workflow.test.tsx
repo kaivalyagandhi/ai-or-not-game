@@ -138,7 +138,7 @@ describe('Game Workflow - Complete User Journey', () => {
       expect(screen.getByText(/which image is real/i)).toBeInTheDocument();
 
       // Should show timer
-      expect(screen.getByText('15')).toBeInTheDocument();
+      expect(screen.getByText('10')).toBeInTheDocument();
 
       // Should show images
       const imageButtons = screen.getAllByRole('button');

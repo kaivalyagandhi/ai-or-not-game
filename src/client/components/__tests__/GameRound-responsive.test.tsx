@@ -7,9 +7,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { GameRound } from '../GameRound.js';
 
 // Mock API call
-const mockApiCall = vi.fn();
 vi.mock('../../utils/network.js', () => ({
-  apiCall: mockApiCall,
+  apiCall: vi.fn(),
 }));
 
 // Mock error handler
@@ -158,8 +157,9 @@ describe('GameRound - Responsive UI Layout', () => {
       expect(computedStyle.gap).toBe('1.5rem');
     });
 
-    it('should use smaller overlay indicators on mobile', () => {
-      mockApiCall.mockResolvedValue({
+    it('should use smaller overlay indicators on mobile', async () => {
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: true,
         correctAnswer: 'A',
@@ -373,7 +373,8 @@ describe('GameRound - Visual Feedback System', () => {
 
   describe('Selection Feedback Borders', () => {
     it('should show green border for correct selection', async () => {
-      mockApiCall.mockResolvedValue({
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: true,
         correctAnswer: 'A',
@@ -403,7 +404,8 @@ describe('GameRound - Visual Feedback System', () => {
     });
 
     it('should show red border for incorrect selection', async () => {
-      mockApiCall.mockResolvedValue({
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: false,
         correctAnswer: 'A',
@@ -433,7 +435,8 @@ describe('GameRound - Visual Feedback System', () => {
     });
 
     it('should use 3px border thickness with rounded corners', async () => {
-      mockApiCall.mockResolvedValue({
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: true,
         correctAnswer: 'A',
@@ -460,7 +463,8 @@ describe('GameRound - Visual Feedback System', () => {
     });
 
     it('should add outer glow effect at 30% opacity', async () => {
-      mockApiCall.mockResolvedValue({
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: true,
         correctAnswer: 'A',
@@ -486,7 +490,8 @@ describe('GameRound - Visual Feedback System', () => {
     });
 
     it('should maintain styling until round transitions', async () => {
-      mockApiCall.mockResolvedValue({
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: true,
         correctAnswer: 'A',
@@ -521,7 +526,8 @@ describe('GameRound - Visual Feedback System', () => {
 
   describe('Overlay Indicators', () => {
     it('should show red circle with X icon for AI image selection', async () => {
-      mockApiCall.mockResolvedValue({
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: false,
         correctAnswer: 'A',
@@ -552,7 +558,8 @@ describe('GameRound - Visual Feedback System', () => {
     });
 
     it('should show green circle with checkmark for human image selection', async () => {
-      mockApiCall.mockResolvedValue({
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: true,
         correctAnswer: 'A',
@@ -583,7 +590,8 @@ describe('GameRound - Visual Feedback System', () => {
     });
 
     it('should show overlay only on selected image', async () => {
-      mockApiCall.mockResolvedValue({
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: true,
         correctAnswer: 'A',
@@ -615,7 +623,8 @@ describe('GameRound - Visual Feedback System', () => {
     });
 
     it('should show colored border outline on non-selected image', async () => {
-      mockApiCall.mockResolvedValue({
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: true,
         correctAnswer: 'A',
@@ -647,7 +656,8 @@ describe('GameRound - Visual Feedback System', () => {
     });
 
     it('should not display emoji symbols in overlay', async () => {
-      mockApiCall.mockResolvedValue({
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: false,
         correctAnswer: 'A',
@@ -683,7 +693,8 @@ describe('GameRound - Visual Feedback System', () => {
 
   describe('Visual Feedback Integration', () => {
     it('should combine border styling with overlay indicators', async () => {
-      mockApiCall.mockResolvedValue({
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: true,
         correctAnswer: 'A',
@@ -717,7 +728,8 @@ describe('GameRound - Visual Feedback System', () => {
     });
 
     it('should handle rapid selections without visual conflicts', async () => {
-      mockApiCall.mockResolvedValue({
+      const { apiCall } = await import('../../utils/network.js');
+      vi.mocked(apiCall).mockResolvedValue({
         success: true,
         isCorrect: true,
         correctAnswer: 'A',

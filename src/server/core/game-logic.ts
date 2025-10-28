@@ -603,11 +603,11 @@ async function validateRoundTiming(
       await redis.expire(roundStartKey, 300); // 5 minute expiry
 
       // Allow this submission with basic time validation
-      if (timeRemaining < 0 || timeRemaining > 15000) {
+      if (timeRemaining < 0 || timeRemaining > 10000) {
         return {
           isValid: false,
           error: 'Invalid time remaining',
-          adjustedTime: Math.max(0, Math.min(15000, timeRemaining)),
+          adjustedTime: Math.max(0, Math.min(10000, timeRemaining)),
         };
       }
 
@@ -618,7 +618,7 @@ async function validateRoundTiming(
     const startTime = parseInt(roundStartTime, 10);
     const currentTime = Date.now();
     const elapsedTime = currentTime - startTime;
-    const maxRoundTime = 20000; // 20 seconds max (15 + 5 buffer for network delays)
+    const maxRoundTime = 15000; // 15 seconds max (10 + 5 buffer for network delays)
 
     // Check if too much time has elapsed
     if (elapsedTime > maxRoundTime) {
@@ -630,7 +630,7 @@ async function validateRoundTiming(
     }
 
     // Calculate expected time remaining
-    const expectedTimeRemaining = Math.max(0, 15000 - elapsedTime);
+    const expectedTimeRemaining = Math.max(0, 10000 - elapsedTime);
     const timeDifference = Math.abs(timeRemaining - expectedTimeRemaining);
     const tolerance = 3000; // 3 second tolerance for network delays and client-server sync
 

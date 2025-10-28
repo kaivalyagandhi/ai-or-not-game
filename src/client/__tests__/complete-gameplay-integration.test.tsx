@@ -238,7 +238,7 @@ describe('Complete 6-Round Gameplay Integration', () => {
     await waitFor(() => {
       expect(screen.getByText(/round 1 of 6/i)).toBeInTheDocument();
       expect(screen.getByText(/which image is real/i)).toBeInTheDocument();
-      expect(screen.getByText('15')).toBeInTheDocument(); // 15-second timer
+      expect(screen.getByText('10')).toBeInTheDocument(); // 10-second timer
     });
 
     // Play round 1
@@ -739,7 +739,7 @@ describe('Complete Gameplay - Performance and Edge Cases', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/round 1 of 6/i)).toBeInTheDocument();
-      expect(screen.getByText('15')).toBeInTheDocument();
+      expect(screen.getByText('10')).toBeInTheDocument();
     });
 
     // Wait for timer to count down (mocked to be faster)
@@ -793,7 +793,7 @@ describe('Complete Gameplay - Performance and Edge Cases', () => {
 
     // State should be consistent
     expect(screen.getByText(/round 1 of 6/i)).toBeInTheDocument();
-    expect(screen.getByText('15')).toBeInTheDocument();
+    expect(screen.getByText('10')).toBeInTheDocument();
 
     const imageA = screen.getAllByRole('button')[0];
     fireEvent.click(imageA);

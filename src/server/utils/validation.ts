@@ -177,7 +177,7 @@ export const gameValidationRules = {
       required: true,
       type: 'number' as const,
       min: 0,
-      max: 15000, // 15 seconds in milliseconds
+      max: 10000, // 10 seconds in milliseconds
     },
   ],
 
@@ -249,7 +249,7 @@ export const sessionValidation = {
     }
     
     // Check if time remaining makes sense
-    const expectedTimeRemaining = 15000 - elapsed; // 15 seconds minus elapsed
+    const expectedTimeRemaining = 10000 - elapsed; // 10 seconds minus elapsed
     const tolerance = 2000; // 2 second tolerance
     
     return Math.abs(timeRemaining - expectedTimeRemaining) <= tolerance;
@@ -349,10 +349,10 @@ export const antiCheatValidation = {
     // Check for impossible timing
     let totalTime = 0;
     for (const round of rounds) {
-      if (round.timeRemaining > 15000) {
+      if (round.timeRemaining > 10000) {
         errors.push(`Impossible time remaining: ${round.timeRemaining}ms`);
       }
-      totalTime += (15000 - (round.timeRemaining || 0));
+      totalTime += (10000 - (round.timeRemaining || 0));
     }
     
     // Total game time should be reasonable (at least 6 seconds, at most 90 seconds)

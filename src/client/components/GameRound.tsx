@@ -11,7 +11,7 @@ interface GameRoundProps {
 }
 
 export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundComplete }) => {
-  const [timeRemaining, setTimeRemaining] = useState(15);
+  const [timeRemaining, setTimeRemaining] = useState(10);
   const [selectedAnswer, setSelectedAnswer] = useState<'A' | 'B' | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackData, setFeedbackData] = useState<SubmitAnswerResponse | null>(null);
@@ -29,7 +29,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   // Reset component state when round changes
   useEffect(() => {
 
-    setTimeRemaining(15);
+    setTimeRemaining(10);
     setSelectedAnswer(null);
     setShowFeedback(false);
     setFeedbackData(null);
@@ -150,15 +150,15 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
 
   // Get timer color based on remaining time
   const getTimerColor = () => {
-    if (timeRemaining > 10) return 'text-green-600';
-    if (timeRemaining > 5) return 'text-yellow-600';
+    if (timeRemaining > 6) return 'text-green-600';
+    if (timeRemaining > 3) return 'text-yellow-600';
     return 'text-red-600';
   };
 
   // Get progress bar color
   const getProgressColor = () => {
-    if (timeRemaining > 10) return 'bg-green-500';
-    if (timeRemaining > 5) return 'bg-yellow-500';
+    if (timeRemaining > 6) return 'bg-green-500';
+    if (timeRemaining > 3) return 'bg-yellow-500';
     return 'bg-red-500';
   };
 
@@ -184,7 +184,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
             <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
               <div
                 className={`h-2 rounded-full transition-all duration-1000 ${getProgressColor()}`}
-                style={{ width: `${(timeRemaining / 15) * 100}%` }}
+                style={{ width: `${(timeRemaining / 10) * 100}%` }}
               />
             </div>
           </div>
@@ -198,19 +198,23 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
         </div>
 
         {/* Image Selection - Responsive Layout */}
-        <div className="image-container mb-6">
+        <div className="image-container">
           {/* Image A */}
-          <div className="relative image-wrapper">
+          <div className="image-wrapper">
             <button
               onClick={() => handleImageSelect('A')}
               disabled={selectedAnswer !== null || showFeedback}
               className={`game-image-button ${
-                selectedAnswer === 'A'
+                showFeedback
+                  ? selectedAnswer === 'A'
+                    ? feedbackData?.isCorrect
+                      ? 'selected correct-feedback'
+                      : 'selected incorrect-feedback'
+                    : feedbackData?.correctAnswer === 'A'
+                    ? 'correct-feedback'
+                    : 'incorrect-feedback'
+                  : selectedAnswer === 'A'
                   ? 'selected'
-                  : showFeedback
-                  ? feedbackData?.aiImagePosition === 'A'
-                    ? 'incorrect-feedback'
-                    : 'correct-feedback'
                   : 'default'
               } ${selectedAnswer || showFeedback ? 'disabled' : ''}`}
             >
@@ -230,7 +234,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
                 className="game-image"
               />
               
-              {/* Custom overlay indicators - only on selected images */}
+              {/* Custom Overlay Indicators - Only show on selected image */}
               {showFeedback && selectedAnswer === 'A' && (
                 <div className="overlay-indicator">
                   {feedbackData?.aiImagePosition === 'A' ? (
@@ -247,24 +251,24 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
                 </div>
               )}
             </button>
-            
-            <div className="text-center mt-2">
-              <span className="text-lg font-semibold text-gray-700">A</span>
-            </div>
           </div>
 
           {/* Image B */}
-          <div className="relative image-wrapper">
+          <div className="image-wrapper">
             <button
               onClick={() => handleImageSelect('B')}
               disabled={selectedAnswer !== null || showFeedback}
               className={`game-image-button ${
-                selectedAnswer === 'B'
+                showFeedback
+                  ? selectedAnswer === 'B'
+                    ? feedbackData?.isCorrect
+                      ? 'selected correct-feedback'
+                      : 'selected incorrect-feedback'
+                    : feedbackData?.correctAnswer === 'B'
+                    ? 'correct-feedback'
+                    : 'incorrect-feedback'
+                  : selectedAnswer === 'B'
                   ? 'selected'
-                  : showFeedback
-                  ? feedbackData?.aiImagePosition === 'B'
-                    ? 'incorrect-feedback'
-                    : 'correct-feedback'
                   : 'default'
               } ${selectedAnswer || showFeedback ? 'disabled' : ''}`}
             >
@@ -284,7 +288,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
                 className="game-image"
               />
               
-              {/* Custom overlay indicators - only on selected images */}
+              {/* Custom Overlay Indicators - Only show on selected image */}
               {showFeedback && selectedAnswer === 'B' && (
                 <div className="overlay-indicator">
                   {feedbackData?.aiImagePosition === 'B' ? (
@@ -301,26 +305,15 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
                 </div>
               )}
             </button>
-            
-            <div className="text-center mt-2">
-              <span className="text-lg font-semibold text-gray-700">B</span>
-            </div>
           </div>
         </div>
 
-        {/* Feedback Message */}
-        {showFeedback && feedbackData && (
+        {/* Points Display */}
+        {showFeedback && feedbackData && feedbackData.roundScore !== undefined && (
           <div className="text-center">
-            <div className={`text-lg font-semibold ${
-              feedbackData.isCorrect ? 'text-green-600' : 'text-red-600'
-            }`}>
-              {feedbackData.isCorrect ? '✅ Correct!' : '❌ Incorrect'}
+            <div className="text-sm text-gray-600">
+              +{feedbackData.roundScore.toFixed(2)} points
             </div>
-            {feedbackData.roundScore !== undefined && (
-              <div className="text-sm text-gray-600 mt-1">
-                +{feedbackData.roundScore.toFixed(2)} points
-              </div>
-            )}
           </div>
         )}
 

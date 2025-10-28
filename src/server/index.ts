@@ -261,7 +261,7 @@ router.post<object, SubmitAnswerResponse, SubmitAnswerRequest>(
         return;
       }
       
-      if (typeof timeRemaining !== 'number' || timeRemaining < 0 || timeRemaining > 15000) {
+      if (typeof timeRemaining !== 'number' || timeRemaining < 0 || timeRemaining > 10000) {
         res.status(400).json({
           success: false,
           error: 'Invalid time remaining',

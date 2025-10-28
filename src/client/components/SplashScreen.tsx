@@ -281,7 +281,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStartGame }) => {
             </li>
             <li className="flex items-start">
               <span className="text-indigo-600 font-bold mr-2">3.</span>
-              You have 15 seconds per round
+              You have 10 seconds per round
             </li>
             <li className="flex items-start">
               <span className="text-indigo-600 font-bold mr-2">4.</span>

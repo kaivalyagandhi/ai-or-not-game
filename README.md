@@ -11,14 +11,14 @@ This interactive React-based game runs directly within Reddit posts, providing a
 Spot the Bot is a **daily visual challenge game** that tests your ability to distinguish between real photographs and AI-generated images. Built as a React web application that runs natively within Reddit posts using the Devvit platform, the game presents players with image comparisons where they must identify which image is the REAL photograph (not the AI-generated one).
 
 ### Core Game Mechanics
-- **6 rounds per game** with exactly 15 seconds per round
+- **6 rounds per game** with exactly 10 seconds per round
 - **6 image categories**: Animals, Architecture, Nature, Food, Products, and Science
-- **Responsive layout**: Images displayed vertically on mobile, side-by-side on desktop
+- **Responsive layout**: Images displayed in a responsive grid that adapts from vertical stack on mobile to side-by-side on desktop
 - **Time-pressure scoring**: Faster correct answers earn higher scores with time bonuses (0.01 points per millisecond remaining)
 - **Multiple attempts per day**: Players can attempt the challenge up to 2 times per day (unlimited in development mode)
 - **Educational break**: After round 3, players receive AI detection tips and facts about AI image generation
-- **Visual feedback**: Custom overlay indicators show AI vs Human sources with colored borders and icons
-- **Audio enhancement**: Background music and sound effects create an immersive gaming experience
+- **Enhanced visual feedback**: Custom overlay indicators with colored circles, icons, and labels show AI vs Human sources
+- **Audio enhancement**: Background music and sound effects create an immersive gaming experience with user controls
 - **Progressive difficulty**: Mixed categories and randomized AI placement keep players guessing
 
 ## 🎮 What Makes This Game Innovative
@@ -26,15 +26,15 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 ### Cutting-Edge AI Detection Challenge
 - **Daily Fresh Content**: New image sets generated every day at 00:00 UTC with completely randomized categories, AI placement, and difficulty progression across 6 diverse image categories
 - **Real-Time Social Competition**: Live participant counter shows how many players have attempted today's challenge, with real-time updates as new players join via Devvit's Realtime API
-- **Intelligent Scoring Algorithm**: Sophisticated time-based scoring system rewards both accuracy (1 point per correct answer) and speed (0.01 bonus points per millisecond remaining), creating strategic tension between careful analysis and quick decisions
-- **Educational Integration**: Midgame learning break after round 3 provides AI detection tips and fascinating facts about AI image generation with daily rotating content
+- **Intelligent Scoring Algorithm**: Sophisticated time-based scoring system rewards both accuracy (1 point per correct answer) and speed (0.01 bonus points per millisecond remaining), creating strategic tension between careful analysis and quick decisions under intense 10-second time pressure
+- **Educational Integration**: Midgame learning break after round 3 provides AI detection tips and fascinating facts about AI image generation with daily rotating content loaded from server-managed files
 - **Immersive Audio Experience**: Background music and contextual sound effects enhance gameplay with user-controlled volume and mute options, gracefully degrading when audio files are unavailable
 
-### Advanced Visual Feedback System
-- **Custom Overlay Indicators**: Selected images show circular overlays with icons (✓ for Human, ✕ for AI) and clear labels, removing confusing emoji-based feedback
-- **Enhanced Border Styling**: Correct selections get green borders (#46E870) with glow effects, incorrect selections get red borders (#F23C3C) with glow effects
-- **Responsive Image Layout**: Mobile devices show images in vertical stack, desktop shows side-by-side comparison, all with 1:1 aspect ratio cropping
-- **Smart Visual Hierarchy**: Only selected images show overlay indicators, non-selected images show subtle border outlines to indicate their source
+### Enhanced Visual Feedback System
+- **Custom Overlay Indicators**: Selected images show circular overlays with white icons (✕ for AI, ✓ for Human) and clear labels ("AI" or "Human")
+- **Enhanced Border Styling**: Selected images get blue borders during selection, correct answers get green borders (#46E870), incorrect get red borders (#F23C3C) with glow effects
+- **Responsive Grid Layout**: Images displayed in a responsive grid that adapts from single column on mobile to side-by-side on desktop, all with consistent 1:1 aspect ratio
+- **Smart Visual States**: Clear visual progression from default state → selection state → feedback state with smooth transitions and hover effects
 
 ### Advanced Social & Community Features
 - **Dynamic Achievement System**: Earn performance-based badges with custom emoji and descriptions from 🤖 AI Whisperer (perfect score) to 🎓 Human in Training (learning mode)
@@ -54,8 +54,8 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 ### Getting Started
 1. **Find the Game**: Look for Spot the Bot posts in participating subreddits or communities where the app is installed
 2. **Launch the App**: Click the "Launch App" button in the Reddit post to open the game in full-screen webview mode
-3. **Welcome Screen**: You'll see today's date, a live participant counter, your progress tracking, and basic game instructions
-4. **Join the Challenge**: Click "Start Playing" to begin your daily challenge
+3. **Welcome Screen**: You'll see today's date, a live participant counter showing how many players have joined today, your remaining attempts (out of 2 per day), and your best score from previous attempts
+4. **Join the Challenge**: Click "Start Playing" to begin your daily challenge (button will be disabled if you've used all daily attempts)
 
 ### Complete Game Flow
 
@@ -63,7 +63,7 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 The splash screen welcomes you with:
 - **Daily Challenge Display**: Shows the current date and live participant count with real-time updates
 - **Your Progress Tracking**: Displays remaining attempts (out of 2 per day) and your best score from previous attempts
-- **Game Rules Overview**: Clear instructions explaining the 6-round format, 15-second time limits, and scoring system
+- **Game Rules Overview**: Clear instructions explaining the 6-round format, 10-second time limits, and scoring system
 
 #### Round-by-Round Gameplay (6 Rounds Total)
 
@@ -72,19 +72,19 @@ The splash screen welcomes you with:
 - **Image Comparison**: Two images displayed - one real photograph, one AI-generated
   - **Mobile Layout**: Images stacked vertically for easy comparison
   - **Desktop Layout**: Images displayed side-by-side
-- **15-Second Timer**: Color-coded countdown timer with progress bar:
-  - **Green** (11-15 seconds): Plenty of time to analyze
-  - **Yellow** (6-10 seconds): Time to make a decision  
-  - **Red** (1-5 seconds): Choose quickly!
+- **10-Second Timer**: Color-coded countdown timer with progress bar:
+  - **Green** (7-10 seconds): Plenty of time to analyze
+  - **Yellow** (4-6 seconds): Time to make a decision  
+  - **Red** (1-3 seconds): Choose quickly!
 
 **Making Your Selection:**
 1. **Analyze Both Images**: Look for AI tells like unnatural lighting, impossible geometry, or weird details
 2. **Click to Choose**: Click on the image you believe is the REAL photograph (not AI-generated)
-3. **Immediate Feedback**: See the correct answer with custom visual indicators:
-   - **Selected Image**: Shows circular overlay with ✓ (Human) or ✕ (AI) icon and label
-   - **Non-Selected Image**: Shows colored border outline indicating its source
-   - **Border Colors**: Green (#46E870) for correct, Red (#F23C3C) for incorrect with glow effects
-4. **Score Display**: See whether you were correct (✅ Correct! or ❌ Incorrect) and your round score
+3. **Immediate Feedback**: See the correct answer with enhanced visual indicators:
+   - **Selected Image Only**: Shows circular overlay with white icon (✕ for AI, ✓ for Human) and label ("AI" or "Human")
+   - **Border Colors**: Selected images get blue borders during selection, then show green borders (#46E870) for correct answers or red borders (#F23C3C) for incorrect answers with glow effects
+   - **Scale Effects**: Selected images scale up slightly (scale-105) for emphasis during feedback
+4. **Score Display**: See your round score with decimal precision (e.g., "+1.23 points")
 5. **Auto-Advance**: Game automatically moves to the next round after 2 seconds
 
 #### Educational Break (After Round 3)
@@ -95,16 +95,18 @@ Halfway through the game, you'll receive:
 - **Continue Button**: "Continue to Round 4" to resume gameplay
 
 #### Audio Experience (Optional)
-- **Background Music**: Atmospheric music during gameplay
-- **Sound Effects**: Click sounds when selecting, success/failure sounds for feedback
-- **Audio Controls**: 🎵 button in top-right corner to adjust volume or mute
-- **Graceful Degradation**: Game works perfectly even if audio files are unavailable
+- **Background Music**: Atmospheric music during gameplay that starts when you begin playing and stops when the game ends
+- **Sound Effects**: Click sounds when selecting images, success sounds for correct answers, failure sounds for incorrect answers
+- **Audio Controls**: Integrated audio system with user-controlled volume and mute options accessible throughout gameplay
+- **Graceful Degradation**: Game works perfectly even if audio files are unavailable, with comprehensive audio validation and development tools
+- **Audio Context Management**: Smart audio unlocking on user interaction to comply with browser autoplay policies
 
 #### Scoring System
 - **Base Points**: 1 point for each correct identification
 - **Time Bonus**: 0.01 bonus points per millisecond remaining when you answer correctly
-- **Maximum Score**: ~16 points per round (1 base + ~15 time bonus for instant correct answers)
+- **Maximum Score**: ~11 points per round (1 base + ~10 time bonus for instant correct answers)
 - **Final Score**: Cumulative total across all 6 rounds with server-side validation
+- **Perfect Game**: Maximum possible score is approximately 66 points (6 correct answers + maximum time bonuses)
 
 #### Badge Achievement System
 Your final performance determines your badge:
@@ -116,19 +118,23 @@ Your final performance determines your badge:
 
 #### Final Results Screen
 After completing all 6 rounds:
-- **Total Score**: Your final score with decimal precision (e.g., "87.45")
+- **Total Score**: Your final score with decimal precision (e.g., "87.45") and attempt number if multiple attempts
 - **Performance Breakdown**: Correct answers (X/6) and total time bonus earned
 - **Badge Achievement**: Large badge display with custom emoji, title, and description
-- **Leaderboard Position**: Your rank among all daily players with live updates
-- **Inspirational Content**: Daily rotating quotes and motivational messages
+- **Leaderboard Position**: Your rank among all daily players with live updates via real-time connection
+- **Inspirational Content**: Daily rotating quotes and motivational messages loaded from server content
+- **Improvement Tracking**: Shows score improvements from previous attempts and best score context
+- **Attempt Status**: Displays remaining attempts and encourages replay if attempts are available
 
 #### Social Sharing Options
-**📤 Share Results**: Standard performance summary with score, badge, and rank
-**👥 Challenge Friends**: Personalized message with friendly challenge invitation
+**📤 Share Results**: Standard performance summary with score, badge, rank, and attempt context
+**👥 Challenge Friends**: Personalized message with friendly challenge invitation and attempt tracking
 
 Both modes support:
-- **Native Sharing**: Uses device's built-in sharing on mobile
-- **Clipboard Fallback**: Automatic copy-to-clipboard with confirmation notification
+- **Native Sharing**: Uses device's built-in sharing API on mobile devices
+- **Clipboard Fallback**: Automatic copy-to-clipboard with toast notification confirmation
+- **Smart Messaging**: Different messages based on attempt number, score improvements, and remaining attempts
+- **Encouragement Context**: Messages adapt based on whether you can still play again or have used all attempts
 
 #### Multi-Tier Leaderboard System
 - **Daily Leaderboard**: Compete against all players for today (resets at 00:00 UTC)
@@ -141,14 +147,17 @@ Both modes support:
 
 #### Daily Challenge System
 - **Multiple Attempts**: Up to 2 attempts per day (unlimited in development mode)
-- **UTC Reset**: New challenges available daily at 00:00 UTC
-- **Best Score Tracking**: System remembers your highest score across attempts
+- **UTC Reset**: New challenges available daily at 00:00 UTC with fresh image sets
+- **Best Score Tracking**: System remembers your highest score across attempts with improvement notifications
 - **Session Persistence**: Must complete started games (can't restart mid-game)
+- **Attempt Tracking**: Clear display of remaining attempts and encouragement to replay
 
 #### Anti-Cheat Protection
-- **Server-Side Timer Validation**: All timing verified server-side with 3-second tolerance
-- **Rate Limiting**: Prevents spam and system abuse
-- **Input Validation**: All user inputs sanitized and validated
+- **Server-Side Timer Validation**: All timing verified server-side with 3-second tolerance for network delays
+- **Rate Limiting**: Prevents spam and system abuse with middleware protection
+- **Input Validation**: All user inputs sanitized and validated on both client and server
+- **Session Integrity**: Comprehensive session validation and state management
+- **Network Resilience**: Retry logic with exponential backoff and offline detection
 
 ### Pro Tips for Success
 
@@ -178,18 +187,18 @@ Both modes support:
 
 
 ### ✅ Fully Implemented Features
-- **Core Gameplay**: 6 rounds with 15-second timers and comprehensive scoring system
-- **Educational System**: Midgame learning breaks with daily rotcts
-- **Audio Integration**: Background music, sound effects, and user controls witon
+- **Core Gameplay**: 6 rounds with 10-second timers and comprehensive scoring system
+- **Educational System**: Midgame learning breaks with daily rotating content and fallbacks
+- **Audio Integration**: Background music, sound effects, and user controls with graceful degradation
 - **Real-time Features**: Live participant counting and leaderboard updates via Devvit Realtime API
-
-- **Content Management**: Daily rotatfallbacks
+- **Enhanced Visual Feedback**: Custom overlay indicators with colored circles, icons, and labels, plus colored borders with glow effects
+- **Content Management**: Daily rotating educational tips, AI facts, and inspirational content
 - **Error Handling**: Comprehensive error boundaries, retry logic, and offline support
 - **Mobile Optimization**: Touch-friendly responsive design optimized for Reddit's mobile users
 - **Session Management**: Secure game state persistence with Redis and local storage caching
-- **Play Limit System**: Multiple daily attempts (2 per day) with best score tracking gement
-
-- **Progress Tracking**:
+- **Play Limit System**: Multiple daily attempts (2 per day) with best score tracking and improvement notifications
+- **Social Features**: Enhanced sharing with two modes (general results and friend challenges)
+- **Progress Tracking**: Attempt tracking, best score display, and improvement notifications
 
 ### 🚧 In Development
 - **Science Category**: Image content for the 6th category (infrastructure ready, awaiting image uploads)
@@ -198,25 +207,48 @@ Both modes support:
 - **Advanced Audio**: Extended sound library and dynamic music system
 - **Community Features**: User-generated content and social interactions
 
+## 🎨 Recent Visual Enhancements
+
+The game recently received major visual feedback improvements to create a more intuitive and engaging experience:
+
+### Custom Overlay Indicator System
+- **Selective Display**: Overlay indicators now appear only on the selected image during feedback
+- **Clear Visual Design**: Red circles with white ✕ icon and "AI" label for AI-generated images
+- **Human Recognition**: Green circles with white ✓ icon and "Human" label for real photographs
+- **Professional Styling**: 80px circular overlays with proper typography and contrast
+
+### Enhanced Border Feedback
+- **Selection State**: Blue borders (#3b82f6) appear when images are selected
+- **Correct Feedback**: Green borders (#46E870) with subtle glow effects for correct answers
+- **Incorrect Feedback**: Red borders (#F23C3C) with subtle glow effects for incorrect answers
+- **Non-Selected Images**: Subtle border outlines indicate the source (AI vs Human) without overlays
+
+### Responsive Layout Improvements
+- **Mobile-First Design**: Single column layout on mobile devices for easy thumb navigation
+- **Desktop Optimization**: Side-by-side layout on larger screens for direct comparison
+- **Consistent Aspect Ratios**: All images maintain 1:1 aspect ratio with proper cropping
+- **Smooth Transitions**: Scale effects and hover states provide tactile feedback
+
 
 ## 🚀 Technology Stack
 
-- **[Devvit](https://developers.reddit.com/)**: Reddit's developer platform f
-- **[React](https://react.dev/)**: Modern UI framework with TypeScript and hooks for snt
-- **[Vite](https://vite.dev/)**: Fast build tool for client and server bundles
-- **[Express](https://expressjs.com/)**: Backend API server with RESTful endpoints
-- **[Redis](https://redis.io/)**: Data persistence, session management, andrds
-- **[Tailwind CSS](https://tailwindcss.com/)**: Utility-first styling with respoign
-- **[TypeScript](https://www.typescriptlang.org/)**: Full type safety across the entire stack
+- **[Devvit](https://developers.reddit.com/)**: Reddit's developer platform for building native Reddit apps with serverless architecture
+- **[React](https://react.dev/)**: Modern UI framework with TypeScript, hooks, and custom components for game state management
+- **[Vite](https://vite.dev/)**: Fast build tool for client and server bundles with hot module replacement and optimized builds
+- **[Express](https://expressjs.com/)**: Backend API server with RESTful endpoints, middleware, and comprehensive error handling
+- **[Redis](https://redis.io/)**: Data persistence for game sessions, leaderboards, daily content, and real-time participant tracking
+- **[Tailwind CSS](https://tailwindcss.com/)**: Utility-first styling with responsive design, custom components, and mobile-first approach
+- **[TypeScript](https://www.typescriptlang.org/)**: Full type safety across the entire stack with strict configuration and shared type definitions
+- **[Devvit Realtime API](https://developers.reddit.com/)**: Real-time updates for participant counts and leaderboard positions
 
 ## 🛠️ Development Setup
 
 ### Prerequisites
 - **Node.js 22+**: Required for Devvit compatibility
 - **Reddit Account**: Connected to Reddit Developers platform
-ticated
+- **Devvit CLI**: Installed and authenticated
 
-rt
+### Quick Start
 1. Clone this repository
 2. Run `npm install` to install dependencies
 3. Run `npm run dev` to start development server
@@ -230,8 +262,8 @@ rt
 - `npm run check`: Run type checking, linting, and code formatting
 
 ### Deployment
-dit
-- `npm run launch`: Poval
+- `npm run deploy`: Upload app to Reddit for testing
+- `npm run launch`: Build, deploy, and publish for review
 - `npm run login`: Authenticate Devvit CLI with Reddit account
 
 ### Individual Builds
@@ -240,7 +272,8 @@ dit
 
 
 
-re
+## 📁 Project Structure
+
 ```
 src/
 ├── client/          # React frontend (runs in Reddit webview)
@@ -248,91 +281,92 @@ src/
 │   │   ├── SplashScreen.tsx      # Welcome screen with live participant count
 │   │   ├── GameRound.tsx         # Image comparison interface with timer
 │   │   ├── EducationalContent.tsx # Midgame learning break with tips and facts
-ty
-│   │   ├── LeaderboardTabs.ts updates
-ent
-│   │   ├── Loading
+│   │   ├── ResultsScreen.tsx     # Final results with sharing and leaderboard
+│   │   ├── LeaderboardTabs.tsx   # Multi-tier leaderboards with live updates
+│   │   ├── LoadingScreen.tsx     # Loading states and progress indicators
+│   │   ├── AudioSystem.tsx       # Audio playback and controls
 │   │   └── ErrorBoundary.tsx     # Error handling and recovery
 │   ├── hooks/       # Custom React hooks
 │   │   ├── useGameState.ts       # Main game state management
 │   │   ├── useErrorHandler.ts    # Error handling with retry logic
-ion
-│   │   └── useCounterook
-es
-│   │   ├── network.tdling
+│   │   ├── useAudio.ts           # Audio controls and context
+│   │   └── useCounter.ts         # Counter utilities
+│   ├── utils/       # Client utilities
+│   │   ├── network.ts            # API calls with retry logic and error handling
 │   │   ├── storage.ts            # Local storage and caching
 │   │   ├── content.ts            # Educational and inspirational content loading
 │   │   ├── audio.ts              # Audio context management
 │   │   ├── audioDevTools.ts      # Audio development and debugging tools
 │   │   └── audioValidation.ts    # Audio file validation utilities
 │   ├── App.tsx      # Main game container with routing
-t
-├── server/          # Express back
-│   ├── core/        # Game logic ant
-│   │   ├── game-logic.ts         # Core game mechanics
-│   │   ├── leaderboard-manager.ts # Leaderboard operations
-│   │   ├── session-manager.ts    # User session handling
-│   │   ├── daily-game-manager.ts # Daily content management
+│   └── main.tsx     # React app entry point
+├── server/          # Express backend (serverless)
+│   ├── core/        # Game logic and data management
+│   │   ├── game-logic.ts         # Core game mechanics and validation
+│   │   ├── leaderboard-manager.ts # Leaderboard operations and rankings
+│   │   ├── session-manager.ts    # User session handling and persistence
+│   │   ├── daily-game-manager.ts # Daily content management and caching
 │   │   ├── content-manager.ts    # Educational and inspirational content
-agement
-│   │   ├── image-manager.tsion
-ystem
+│   │   ├── play-limit-manager.ts # Daily attempt tracking and limits
+│   │   ├── badge-manager.ts      # Achievement badge system
+│   │   ├── image-manager.ts      # Image loading and validation
+│   │   └── scheduler-manager.ts  # Background task scheduling
 │   ├── middleware/  # Server middleware
+│   │   └── security.ts           # Rate limiting and validation
 │   └── index.ts     # API endpoints and Devvit integration
 └── shared/          # TypeScript types used by both client and server
     └── types/       # Game data models and API interfaces
+        ├── api.ts               # Complete API type definitions
+        └── index.ts             # Type exports
 ```
 
 ### Key Features Implementation
 
-- **Educational System**:ts`
-- **Audio Integration**: Comprehensive audio system with background music, sound effec` hook
-- **Real-Time Updates**: Realtime connections via Devvit Realtime API for live participant counts and leaderboard updan
-- **Timer System**: Client-side countdown with color-coded visual progress bar (green/yellow/red) and sends)
-- **Image Handling**: Responsive aspect-square grid layout with hover effects,s
-- **Score Calculation**: Time-based bonus system (0.01 pounds
-- **Badge Assignment**: Automatic badge calculation bastions
-- **Content Management**: Daily rotating ed
-- **Social Sharing**: Native sharing API with clipboard fallback and formatted result messages
-- **Error Resilience**: Comprehensive error boundaries, network retry logic with exponential backoff, offline drHandler`
-
-- **Session Management
-- **Network Optimization**: Smart retry logic with exponential backoff, offline detec
-- **Loading States**: Comprehensive loading screens, skeleton states, progress indicators, and ourney
-- **Offline Support**: Local caching system for game data, results viewing, cached leaderboards
+- **Educational System**: Midgame learning breaks with daily rotating tips and facts loaded from server content management
+- **Audio Integration**: Comprehensive audio system with background music, sound effects, and `useAudio` hook for controls
+- **Real-Time Updates**: Realtime connections via Devvit Realtime API for live participant counts and leaderboard updates
+- **Timer System**: Client-side countdown with color-coded visual progress bar (green/yellow/red) and server-side validation
+- **Image Handling**: Responsive grid layout with 1:1 aspect ratio, custom overlay indicators, and enhanced visual feedback
+- **Score Calculation**: Time-based bonus system (0.01 points per millisecond remaining) with server-side validation
+- **Badge Assignment**: Automatic badge calculation based on performance with 5 achievement tiers
+- **Content Management**: Daily rotating educational tips, AI facts, and inspirational content with caching
+- **Social Sharing**: Native sharing API with clipboard fallback and two sharing modes (results and friend challenges)
+- **Error Resilience**: Comprehensive error boundaries, network retry logic with exponential backoff, offline detection via `useErrorHandler`
+- **Session Management**: Secure Redis-based persistence with local storage caching and session validation
+- **Network Optimization**: Smart retry logic with exponential backoff, offline detection, and pending request queuing
+- **Loading States**: Comprehensive loading screens, skeleton states, progress indicators, and smooth state transitions
+- **Offline Support**: Local caching system for game data, results viewing, cached leaderboards, and graceful degradation
 
 ## 🎨 Design Philosophy
 
-proach
-- Responsive grid layouts that work on all scre
-- Touch-friendly button sizes and hover states
+### Mobile-First Approach
+- Responsive grid layouts that adapt from single column to side-by-side comparison
+- Touch-friendly button sizes with hover states and scale effects
 - Optimized image loading and display for mobile networks
 
 ### User Experience Focus
-- Clear visual feedback for all interactions
-- Smooth transitions and loading states
-
-- Accessible color schemes anhy
+- Clear visual feedback with custom overlay indicators and colored borders
+- Smooth transitions and loading states with comprehensive error handling
+- Intuitive game flow with automatic progression and clear visual hierarchy
+- Accessible color schemes (#46E870 green, #F23C3C red) with high contrast for visual feedback
 
 ### Performance Optimization
-- Efficient API calls with proper error handling
-- Optimized image loading and caching
-- Minimal bundle sizes for fast loading on Reddit
+- Efficient API calls with proper error handling and retry logic
+- Optimized image loading and caching with graceful degradation
+- Minimal bundle sizes for fast loading on Reddit's platform
 
-## 🔧 Cursor Integration
+## 🚀 Deployment Guide
 
-This project includes pre-configured Cursor IDE integration. To get started:
-1. [Download Cursor](https://www.cursor.com/downloads)
-2. Enable the `devvit-mcp` when prompted
-3. Enjoy enhanced development experience with AI assistance
+### Pre-Deployment Checklist
+1. **Code Quality**: Execute `npm run check` to validate TypeScript, linting, and formatting
+2. **Build Verification**: Run `npm run build` to ensure clean builds for client and server
+3. **Testing**: Verify functionality with `npm run dev` and test in the playtest environment
+4. **Audio Setup**: Ensure audio files are properly configured (see `AUDIO_SETUP_GUIDE.md`)
 
- Guide
-
-tegration
-2. **Build Verification**uilds
-3. **Code Quality**: Execute `npm run check` to validate code standards
-4. **Upload**: Deploy with `npm run deploy` to update your Reddit app
-5. **Publishing**: Submit for review using `npm run launch`
+### Deployment Process
+1. **Upload**: Deploy with `npm run deploy` to update your Reddit app
+2. **Publishing**: Submit for review using `npm run launch`
+3. **Monitoring**: Check app performance and user feedback after deployment
 
 ## 📈 Future Enhancements
 
