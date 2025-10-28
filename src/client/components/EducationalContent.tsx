@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchCurrentContentCached } from '../utils/content';
+import { fetchRandomContentFresh } from '../utils/content';
 
 interface EducationalContentProps {
   onContinue: () => void;
@@ -17,7 +17,7 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
         setLoading(true);
         setError(null);
         
-        const response = await fetchCurrentContentCached();
+        const response = await fetchRandomContentFresh();
         
         if (response.success) {
           setTip(response.tip || 'Look for unnatural lighting or impossible geometry.');

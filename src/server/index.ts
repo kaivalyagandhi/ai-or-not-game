@@ -707,6 +707,25 @@ router.get('/api/content/current', async (_req, res): Promise<void> => {
   }
 });
 
+router.get('/api/content/random', async (_req, res): Promise<void> => {
+  try {
+    const { contentManager } = await import('./core/content-manager.js');
+    
+    res.json({
+      success: true,
+      tip: contentManager.getRandomTip(),
+      fact: contentManager.getRandomFact(),
+      inspiration: contentManager.getRandomInspiration(),
+    });
+  } catch (error) {
+    console.error('Error fetching random content:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load random content',
+    });
+  }
+});
+
 router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
   try {
     const post = await createPost();

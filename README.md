@@ -16,7 +16,7 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 - **Responsive layout**: Images displayed in a responsive grid that adapts from vertical stack on mobile to side-by-side on desktop
 - **Whole number scoring system**: 10 points per correct answer + tier-based time bonuses (5 points for 7-10 seconds, 3 points for 4-6 seconds, 1 point for 1-3 seconds)
 - **Multiple attempts per day**: Players can attempt the challenge up to 2 times per day (unlimited in development mode)
-- **Educational break**: After round 3, players receive AI detection tips and facts about AI image generation
+- **Educational break**: After round 3, players receive AI detection tips and facts about AI image generation with fresh content each session
 - **Enhanced visual feedback**: Custom overlay indicators with colored circles, icons, and labels show AI vs Human sources
 - **Simplified audio system**: Background music and sound effects with one-click toggle controls (🎵/🔇)
 - **Progressive difficulty**: Mixed categories and randomized AI placement keep players guessing
@@ -27,7 +27,7 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 - **Daily Fresh Content**: New image sets generated every day at 00:00 UTC with completely randomized categories, AI placement, and difficulty progression across 5 diverse image categories
 - **Real-Time Social Competition**: Live participant counter shows how many players have attempted today's challenge, with real-time updates as new players join via Devvit's Realtime API
 - **Intelligent Scoring Algorithm**: Sophisticated tier-based scoring system rewards both accuracy (10 points per correct answer) and speed (5/3/1 bonus points based on remaining time), creating strategic tension between careful analysis and quick decisions under intense 10-second time pressure
-- **Educational Integration**: Midgame learning break after round 3 provides AI detection tips and fascinating facts about AI image generation with daily rotating content loaded from server-managed files
+- **Educational Integration**: Midgame learning break after round 3 provides AI detection tips and fascinating facts about AI image generation with fresh content loaded for each game session
 - **Immersive Audio Experience**: Background music and contextual sound effects enhance gameplay with simplified one-click toggle controls, gracefully degrading when audio files are unavailable
 
 ### Enhanced Visual Feedback System
@@ -96,9 +96,9 @@ The splash screen welcomes you with:
 
 #### Educational Break (After Round 3)
 Halfway through the game, you'll receive:
-- **AI Detection Tips**: Practical advice for spotting AI-generated images
-- **AI Facts**: Fascinating insights about AI image generation technology
-- **Daily Rotation**: New educational content provided each day
+- **AI Detection Tips**: Practical advice for spotting AI-generated images (randomly selected from 49 tips)
+- **AI Facts**: Fascinating insights about AI image generation technology (randomly selected from 49 facts)
+- **Fresh Content Each Session**: New educational content provided for every game session
 - **Continue Button**: "Continue to Round 4" to resume gameplay
 
 #### Audio Experience (Optional)
@@ -135,7 +135,7 @@ After completing all 6 rounds:
 - **Performance Breakdown**: Correct answers (X/6) and total time bonus earned
 - **Badge Achievement**: Large badge display with custom emoji, title, and description
 - **Leaderboard Position**: Your rank among all daily players with live updates via real-time connection
-- **Inspirational Content**: Daily rotating quotes and motivational messages loaded from server content
+- **Inspirational Content**: Fresh quotes and motivational messages loaded from server content for each session
 - **Improvement Tracking**: Shows score improvements from previous attempts and best score context
 - **Attempt Status**: Displays remaining attempts and encourages replay if attempts are available
 
@@ -202,7 +202,7 @@ Both modes support:
 
 #### Core Game Systems
 - **Complete Gameplay Loop**: 6 rounds with 10-second timers and comprehensive whole-number scoring system
-- **Educational Integration**: Midgame learning breaks with daily rotating content and fallbacks
+- **Educational Integration**: Midgame learning breaks with fresh content each session from comprehensive content library (49 tips, 49 facts) and fallbacks
 - **Audio System**: Background music, sound effects, and user controls with graceful degradation and localStorage persistence
 - **Play Limit Management**: Multiple daily attempts (2 per day) with best score tracking and improvement notifications
 
@@ -220,7 +220,7 @@ Both modes support:
 
 #### Technical Infrastructure
 - **Session Management**: Secure game state persistence with Redis and local storage caching
-- **Content Management**: Daily rotating educational tips, AI facts, and inspirational content
+- **Content Management**: Fresh educational content system with random selection from comprehensive libraries (49 tips, 49 facts)
 - **Anti-Cheat Protection**: Server-side validation and comprehensive input sanitization
 - **Performance Optimization**: Efficient API calls, caching, and bundle optimization
 
@@ -241,7 +241,7 @@ The game is **fully functional and production-ready** with all core systems impl
 - Modernized whole-number scoring system for better user experience
 - Simplified audio system with one-click toggle controls and enhanced sound effects
 - Real-time leaderboards and participant tracking
-- Educational content system with daily rotation
+- Educational content system with fresh content each session
 - Comprehensive error handling and offline support
 - Mobile-responsive design optimized for Reddit users
 - Anti-cheat protection and play limit enforcement
@@ -256,8 +256,14 @@ The game is **fully functional and production-ready** with all core systems impl
 
 ## 🎨 Recent Updates & Enhancements
 
-### 🔥 Latest Update: Audio System Simplification & Enhanced User Experience
-The game recently received major audio system improvements and user experience enhancements:
+### 🔥 Latest Update: Fresh Educational Content System & Audio Enhancements
+The game recently received a major educational content system upgrade and audio improvements:
+
+**Fresh Educational Content System:**
+- **Dynamic Content Loading**: New `fetchRandomContentFresh()` function ensures unique educational content for each game session
+- **Comprehensive Content Library**: 49 AI detection tips and 49 fascinating AI facts stored in server-managed JSON files
+- **No Content Repetition**: Each educational break provides fresh, randomly selected tips and facts
+- **Enhanced Learning Experience**: Players receive varied educational content across multiple game sessions
 
 **Audio System Simplification:**
 - **One-Click Toggle**: Replaced complex dropdown controls with simple music icon button (🎵/🔇)
@@ -275,6 +281,21 @@ The game recently received major audio system improvements and user experience e
 These changes make the game more accessible and intuitive while maintaining the strategic balance between speed and accuracy.
 
 ### Latest Code Improvements
+
+#### Fresh Educational Content System ⚡
+The game recently received a major educational content system upgrade:
+
+**Dynamic Content Loading:**
+- Added `fetchRandomContentFresh()` function for fresh content each session
+- Educational content no longer cached, ensuring unique tips and facts every game
+- Random selection from comprehensive libraries (49 tips, 49 facts)
+- Enhanced learning experience with varied content across multiple sessions
+
+**Content Library Expansion:**
+- Comprehensive AI detection tips covering hands, lighting, textures, and more
+- Fascinating AI facts about image generation technology and capabilities
+- Server-managed JSON files for easy content updates and maintenance
+- Graceful fallback system ensures uninterrupted gameplay
 
 #### Audio System Simplification & Enhancement ⚡
 The game recently received major audio system improvements for better user experience:
@@ -488,14 +509,14 @@ src/
 
 ### Key Features Implementation
 
-- **Educational System**: Midgame learning breaks with daily rotating tips and facts loaded from server content management
+- **Educational System**: Midgame learning breaks with fresh content each session from comprehensive libraries (49 tips, 49 facts)
 - **Audio Integration**: Simplified audio system with background music, enhanced sound effects, and one-click toggle controls
 - **Real-Time Updates**: Realtime connections via Devvit Realtime API for live participant counts and leaderboard updates
 - **Timer System**: Client-side countdown with color-coded visual progress bar (green/yellow/red) and server-side validation
 - **Image Handling**: Responsive grid layout with 1:1 aspect ratio, custom overlay indicators, and enhanced visual feedback
 - **Score Calculation**: Tier-based bonus system (5/3/1 points based on remaining time) with server-side validation
 - **Badge Assignment**: Automatic badge calculation based on performance with 5 achievement tiers
-- **Content Management**: Daily rotating educational tips, AI facts, and inspirational content with caching
+- **Content Management**: Fresh educational content system with random selection from comprehensive libraries and caching
 - **Social Sharing**: Native sharing API with clipboard fallback and two sharing modes (results and friend challenges)
 - **Error Resilience**: Comprehensive error boundaries, network retry logic with exponential backoff, offline detection via `useErrorHandler`
 - **Session Management**: Secure Redis-based persistence with local storage caching and session validation

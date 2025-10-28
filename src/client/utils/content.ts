@@ -68,6 +68,27 @@ export async function fetchCurrentContent(): Promise<CurrentContentResponse> {
 }
 
 /**
+ * Fetch random content for each game session (one tip, one fact, one inspiration)
+ */
+export async function fetchRandomContent(): Promise<CurrentContentResponse> {
+  try {
+    const response = await fetch('/api/content/random');
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching random content:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch random content',
+    };
+  }
+}
+
+/**
  * Content loading utility with retry logic
  */
 export async function loadContentWithRetry<T>(
@@ -188,6 +209,13 @@ export async function fetchCurrentContentCached(): Promise<CurrentContentRespons
   }
   
   return content;
+}
+
+/**
+ * Fetch random content without caching (for fresh content each game session)
+ */
+export async function fetchRandomContentFresh(): Promise<CurrentContentResponse> {
+  return await loadContentWithRetry(fetchRandomContent);
 }
 
 /**

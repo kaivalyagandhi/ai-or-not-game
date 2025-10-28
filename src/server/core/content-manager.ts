@@ -46,43 +46,45 @@ export class ContentManager {
   }
 
   /**
-   * Get embedded educational tips (replaces file reading)
+   * Get educational tips from JSON file (replaces file reading)
    */
   private getEmbeddedTips(): { tips: string[] } {
-    return {
-      tips: [
-        "Look for unnatural lighting or shadows that don't match the scene.",
-        "Check hands and fingers carefully - AI often generates extra fingers or distorted anatomy.",
-        "Examine text in images - AI-generated text is often blurry, nonsensical, or has impossible characters.",
-        "Watch for impossible reflections or shadows that don't match the lighting.",
-        "Look for repetitive patterns or textures that seem too perfect or artificial.",
-        "Check for anatomical inconsistencies in people and animals.",
-        "Notice if small details like jewelry, buttons, or accessories look warped or impossible.",
-        "AI often struggles with complex scenes - look for objects that don't make physical sense.",
-        "Check if the image has an 'uncanny valley' feeling - something that looks almost right but feels off.",
-        "Look for inconsistent perspective or impossible geometry in architectural elements."
-      ]
-    };
+    try {
+      // Import the JSON file directly since fs is not available in serverless environment
+      const tipsData = require('../content/educational-tips.json');
+      return tipsData;
+    } catch (error) {
+      console.error('Error loading tips from JSON file:', error);
+      // Fallback to a few basic tips if JSON loading fails
+      return {
+        tips: [
+          "Check the hands and feet: AI models often struggle with generating realistic hands and feet, so look for inconsistencies like extra fingers, distorted limbs, or unnatural poses.",
+          "Look for strange patterns in textures: Repetitive or unnatural-looking textures in clothing, skin, or backgrounds can be a tell-tale sign of AI generation.",
+          "Examine the eyes: In AI-generated portraits, the eyes may lack the depth and detail of a real photograph. Look for inconsistent reflections or pupils that are perfectly round."
+        ]
+      };
+    }
   }
 
   /**
-   * Get embedded AI facts (replaces file reading)
+   * Get AI facts from JSON file (replaces file reading)
    */
   private getEmbeddedFacts(): { facts: string[] } {
-    return {
-      facts: [
-        "AI image generators learn by studying millions of real photos to understand patterns and styles.",
-        "Modern AI can create photorealistic images in seconds that would take human artists hours or days.",
-        "AI image generators use neural networks inspired by how human brains process visual information.",
-        "The most advanced AI models can generate images at resolutions up to 1024x1024 pixels or higher.",
-        "AI struggles most with generating realistic hands, text, and complex human interactions.",
-        "Some AI models are trained on over 5 billion image-text pairs from the internet.",
-        "AI-generated images often have subtle tells like impossible lighting or physics-defying elements.",
-        "The technology behind AI art uses something called 'diffusion models' that gradually build images from noise.",
-        "AI can now generate images in specific artistic styles by learning from famous artists' works.",
-        "Each AI-generated image is unique - the same prompt will produce different results every time."
-      ]
-    };
+    try {
+      // Import the JSON file directly since fs is not available in serverless environment
+      const factsData = require('../content/ai-facts.json');
+      return factsData;
+    } catch (error) {
+      console.error('Error loading facts from JSON file:', error);
+      // Fallback to a few basic facts if JSON loading fails
+      return {
+        facts: [
+          "AI image generators learn by studying millions of real photos to understand patterns and styles.",
+          "Modern AI can create photorealistic images in seconds that would take human artists hours or days.",
+          "AI image generators use neural networks inspired by how human brains process visual information."
+        ]
+      };
+    }
   }
 
   /**
@@ -283,6 +285,56 @@ export class ContentManager {
     const content = this.getDailyInspirationContent();
     const contentArray = content.type === 'quote' ? content.quotes : content.jokes;
     return contentArray[content.currentIndex] || contentArray[0] || 'Stay positive!';
+  }
+
+  /**
+   * Get a random tip for each game session
+   */
+  public getRandomTip(): string {
+    this.ensureContentLoaded();
+    
+    if (!this.contentCache || this.contentCache.tips.length === 0) {
+      return 'Look for unnatural lighting or shadows that don\'t match the scene.';
+    }
+
+    const randomIndex = Math.floor(Math.random() * this.contentCache.tips.length);
+    return this.contentCache.tips[randomIndex] || 'Look for unnatural lighting or shadows that don\'t match the scene.';
+  }
+
+  /**
+   * Get a random fact for each game session
+   */
+  public getRandomFact(): string {
+    this.ensureContentLoaded();
+    
+    if (!this.contentCache || this.contentCache.facts.length === 0) {
+      return 'AI image generators learn by studying millions of real photos.';
+    }
+
+    const randomIndex = Math.floor(Math.random() * this.contentCache.facts.length);
+    return this.contentCache.facts[randomIndex] || 'AI image generators learn by studying millions of real photos.';
+  }
+
+  /**
+   * Get random inspirational content for each game session
+   */
+  public getRandomInspiration(): string {
+    this.ensureContentLoaded();
+    
+    if (!this.contentCache) {
+      return 'Stay positive!';
+    }
+
+    // Randomly choose between quotes and jokes
+    const useQuotes = Math.random() < 0.5;
+    const contentArray = useQuotes ? this.contentCache.quotes : this.contentCache.jokes;
+    
+    if (contentArray.length === 0) {
+      return 'Stay positive!';
+    }
+
+    const randomIndex = Math.floor(Math.random() * contentArray.length);
+    return contentArray[randomIndex] || 'Stay positive!';
   }
 
   /**
