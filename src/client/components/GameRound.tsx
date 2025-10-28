@@ -19,6 +19,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   const [feedbackData, setFeedbackData] = useState<SubmitAnswerResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTimeout, setIsTimeout] = useState(false);
+  const [timeoutCountdown, setTimeoutCountdown] = useState<number | null>(null);
   
   // Audio controls
   const audio = useAudio();
@@ -37,6 +38,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
     setFeedbackData(null);
     setIsSubmitting(false);
     setIsTimeout(false);
+    setTimeoutCountdown(null);
     
     // Cleanup any existing confetti animations
     cleanupConfetti();
@@ -168,10 +170,20 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
     
     // No sound effects for timeout
     
-    // Show feedback for 2 seconds before proceeding
-    setTimeout(() => {
-      onRoundComplete(timeoutFeedback);
-    }, 2000);
+    // Start countdown animation
+    setTimeoutCountdown(3);
+    
+    // Countdown timer
+    const countdownInterval = setInterval(() => {
+      setTimeoutCountdown((prev) => {
+        if (prev === null || prev <= 1) {
+          clearInterval(countdownInterval);
+          onRoundComplete(timeoutFeedback);
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   }, [round.correctAnswer, round.aiImagePosition, onRoundComplete, selectedAnswer, showFeedback]);
 
   // Handle image selection
@@ -367,11 +379,15 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
         {/* Timeout Message */}
         {showFeedback && isTimeout && (
           <div className="text-center mt-6">
-            <div className="text-lg font-semibold text-red-600 mb-2">
-              Time's Up!
-            </div>
-            <div className="text-sm text-gray-600">
-              The correct answer was {feedbackData?.correctAnswer === 'A' ? 'left' : 'right'} image
+            <div className="flex items-center justify-center gap-4">
+              <div className="text-lg font-semibold text-red-600">
+                Time's Up!
+              </div>
+              {timeoutCountdown !== null && (
+                <div className="text-2xl font-bold text-gray-700 animate-pulse">
+                  {timeoutCountdown}
+                </div>
+              )}
             </div>
           </div>
         )}

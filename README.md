@@ -19,6 +19,7 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 - **Educational break**: After round 3, players receive AI detection tips and facts about AI image generation with fresh content each session
 - **Enhanced visual feedback**: Custom overlay indicators with colored circles, icons, and labels show AI vs Human sources
 - **Simplified audio system**: Background music and sound effects with one-click toggle controls (🎵/🔇)
+- **Extended timeout feedback**: 5-second feedback display when time expires to clearly show the correct answer
 - **Progressive difficulty**: Mixed categories and randomized AI placement keep players guessing
 
 ## 🎮 What Makes This Game Innovative
@@ -94,10 +95,15 @@ The splash screen welcomes you with:
 4. **Score Display**: See your round score as whole numbers (e.g., "+13 points")
 5. **Auto-Advance**: Game automatically moves to the next round after 2 seconds
 
+**Timeout Handling:**
+- **Extended Feedback**: If time expires without selection, the correct answer is displayed for 5 seconds
+- **No Penalty Points**: Timeout results in 0 points but doesn't count as incorrect for badge calculation
+- **Clear Visual Indication**: "Time's Up!" message with highlighted correct answer
+
 #### Educational Break (After Round 3)
 Halfway through the game, you'll receive:
-- **AI Detection Tips**: Practical advice for spotting AI-generated images (randomly selected from 49 tips)
-- **AI Facts**: Fascinating insights about AI image generation technology (randomly selected from 49 facts)
+- **AI Detection Tips**: Practical advice for spotting AI-generated images (randomly selected from 50 tips)
+- **AI Facts**: Fascinating insights about AI image generation technology (randomly selected from 50 facts)
 - **Fresh Content Each Session**: New educational content provided for every game session
 - **Continue Button**: "Continue to Round 4" to resume gameplay
 
@@ -109,6 +115,7 @@ Halfway through the game, you'll receive:
 - **Session Persistence**: Audio preference maintained throughout your entire game session
 - **Graceful Degradation**: Game works perfectly even if audio files are unavailable, with comprehensive audio validation and development tools
 - **Audio Context Management**: Smart audio unlocking on user interaction to comply with browser autoplay policies
+- **No Timeout Sounds**: Silent feedback during timeout scenarios to avoid confusion
 
 #### Scoring System
 - **Base Points**: 10 points for each correct identification
@@ -165,6 +172,12 @@ Both modes support:
 - **Session Persistence**: Must complete started games (can't restart mid-game)
 - **Attempt Tracking**: Clear display of remaining attempts and encouragement to replay
 
+#### Timeout & Scoring Rules
+- **Fair Timeout Handling**: If time expires without selection, 0 points awarded but doesn't count as incorrect
+- **Extended Learning**: Timeout scenarios show correct answer for 5 seconds to help learning
+- **No Audio Confusion**: Silent feedback during timeouts to avoid misleading players
+- **Consistent Scoring**: Only deliberate selections count toward badge calculations
+
 #### Anti-Cheat Protection
 - **Server-Side Timer Validation**: All timing verified server-side with 3-second tolerance for network delays
 - **Rate Limiting**: Prevents spam and system abuse with middleware protection
@@ -202,7 +215,7 @@ Both modes support:
 
 #### Core Game Systems
 - **Complete Gameplay Loop**: 6 rounds with 10-second timers and comprehensive whole-number scoring system
-- **Educational Integration**: Midgame learning breaks with fresh content each session from comprehensive content library (49 tips, 49 facts) and fallbacks
+- **Educational Integration**: Midgame learning breaks with fresh content each session from comprehensive content library (50 tips, 50 facts) and fallbacks
 - **Audio System**: Background music, sound effects, and user controls with graceful degradation and localStorage persistence
 - **Play Limit Management**: Multiple daily attempts (2 per day) with best score tracking and improvement notifications
 
@@ -220,7 +233,7 @@ Both modes support:
 
 #### Technical Infrastructure
 - **Session Management**: Secure game state persistence with Redis and local storage caching
-- **Content Management**: Fresh educational content system with random selection from comprehensive libraries (49 tips, 49 facts)
+- **Content Management**: Fresh educational content system with random selection from comprehensive libraries (50 tips, 50 facts)
 - **Anti-Cheat Protection**: Server-side validation and comprehensive input sanitization
 - **Performance Optimization**: Efficient API calls, caching, and bundle optimization
 
@@ -256,12 +269,18 @@ The game is **fully functional and production-ready** with all core systems impl
 
 ## 🎨 Recent Updates & Enhancements
 
-### 🔥 Latest Update: Fresh Educational Content System & Audio Enhancements
-The game recently received a major educational content system upgrade and audio improvements:
+### 🔥 Latest Update: Enhanced Timeout Handling & Audio Improvements
+The game recently received important timeout handling improvements and audio system enhancements:
+
+**Enhanced Timeout Handling:**
+- **Extended Feedback Duration**: Timeout scenarios now display correct answer for 5 seconds (increased from 2 seconds)
+- **Clear Visual Indication**: "Time's Up!" message with highlighted correct answer for better learning
+- **No Audio Confusion**: Silent feedback during timeouts to avoid misleading sound effects
+- **Fair Scoring**: Timeout results in 0 points but doesn't count as incorrect for badge calculation
 
 **Fresh Educational Content System:**
 - **Dynamic Content Loading**: New `fetchRandomContentFresh()` function ensures unique educational content for each game session
-- **Comprehensive Content Library**: 49 AI detection tips and 49 fascinating AI facts stored in server-managed JSON files
+- **Comprehensive Content Library**: 50 AI detection tips and 50 fascinating AI facts stored in server-managed JSON files
 - **No Content Repetition**: Each educational break provides fresh, randomly selected tips and facts
 - **Enhanced Learning Experience**: Players receive varied educational content across multiple game sessions
 
@@ -288,12 +307,12 @@ The game recently received a major educational content system upgrade:
 **Dynamic Content Loading:**
 - Added `fetchRandomContentFresh()` function for fresh content each session
 - Educational content no longer cached, ensuring unique tips and facts every game
-- Random selection from comprehensive libraries (49 tips, 49 facts)
+- Random selection from comprehensive libraries (50 tips, 50 facts)
 - Enhanced learning experience with varied content across multiple sessions
 
 **Content Library Expansion:**
-- Comprehensive AI detection tips covering hands, lighting, textures, and more
-- Fascinating AI facts about image generation technology and capabilities
+- Comprehensive AI detection tips covering hands, lighting, textures, and more (50 total tips)
+- Fascinating AI facts about image generation technology and capabilities (50 total facts)
 - Server-managed JSON files for easy content updates and maintenance
 - Graceful fallback system ensures uninterrupted gameplay
 
@@ -339,6 +358,21 @@ The game recently received a complete scoring system redesign for better user ex
 - **Enhanced Border Feedback**: Blue borders during selection, green borders (#46E870) for correct answers, red borders (#F23C3C) for incorrect answers with glow effects
 - **Responsive Grid Layout**: Images adapt from single column on mobile to side-by-side on desktop with consistent 1:1 aspect ratio
 - **Responsive Layout Refinements**: Better visual consistency between mobile and desktop layouts
+
+#### Enhanced Timeout Handling ⚡
+The game recently received major timeout handling improvements for better user experience:
+
+**Extended Feedback Duration:**
+- Timeout scenarios now display correct answer for 5 seconds (increased from 2 seconds)
+- Clear "Time's Up!" message with highlighted correct answer for better learning
+- Silent feedback during timeouts to avoid misleading sound effects
+- Fair scoring system where timeout results in 0 points but doesn't count as incorrect
+
+**Improved User Experience:**
+- Better visual clarity when time expires without selection
+- Extended viewing time helps players learn from missed opportunities
+- Consistent feedback timing across all game scenarios
+- Enhanced learning opportunity through extended correct answer display
 
 #### Other Recent Improvements
 - **CSS Modernization**: Migrated from inline styles to Tailwind CSS classes for better maintainability and consistency
@@ -509,7 +543,7 @@ src/
 
 ### Key Features Implementation
 
-- **Educational System**: Midgame learning breaks with fresh content each session from comprehensive libraries (49 tips, 49 facts)
+- **Educational System**: Midgame learning breaks with fresh content each session from comprehensive libraries (50 tips, 50 facts)
 - **Audio Integration**: Simplified audio system with background music, enhanced sound effects, and one-click toggle controls
 - **Real-Time Updates**: Realtime connections via Devvit Realtime API for live participant counts and leaderboard updates
 - **Timer System**: Client-side countdown with color-coded visual progress bar (green/yellow/red) and server-side validation
