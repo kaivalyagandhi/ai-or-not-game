@@ -325,11 +325,11 @@ After completing round 3, players receive a midgame learning break featuring:
 
 #### Achievement Badge System
 Your final performance determines your badge with custom colors and descriptions:
-- 🧙‍♂️ **AI Whisperer** (6/6 correct): "Perfect score! You can spot AI from a mile away" - Purple badge
-- 🕵️ **AI Detective** (5/6 correct): "Excellent detective work! You're getting really good at this" - Blue badge
-- 😇 **Good Samaritan** (4/6 correct): "Great job! You got most of them right" - Green badge
-- 🙂 **Just Human** (3/6 correct): "Not bad! You're getting the hang of this" - Yellow badge
-- 🤖 **Human in Training** (≤2/6 correct): "Keep practicing! AI is getting better every day" - Gray badge
+- 🤖 **AI Whisperer** (6/6 correct): "Perfect score! You can spot AI-generated content with incredible accuracy"
+- 🕵️ **AI Detective** (5/6 correct): "Outstanding! You have excellent skills at detecting AI-generated content"
+- 👁️ **Good Samaritan** (4/6 correct): "Excellent work! You have a keen eye for distinguishing real from artificial"
+- 👤 **Just Human** (3/6 correct): "Not bad! You're getting the hang of spotting AI-generated images"
+- 🎓 **Human in Training** (≤2/6 correct): "Keep practicing! AI detection skills take time to develop"
 
 ### Results & Social Features
 
