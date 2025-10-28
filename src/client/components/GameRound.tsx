@@ -197,22 +197,22 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
           </p>
         </div>
 
-        {/* Image Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        {/* Image Selection - Responsive Layout */}
+        <div className="image-container mb-6">
           {/* Image A */}
-          <div className="relative">
+          <div className="relative image-wrapper">
             <button
               onClick={() => handleImageSelect('A')}
               disabled={selectedAnswer !== null || showFeedback}
-              className={`w-full aspect-square rounded-lg overflow-hidden border-4 transition-all duration-200 ${
+              className={`game-image-button ${
                 selectedAnswer === 'A'
-                  ? 'border-blue-500 scale-105'
-                  : showFeedback && feedbackData?.correctAnswer === 'A'
-                  ? 'border-green-500 scale-105'
-                  : showFeedback && feedbackData?.aiImagePosition === 'A'
-                  ? 'border-red-500'
-                  : 'border-gray-300 hover:border-gray-400 hover:scale-102'
-              } ${selectedAnswer || showFeedback ? 'cursor-default' : 'cursor-pointer'}`}
+                  ? 'selected'
+                  : showFeedback
+                  ? feedbackData?.aiImagePosition === 'A'
+                    ? 'incorrect-feedback'
+                    : 'correct-feedback'
+                  : 'default'
+              } ${selectedAnswer || showFeedback ? 'disabled' : ''}`}
             >
               <img
                 src={round.imageA.url}
@@ -227,25 +227,23 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
                   console.log('Image A dimensions:', img.naturalWidth, 'x', img.naturalHeight);
                   console.log('Image A display size:', img.width, 'x', img.height);
                 }}
-                className="w-full h-full object-contain bg-gray-100"
+                className="game-image"
               />
               
-              {/* Feedback overlay */}
-              {showFeedback && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                  <div className="text-white text-center">
-                    {feedbackData?.aiImagePosition === 'A' ? (
-                      <div>
-                        <div className="text-3xl mb-2">🤖</div>
-                        <div className="font-semibold">AI Generated</div>
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="text-3xl mb-2">📸</div>
-                        <div className="font-semibold">Real Photo</div>
-                      </div>
-                    )}
-                  </div>
+              {/* Custom overlay indicators - only on selected images */}
+              {showFeedback && selectedAnswer === 'A' && (
+                <div className="overlay-indicator">
+                  {feedbackData?.aiImagePosition === 'A' ? (
+                    <div className="ai-indicator">
+                      <div className="overlay-icon">✕</div>
+                      <div className="overlay-label">AI</div>
+                    </div>
+                  ) : (
+                    <div className="human-indicator">
+                      <div className="overlay-icon">✓</div>
+                      <div className="overlay-label">Human</div>
+                    </div>
+                  )}
                 </div>
               )}
             </button>
@@ -256,19 +254,19 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
           </div>
 
           {/* Image B */}
-          <div className="relative">
+          <div className="relative image-wrapper">
             <button
               onClick={() => handleImageSelect('B')}
               disabled={selectedAnswer !== null || showFeedback}
-              className={`w-full aspect-square rounded-lg overflow-hidden border-4 transition-all duration-200 ${
+              className={`game-image-button ${
                 selectedAnswer === 'B'
-                  ? 'border-blue-500 scale-105'
-                  : showFeedback && feedbackData?.correctAnswer === 'B'
-                  ? 'border-green-500 scale-105'
-                  : showFeedback && feedbackData?.aiImagePosition === 'B'
-                  ? 'border-red-500'
-                  : 'border-gray-300 hover:border-gray-400 hover:scale-102'
-              } ${selectedAnswer || showFeedback ? 'cursor-default' : 'cursor-pointer'}`}
+                  ? 'selected'
+                  : showFeedback
+                  ? feedbackData?.aiImagePosition === 'B'
+                    ? 'incorrect-feedback'
+                    : 'correct-feedback'
+                  : 'default'
+              } ${selectedAnswer || showFeedback ? 'disabled' : ''}`}
             >
               <img
                 src={round.imageB.url}
@@ -283,25 +281,23 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
                   console.log('Image B dimensions:', img.naturalWidth, 'x', img.naturalHeight);
                   console.log('Image B display size:', img.width, 'x', img.height);
                 }}
-                className="w-full h-full object-contain bg-gray-100"
+                className="game-image"
               />
               
-              {/* Feedback overlay */}
-              {showFeedback && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                  <div className="text-white text-center">
-                    {feedbackData?.aiImagePosition === 'B' ? (
-                      <div>
-                        <div className="text-3xl mb-2">🤖</div>
-                        <div className="font-semibold">AI Generated</div>
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="text-3xl mb-2">📸</div>
-                        <div className="font-semibold">Real Photo</div>
-                      </div>
-                    )}
-                  </div>
+              {/* Custom overlay indicators - only on selected images */}
+              {showFeedback && selectedAnswer === 'B' && (
+                <div className="overlay-indicator">
+                  {feedbackData?.aiImagePosition === 'B' ? (
+                    <div className="ai-indicator">
+                      <div className="overlay-icon">✕</div>
+                      <div className="overlay-label">AI</div>
+                    </div>
+                  ) : (
+                    <div className="human-indicator">
+                      <div className="overlay-icon">✓</div>
+                      <div className="overlay-label">Human</div>
+                    </div>
+                  )}
                 </div>
               )}
             </button>

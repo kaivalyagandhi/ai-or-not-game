@@ -1,6 +1,6 @@
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-  "name": "spot-the-bot",
+  "name": "spot-the-bot-v4",
   "post": {
     "dir": "dist/client",
     "entrypoints": {

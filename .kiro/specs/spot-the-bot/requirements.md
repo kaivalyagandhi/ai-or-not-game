@@ -39,6 +39,30 @@ Spot the Bot is a daily challenge game built on Reddit's Devvit platform where p
 4. WHEN a user selects an image THEN the Spot_the_Bot_System SHALL immediately show feedback and proceed to the next round
 5. WHEN a user selects the human image THEN the Spot_the_Bot_System SHALL record the remaining time as bonus points
 
+### Requirement 15
+
+**User Story:** As a mobile user, I want images displayed in a vertical layout optimized for my device, so that I can easily compare the two images without horizontal scrolling.
+
+#### Acceptance Criteria
+
+1. WHEN viewing on mobile devices THEN the Spot_the_Bot_System SHALL display both images in a vertical stack layout
+2. WHEN viewing on mobile devices THEN the Spot_the_Bot_System SHALL crop all images to a 1:1 aspect ratio
+3. WHEN viewing on mobile devices THEN the Spot_the_Bot_System SHALL ensure images fill the available width while maintaining aspect ratio
+4. WHEN viewing on mobile devices THEN the Spot_the_Bot_System SHALL position the first image above the second image
+5. WHEN viewing on mobile devices THEN the Spot_the_Bot_System SHALL maintain consistent spacing between the stacked images
+
+### Requirement 16
+
+**User Story:** As a desktop user, I want images displayed side-by-side for easy comparison, so that I can quickly evaluate both options simultaneously.
+
+#### Acceptance Criteria
+
+1. WHEN viewing on desktop devices THEN the Spot_the_Bot_System SHALL display both images horizontally next to each other
+2. WHEN viewing on desktop devices THEN the Spot_the_Bot_System SHALL crop all images to a 1:1 aspect ratio
+3. WHEN viewing on desktop devices THEN the Spot_the_Bot_System SHALL ensure both images have equal width and height
+4. WHEN viewing on desktop devices THEN the Spot_the_Bot_System SHALL maintain consistent spacing between the side-by-side images
+5. WHEN viewing on desktop devices THEN the Spot_the_Bot_System SHALL center the image pair within the available screen space
+
 ### Requirement 3
 
 **User Story:** As a competitive player, I want to see how I rank against other players, so that I can gauge my performance and stay motivated.
@@ -61,6 +85,30 @@ Spot the Bot is a daily challenge game built on Reddit's Devvit platform where p
 2. WHEN a user makes a correct choice THEN the Spot_the_Bot_System SHALL increment their correct count by 1
 3. WHEN a user makes an incorrect choice THEN the Spot_the_Bot_System SHALL show the correct answer without penalty beyond lost time
 4. WHEN all rounds are complete THEN the Spot_the_Bot_System SHALL display a badge based on total correct answers
+
+### Requirement 17
+
+**User Story:** As a player, I want clear visual feedback on my answer selection, so that I can immediately understand whether my choice was correct or incorrect.
+
+#### Acceptance Criteria
+
+1. WHEN a user selects the correct image THEN the Spot_the_Bot_System SHALL display a green outline with color #46E870
+2. WHEN a user selects the incorrect image THEN the Spot_the_Bot_System SHALL display a red outline with color #F23C3C
+3. WHEN displaying feedback outlines THEN the Spot_the_Bot_System SHALL use 3px thickness with rounded corners matching the image container
+4. WHEN displaying feedback outlines THEN the Spot_the_Bot_System SHALL add a subtle outer glow effect at 30% opacity
+5. WHEN showing feedback THEN the Spot_the_Bot_System SHALL maintain the outline styling until the round transitions
+
+### Requirement 18
+
+**User Story:** As a player, I want clear overlay indicators showing the source of each image, so that I can learn to identify AI-generated vs human-captured content.
+
+#### Acceptance Criteria
+
+1. WHEN a user selects an AI-generated image THEN the Spot_the_Bot_System SHALL display a red circle overlay with color #F23C3C containing a white X icon and "AI" label in white font
+2. WHEN a user selects a human-captured image THEN the Spot_the_Bot_System SHALL display a green circle overlay with color #46E870 containing a white checkmark icon and "Human" label in white font
+3. WHEN displaying overlay indicators THEN the Spot_the_Bot_System SHALL show the overlay only on the selected image
+4. WHEN displaying overlay indicators THEN the Spot_the_Bot_System SHALL show the colored border outline only on the non-selected image to indicate its source
+5. WHEN displaying overlay indicators THEN the Spot_the_Bot_System SHALL remove all emoji symbols from the overlay display
 
 ### Requirement 5
 

@@ -1,1 +1,197 @@
 @import 'tailwindcss';
+
+/* Responsive Image Layout */
+.image-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-width: 100%;
+}
+
+/* Desktop layout - horizontal side-by-side */
+@media (min-width: 768px) {
+  .image-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Image wrapper for consistent spacing */
+.image-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Game image button styling */
+.game-image-button {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 3px solid transparent;
+  transition: all 0.2s ease-in-out;
+  background: transparent;
+  padding: 0;
+}
+
+.game-image-button.default {
+  border-color: #d1d5db; /* gray-300 */
+}
+
+.game-image-button.default:hover:not(.disabled) {
+  border-color: #9ca3af; /* gray-400 */
+  transform: scale(1.02);
+}
+
+.game-image-button.selected {
+  border-color: #3b82f6; /* blue-500 */
+  transform: scale(1.05);
+}
+
+/* Visual feedback borders with glow effects */
+.game-image-button.correct-feedback {
+  border-color: #46E870;
+  box-shadow: 0 0 20px rgba(70, 232, 112, 0.3);
+}
+
+.game-image-button.incorrect-feedback {
+  border-color: #F23C3C;
+  box-shadow: 0 0 20px rgba(242, 60, 60, 0.3);
+}
+
+/* Selected image gets enhanced styling */
+.game-image-button.selected.correct-feedback,
+.game-image-button.selected.incorrect-feedback {
+  transform: scale(1.05);
+}
+
+/* Non-selected images during feedback get subtle border outline */
+.game-image-button.correct-feedback:not(.selected) {
+  box-shadow: 0 0 15px rgba(70, 232, 112, 0.2);
+}
+
+.game-image-button.incorrect-feedback:not(.selected) {
+  box-shadow: 0 0 15px rgba(242, 60, 60, 0.2);
+}
+
+.game-image-button.disabled {
+  cursor: default;
+}
+
+/* Game image styling with proper cropping */
+.game-image {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background-color: #f3f4f6; /* gray-100 */
+  display: block;
+}
+
+/* Overlay indicator system */
+.overlay-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.ai-indicator,
+.human-indicator {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.ai-indicator {
+  background-color: #F23C3C;
+}
+
+.human-indicator {
+  background-color: #46E870;
+}
+
+.overlay-icon {
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.overlay-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Responsive utility classes */
+.mobile-vertical {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.desktop-horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+/* Ensure consistent styling across screen sizes */
+@media (max-width: 767px) {
+  .image-container {
+    padding: 0 0.5rem;
+  }
+  
+  .overlay-indicator {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .ai-indicator,
+  .human-indicator {
+    width: 70px;
+    height: 70px;
+    font-size: 0.8rem;
+  }
+  
+  .overlay-icon {
+    font-size: 1.25rem;
+  }
+  
+  .overlay-label {
+    font-size: 0.7rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .image-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+}
+
+/* Visual feedback consistency */
+.game-image-button {
+  border-radius: 0.5rem;
+}
+
+.game-image-button.correct-feedback,
+.game-image-button.incorrect-feedback {
+  border-radius: 0.5rem;
+}
+
+/* Ensure proper aspect ratio maintenance */
+.game-image {
+  border-radius: 0.375rem; /* Slightly smaller radius for inner image */
+}
