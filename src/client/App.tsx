@@ -1,4 +1,4 @@
-import { ErrorInfo, useRef, useEffect } from 'react';
+import { ErrorInfo, useRef, useEffect, useCallback } from 'react';
 import { 
   SplashScreen, 
   GameRound, 
@@ -31,6 +31,25 @@ export const App = () => {
 
   // Audio system ref for controlling audio
   const audioSystemRef = useAudioRef();
+
+  // Audio settings handlers with localStorage persistence
+  const handleVolumeChange = useCallback((volume: number) => {
+    try {
+      localStorage.setItem('spotTheBot_audioVolume', volume.toString());
+      console.log('Volume changed to:', Math.round(volume * 100) + '%');
+    } catch (error) {
+      console.warn('Failed to save volume to localStorage:', error);
+    }
+  }, []);
+
+  const handleMuteToggle = useCallback((muted: boolean) => {
+    try {
+      localStorage.setItem('spotTheBot_audioMuted', muted.toString());
+      console.log('Audio', muted ? 'muted' : 'unmuted');
+    } catch (error) {
+      console.warn('Failed to save mute state to localStorage:', error);
+    }
+  }, []);
 
   // Handle start game from splash
   const handleStartGame = async () => {
@@ -131,6 +150,8 @@ export const App = () => {
                 audioSystemRef.current = ref;
               }
             }}
+            onVolumeChange={handleVolumeChange}
+            onMuteToggle={handleMuteToggle}
           />
         {(() => {
           switch (gameState) {

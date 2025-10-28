@@ -28,7 +28,6 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
 
   // Reset component state when round changes
   useEffect(() => {
-
     setTimeRemaining(10);
     setSelectedAnswer(null);
     setShowFeedback(false);
