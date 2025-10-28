@@ -565,16 +565,28 @@ export async function validateUserCanPlay(
 
 /**
  * Calculate score for a round based on correctness and time remaining
+ * Uses tier-based scoring system with whole numbers only
  */
 export function calculateRoundScore(isCorrect: boolean, timeRemaining: number): number {
   if (!isCorrect) {
     return 0; // No points for incorrect answers
   }
 
-  // 1 point for correct answer + time bonus (0.01 points per millisecond remaining)
-  const correctnessPoints = 1;
-  const timeBonus = Math.max(0, timeRemaining) * 0.01;
-
+  const correctnessPoints = 10; // Base points for correct answer
+  
+  // Tier-based time bonus (convert milliseconds to seconds)
+  const secondsRemaining = Math.floor(timeRemaining / 1000);
+  let timeBonus = 0;
+  
+  if (secondsRemaining >= 7) {
+    timeBonus = 5;
+  } else if (secondsRemaining >= 4) {
+    timeBonus = 3;
+  } else if (secondsRemaining >= 1) {
+    timeBonus = 1;
+  }
+  // 0 seconds remaining = 0 bonus points
+  
   return correctnessPoints + timeBonus;
 }
 
@@ -782,7 +794,17 @@ export async function submitAnswer(
     // Update session scores
     if (isCorrect) {
       session.correctCount += 1;
-      session.totalTimeBonus += validatedTimeRemaining * 0.01;
+      // Calculate time bonus using tier-based system
+      const secondsRemaining = Math.floor(validatedTimeRemaining / 1000);
+      let timeBonus = 0;
+      if (secondsRemaining >= 7) {
+        timeBonus = 5;
+      } else if (secondsRemaining >= 4) {
+        timeBonus = 3;
+      } else if (secondsRemaining >= 1) {
+        timeBonus = 1;
+      }
+      session.totalTimeBonus += timeBonus;
     }
     session.totalScore += roundScore;
 

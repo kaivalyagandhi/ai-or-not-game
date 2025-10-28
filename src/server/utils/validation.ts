@@ -205,6 +205,40 @@ export const gameValidationRules = {
       enum: ['daily', 'weekly', 'all-time'],
     },
   ],
+
+  roundScore: [
+    {
+      field: 'score',
+      required: true,
+      type: 'number' as const,
+      min: 0,
+      max: 15, // Maximum 15 points per round (10 base + 5 time bonus)
+      custom: (value: number) => {
+        // Ensure score is a whole number
+        if (!Number.isInteger(value)) {
+          return 'Score must be a whole number';
+        }
+        return null;
+      },
+    },
+  ],
+
+  totalScore: [
+    {
+      field: 'totalScore',
+      required: true,
+      type: 'number' as const,
+      min: 0,
+      max: 90, // Maximum 90 points total (6 rounds × 15 points)
+      custom: (value: number) => {
+        // Ensure total score is a whole number
+        if (!Number.isInteger(value)) {
+          return 'Total score must be a whole number';
+        }
+        return null;
+      },
+    },
+  ],
 };
 
 /**
@@ -367,22 +401,31 @@ export const antiCheatValidation = {
   },
 
   /**
-   * Validates score calculation
+   * Validates score calculation using tier-based whole number system
    */
   validateScore(rounds: any[], reportedScore: number): boolean {
     let calculatedScore = 0;
     
     for (const round of rounds) {
       if (round.isCorrect) {
-        calculatedScore += 1; // 1 point for correct answer
+        calculatedScore += 10; // 10 points for correct answer
         if (round.timeRemaining) {
-          calculatedScore += round.timeRemaining * 0.01; // Time bonus
+          // Tier-based time bonus calculation
+          const secondsRemaining = Math.floor(round.timeRemaining / 1000);
+          let timeBonus = 0;
+          if (secondsRemaining >= 7) {
+            timeBonus = 5;
+          } else if (secondsRemaining >= 4) {
+            timeBonus = 3;
+          } else if (secondsRemaining >= 1) {
+            timeBonus = 1;
+          }
+          calculatedScore += timeBonus;
         }
       }
     }
     
-    // Allow small floating point differences
-    const tolerance = 0.01;
-    return Math.abs(calculatedScore - reportedScore) <= tolerance;
+    // Scores should be exact whole numbers now
+    return calculatedScore === reportedScore;
   },
 };

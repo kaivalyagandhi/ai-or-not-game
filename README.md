@@ -14,7 +14,7 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 - **6 rounds per game** with exactly 10 seconds per round
 - **6 image categories**: Animals, Architecture, Nature, Food, Products, and Science
 - **Responsive layout**: Images displayed in a responsive grid that adapts from vertical stack on mobile to side-by-side on desktop
-- **Time-pressure scoring**: Faster correct answers earn higher scores with time bonuses (0.01 points per millisecond remaining)
+- **Whole number scoring system**: 10 points per correct answer + tier-based time bonuses (5 points for 7-10 seconds, 3 points for 4-6 seconds, 1 point for 1-3 seconds)
 - **Multiple attempts per day**: Players can attempt the challenge up to 2 times per day (unlimited in development mode)
 - **Educational break**: After round 3, players receive AI detection tips and facts about AI image generation
 - **Enhanced visual feedback**: Custom overlay indicators with colored circles, icons, and labels show AI vs Human sources
@@ -26,14 +26,14 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 ### Cutting-Edge AI Detection Challenge
 - **Daily Fresh Content**: New image sets generated every day at 00:00 UTC with completely randomized categories, AI placement, and difficulty progression across 6 diverse image categories
 - **Real-Time Social Competition**: Live participant counter shows how many players have attempted today's challenge, with real-time updates as new players join via Devvit's Realtime API
-- **Intelligent Scoring Algorithm**: Sophisticated time-based scoring system rewards both accuracy (1 point per correct answer) and speed (0.01 bonus points per millisecond remaining), creating strategic tension between careful analysis and quick decisions under intense 10-second time pressure
+- **Intelligent Scoring Algorithm**: Sophisticated tier-based scoring system rewards both accuracy (10 points per correct answer) and speed (5/3/1 bonus points based on remaining time), creating strategic tension between careful analysis and quick decisions under intense 10-second time pressure
 - **Educational Integration**: Midgame learning break after round 3 provides AI detection tips and fascinating facts about AI image generation with daily rotating content loaded from server-managed files
 - **Immersive Audio Experience**: Background music and contextual sound effects enhance gameplay with user-controlled volume and mute options, gracefully degrading when audio files are unavailable
 
 ### Enhanced Visual Feedback System
 - **Custom Overlay Indicators**: Selected images show circular overlays with white icons (✕ for AI, ✓ for Human) and clear labels ("AI" or "Human")
 - **Enhanced Border Styling**: Selected images get blue borders during selection, correct answers get green borders (#46E870), incorrect get red borders (#F23C3C) with glow effects
-- **Responsive Grid Layout**: Images displayed in a responsive grid that adapts from single column on mobile to side-by-side on desktop, all with consistent 1:1 aspect ratio
+- **Responsive Grid Layout**: Images displayed in a responsive grid that adapts from single column on mobile to side-by-side on desktop, all with consistent 1:1 aspect ratio and 20px border radius
 - **Smart Visual States**: Clear visual progression from default state → selection state → feedback state with smooth transitions and hover effects
 
 ### Advanced Social & Community Features
@@ -71,7 +71,7 @@ The splash screen welcomes you with:
 - **Category Display**: See which category you're playing (Animals, Architecture, Nature, Food, Products, or Science)
 - **Image Comparison**: Two images displayed - one real photograph, one AI-generated
   - **Mobile Layout**: Images stacked vertically for easy comparison
-  - **Desktop Layout**: Images displayed side-by-side
+  - **Desktop Layout**: Images displayed side-by-side with 20px rounded corners
 - **10-Second Timer**: Color-coded countdown timer with progress bar:
   - **Green** (7-10 seconds): Plenty of time to analyze
   - **Yellow** (4-6 seconds): Time to make a decision  
@@ -83,8 +83,8 @@ The splash screen welcomes you with:
 3. **Immediate Feedback**: See the correct answer with enhanced visual indicators:
    - **Selected Image Only**: Shows circular overlay with white icon (✕ for AI, ✓ for Human) and label ("AI" or "Human")
    - **Border Colors**: Selected images get blue borders during selection, then show green borders (#46E870) for correct answers or red borders (#F23C3C) for incorrect answers with glow effects
-   - **Scale Effects**: Selected images scale up slightly (scale-105) for emphasis during feedback
-4. **Score Display**: See your round score with decimal precision (e.g., "+1.23 points")
+   - **Scale Effects**: Selected images scale up slightly for emphasis during feedback
+4. **Score Display**: See your round score as whole numbers (e.g., "+13 points")
 5. **Auto-Advance**: Game automatically moves to the next round after 2 seconds
 
 #### Educational Break (After Round 3)
@@ -102,11 +102,15 @@ Halfway through the game, you'll receive:
 - **Audio Context Management**: Smart audio unlocking on user interaction to comply with browser autoplay policies
 
 #### Scoring System
-- **Base Points**: 1 point for each correct identification
-- **Time Bonus**: 0.01 bonus points per millisecond remaining when you answer correctly
-- **Maximum Score**: ~11 points per round (1 base + ~10 time bonus for instant correct answers)
+- **Base Points**: 10 points for each correct identification
+- **Time Bonus**: Tier-based bonuses using whole numbers only:
+  - **7-10 seconds remaining**: +5 bonus points
+  - **4-6 seconds remaining**: +3 bonus points  
+  - **1-3 seconds remaining**: +1 bonus point
+  - **0 seconds remaining**: +0 bonus points
+- **Maximum Score**: 15 points per round (10 base + 5 time bonus for fastest correct answers)
 - **Final Score**: Cumulative total across all 6 rounds with server-side validation
-- **Perfect Game**: Maximum possible score is approximately 66 points (6 correct answers + maximum time bonuses)
+- **Perfect Game**: Maximum possible score is 90 points (6 correct answers × 15 points each)
 
 #### Badge Achievement System
 Your final performance determines your badge:
@@ -118,7 +122,7 @@ Your final performance determines your badge:
 
 #### Final Results Screen
 After completing all 6 rounds:
-- **Total Score**: Your final score with decimal precision (e.g., "87.45") and attempt number if multiple attempts
+- **Total Score**: Your final score as a whole number (e.g., "87.00") and attempt number if multiple attempts
 - **Performance Breakdown**: Correct answers (X/6) and total time bonus earned
 - **Badge Achievement**: Large badge display with custom emoji, title, and description
 - **Leaderboard Position**: Your rank among all daily players with live updates via real-time connection
@@ -169,7 +173,7 @@ Both modes support:
 
 #### Strategic Gameplay
 - **Trust Your Instincts**: The "uncanny valley" feeling is often a reliable AI indicator
-- **Balance Speed vs. Accuracy**: Time bonuses are significant, but accuracy is more important
+- **Balance Speed vs. Accuracy**: Time bonuses can add up to 30 points total (5 points × 6 rounds), but accuracy is still most important (60 points total for perfect answers)
 - **Category-Specific Patterns**: Each category has different AI tells:
   - **Animals**: Unnatural fur patterns, impossible anatomy, weird eyes
   - **Architecture**: Impossible geometry, floating elements, inconsistent perspective
@@ -189,9 +193,9 @@ Both modes support:
 ### ✅ Fully Implemented Features
 
 #### Core Game Systems
-- **Complete Gameplay Loop**: 6 rounds with 10-second timers and comprehensive scoring system
+- **Complete Gameplay Loop**: 6 rounds with 10-second timers and comprehensive whole-number scoring system
 - **Educational Integration**: Midgame learning breaks with daily rotating content and fallbacks
-- **Audio System**: Background music, sound effects, and user controls with graceful degradation
+- **Audio System**: Background music, sound effects, and user controls with graceful degradation and localStorage persistence
 - **Play Limit Management**: Multiple daily attempts (2 per day) with best score tracking and improvement notifications
 
 #### Real-time & Social Features
@@ -226,6 +230,7 @@ Both modes support:
 #### Production Ready ✅
 The game is **fully functional and production-ready** with all core systems implemented:
 - Complete 6-round gameplay with 5 active image categories (Animals, Architecture, Nature, Food, Products)
+- Modernized whole-number scoring system for better user experience
 - Full audio system with background music and sound effects
 - Real-time leaderboards and participant tracking
 - Educational content system with daily rotation
@@ -243,10 +248,54 @@ The game is **fully functional and production-ready** with all core systems impl
 
 ## 🎨 Recent Updates & Enhancements
 
+### 🔥 Latest Update: Enhanced Visual Polish & Scoring System
+The game recently received visual polish updates and scoring system improvements:
+
+**Visual Enhancements:**
+- **Improved Spacing**: Better visual hierarchy with consistent Tailwind CSS spacing (mt-6 for score display)
+- **Rounded Corner Consistency**: All game elements now use consistent 20px border radius for a modern, polished look
+- **Enhanced Visual Feedback**: Refined overlay indicators and border styling for better user experience
+
+**Scoring System Modernization:**
+- **Simplified Calculations**: Moved from complex decimal-based scoring (0.01 points per millisecond) to clean whole numbers
+- **Clearer Rewards**: 10 points per correct answer + tier-based time bonuses (5/3/1 points)
+- **Better Balance**: Time bonuses now provide meaningful rewards without overwhelming the accuracy component
+- **User-Friendly Display**: Scores are now easy to understand whole numbers instead of confusing decimals
+
+These changes make the game more accessible and visually appealing while maintaining the strategic balance between speed and accuracy.
+
 ### Latest Code Improvements
-- **React Hook Optimization**: Updated App.tsx to properly import `useCallback` for optimized audio control handlers
-- **Audio System Integration**: Enhanced audio context management with proper lifecycle handling
-- **Performance Optimizations**: Improved component re-rendering with proper hook dependencies
+
+#### Major Scoring System Overhaul ⚡
+The game recently received a complete scoring system redesign for better user experience:
+
+**Previous System (Decimal-based):**
+- 1 point per correct answer + 0.01 points per millisecond remaining
+- Complex decimal calculations (e.g., 4.23 points)
+- Maximum ~66 points for perfect game
+
+**New System (Whole Numbers):**
+- 10 points per correct answer + tier-based time bonuses
+- Simple, clear scoring: 5 points (7-10s), 3 points (4-6s), 1 point (1-3s)
+- Maximum 90 points for perfect game (6 × 15 points)
+- Easier to understand and more rewarding for players
+
+*Note: The scoring logic has been fully updated throughout the application, with both backend calculations and frontend display now using the new whole number system for a consistent user experience.*
+
+#### Visual Design Enhancements
+- **Rounded Corner Update**: Game image buttons now feature 20px border radius for a more modern, polished appearance
+- **Enhanced Visual Feedback**: Improved border styling with consistent 20px rounded corners across all game states
+- **Custom Overlay System**: Selected images show circular overlays with white icons (✕ for AI, ✓ for Human) and clear labels
+- **Enhanced Border Feedback**: Blue borders during selection, green borders (#46E870) for correct answers, red borders (#F23C3C) for incorrect answers with glow effects
+- **Responsive Grid Layout**: Images adapt from single column on mobile to side-by-side on desktop with consistent 1:1 aspect ratio
+- **Responsive Layout Refinements**: Better visual consistency between mobile and desktop layouts
+
+#### Other Recent Improvements
+- **CSS Modernization**: Migrated from inline styles to Tailwind CSS classes for better maintainability and consistency
+- **Audio System Refactoring**: Completely refactored AudioSystem component to remove unused imports and improve performance
+- **LocalStorage Integration**: Enhanced audio settings persistence with proper localStorage handling for volume and mute state
+- **Audio Context Management**: Improved audio initialization and lifecycle management with better error handling
+- **Performance Optimizations**: Streamlined component dependencies and removed unnecessary re-renders
 
 ### Visual Feedback Enhancements
 The game recently received major visual feedback improvements to create a more intuitive and engaging experience:
@@ -268,6 +317,11 @@ The game recently received major visual feedback improvements to create a more i
 - **Desktop Optimization**: Side-by-side layout on larger screens for direct comparison
 - **Consistent Aspect Ratios**: All images maintain 1:1 aspect ratio with proper cropping
 - **Smooth Transitions**: Scale effects and hover states provide tactile feedback
+
+### Modern CSS Architecture
+- **Tailwind CSS Integration**: Consistent spacing and styling using utility-first CSS framework
+- **Maintainable Codebase**: Migration from inline styles to Tailwind classes for better code organization
+- **Responsive Design System**: Unified approach to breakpoints and responsive behavior across all components
 
 
 ## 🚀 Technology Stack
@@ -409,7 +463,7 @@ src/
 - **Real-Time Updates**: Realtime connections via Devvit Realtime API for live participant counts and leaderboard updates
 - **Timer System**: Client-side countdown with color-coded visual progress bar (green/yellow/red) and server-side validation
 - **Image Handling**: Responsive grid layout with 1:1 aspect ratio, custom overlay indicators, and enhanced visual feedback
-- **Score Calculation**: Time-based bonus system (0.01 points per millisecond remaining) with server-side validation
+- **Score Calculation**: Tier-based bonus system (5/3/1 points based on remaining time) with server-side validation
 - **Badge Assignment**: Automatic badge calculation based on performance with 5 achievement tiers
 - **Content Management**: Daily rotating educational tips, AI facts, and inspirational content with caching
 - **Social Sharing**: Native sharing API with clipboard fallback and two sharing modes (results and friend challenges)
@@ -424,7 +478,16 @@ src/
 ### Mobile-First Approach
 - Responsive grid layouts that adapt from single column to side-by-side comparison
 - Touch-friendly button sizes with hover states and scale effects
-- Optimized image loading and display for mobile networks
+- Optimized image loading and display with 1:1 aspect ratio maintenance
+- Color-coded timer system with intuitive visual feedback (green/yellow/red)
+- Smooth transitions and animations that enhance user experience without being distracting
+
+### User Experience Principles
+- **Immediate Feedback**: Visual and audio responses to every user action
+- **Progressive Disclosure**: Information revealed at the right time (educational content at midgame)
+- **Error Resilience**: Graceful handling of network issues and offline scenarios
+- **Accessibility**: High contrast colors, clear typography, and keyboard navigation support
+- **Performance**: Optimized loading with caching and efficient state managementlay for mobile networks
 
 ### User Experience Focus
 - Clear visual feedback with custom overlay indicators and colored borders

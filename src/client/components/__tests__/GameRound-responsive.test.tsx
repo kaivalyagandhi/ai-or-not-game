@@ -434,7 +434,7 @@ describe('GameRound - Visual Feedback System', () => {
       expect(computedStyle.boxShadow).toContain('rgba(242, 60, 60, 0.3)');
     });
 
-    it('should use 3px border thickness with rounded corners', async () => {
+    it('should use 6px border thickness with 3px rounded corners for selected and feedback states', async () => {
       const { apiCall } = await import('../../utils/network.js');
       vi.mocked(apiCall).mockResolvedValue({
         success: true,
@@ -457,8 +457,8 @@ describe('GameRound - Visual Feedback System', () => {
 
       await waitFor(() => {
         const computedStyle = window.getComputedStyle(imageA);
-        expect(computedStyle.borderWidth).toBe('3px');
-        expect(computedStyle.borderRadius).toBe('0.5rem');
+        expect(computedStyle.borderWidth).toBe('6px');
+        expect(computedStyle.borderRadius).toBe('3px');
       });
     });
 

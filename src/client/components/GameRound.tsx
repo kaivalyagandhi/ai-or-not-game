@@ -3,6 +3,7 @@ import { GameRound as GameRoundType, SubmitAnswerResponse } from '../../shared/t
 import { apiCall } from '../utils/network';
 import { useErrorHandler } from '../hooks/useErrorHandler';
 import { useAudio } from '../hooks/useAudio';
+import { triggerConfetti, cleanupConfetti } from '../utils/confetti';
 
 interface GameRoundProps {
   round: GameRoundType;
@@ -33,7 +34,17 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
     setShowFeedback(false);
     setFeedbackData(null);
     setIsSubmitting(false);
+    
+    // Cleanup any existing confetti animations
+    cleanupConfetti();
   }, [round.roundNumber]); // Reset when round number changes
+
+  // Cleanup confetti on component unmount
+  useEffect(() => {
+    return () => {
+      cleanupConfetti();
+    };
+  }, []);
 
   // Submit answer to server with enhanced error handling
   const submitAnswer = useCallback(async (answer: 'A' | 'B', timeLeft: number) => {
@@ -72,6 +83,14 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
             audio?.playFailureSound();
           }
           
+          // Trigger confetti animation for positive scores
+          if (data.roundScore && data.roundScore > 0) {
+            // Small delay to ensure feedback is visible before confetti
+            setTimeout(() => {
+              triggerConfetti(data.roundScore!);
+            }, 100);
+          }
+          
           // Show feedback for 2 seconds before proceeding
           setTimeout(() => {
             onRoundComplete(data);
@@ -106,6 +125,14 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
           audio?.playSuccessSound();
         } else {
           audio?.playFailureSound();
+        }
+        
+        // Trigger confetti animation for positive scores
+        if (fallbackResponse.roundScore && fallbackResponse.roundScore > 0) {
+          // Small delay to ensure feedback is visible before confetti
+          setTimeout(() => {
+            triggerConfetti(fallbackResponse.roundScore!);
+          }, 100);
         }
         
         // Show feedback and continue
@@ -309,9 +336,9 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
 
         {/* Points Display */}
         {showFeedback && feedbackData && feedbackData.roundScore !== undefined && (
-          <div className="text-center">
-            <div className="text-sm text-gray-600">
-              +{feedbackData.roundScore.toFixed(2)} points
+          <div className="text-center mt-6">
+            <div className="text-lg font-semibold text-gray-700">
+              +{Math.round(feedbackData.roundScore)} points
             </div>
           </div>
         )}

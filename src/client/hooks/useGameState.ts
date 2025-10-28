@@ -95,7 +95,7 @@ export const useGameState = (): GameStateManager => {
     return true;
   }, [session]);
 
-  // Calculate final score based on correct answers and time bonus
+  // Calculate final score based on correct answers and time bonus (whole numbers only)
   const calculateFinalScore = useCallback(() => {
     if (!session || !session.rounds) {
       return;
@@ -104,13 +104,21 @@ export const useGameState = (): GameStateManager => {
     let correctCount = 0;
     let totalTimeBonus = 0;
 
-    // Calculate score from completed rounds
+    // Calculate score from completed rounds using whole number logic
     session.rounds.forEach(round => {
       if (round.isCorrect) {
         correctCount += 1;
-        // Add time bonus (0.01 points per millisecond remaining)
+        // Add tier-based time bonus (whole numbers only)
         if (round.timeRemaining) {
-          totalTimeBonus += round.timeRemaining * 0.01;
+          const secondsRemaining = Math.floor(round.timeRemaining / 1000);
+          if (secondsRemaining >= 7) {
+            totalTimeBonus += 5;
+          } else if (secondsRemaining >= 4) {
+            totalTimeBonus += 3;
+          } else if (secondsRemaining >= 1) {
+            totalTimeBonus += 1;
+          }
+          // 0 seconds remaining = 0 bonus points
         }
       }
     });
@@ -129,7 +137,8 @@ export const useGameState = (): GameStateManager => {
       badge = BadgeType.HUMAN_IN_TRAINING;
     }
 
-    const totalScore = correctCount + totalTimeBonus;
+    // Total score: 10 points per correct answer + time bonus (all whole numbers)
+    const totalScore = (correctCount * 10) + totalTimeBonus;
 
     // Update session with final results
     setSession(prevSession => {
@@ -405,7 +414,25 @@ export const useGameState = (): GameStateManager => {
           }
           
           if (response.roundScore !== undefined) {
-            updatedRound.timeRemaining = Math.round(response.roundScore / 0.01);
+            // Store the actual time remaining (server should provide this directly)
+            // For backward compatibility, if server sends old decimal score, convert it
+            if (response.roundScore < 20) {
+              // Old decimal system - convert back to milliseconds
+              updatedRound.timeRemaining = Math.round(response.roundScore / 0.01);
+            } else {
+              // New whole number system - time remaining should be provided separately
+              // For now, estimate from score (this should be improved when server is updated)
+              const timeBonus = response.roundScore - 10; // Subtract base 10 points
+              if (timeBonus >= 5) {
+                updatedRound.timeRemaining = 8500; // ~8.5 seconds (7-10 range)
+              } else if (timeBonus >= 3) {
+                updatedRound.timeRemaining = 5000; // ~5 seconds (4-6 range)
+              } else if (timeBonus >= 1) {
+                updatedRound.timeRemaining = 2000; // ~2 seconds (1-3 range)
+              } else {
+                updatedRound.timeRemaining = 0; // 0 seconds
+              }
+            }
           }
           
           rounds[roundIndex] = updatedRound;
@@ -420,7 +447,9 @@ export const useGameState = (): GameStateManager => {
       }
       
       if (response.roundScore !== undefined) {
-        updatedSession.totalScore = (updatedSession.totalScore || 0) + response.roundScore;
+        // Ensure we're working with whole numbers
+        const roundScore = Math.round(response.roundScore);
+        updatedSession.totalScore = (updatedSession.totalScore || 0) + roundScore;
       }
       
       return updatedSession;

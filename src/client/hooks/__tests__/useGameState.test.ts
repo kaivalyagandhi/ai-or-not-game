@@ -147,15 +147,16 @@ describe('useGameState Hook - Score Calculation', () => {
     vi.clearAllMocks();
   });
 
-  it('should calculate final score correctly', () => {
+  it('should calculate final score correctly with tier-based system', () => {
     const { result } = renderHook(() => useGameState());
     
     const mockRounds = [
-      { ...createMockGameRound(1), isCorrect: true, timeRemaining: 5000 },
-      { ...createMockGameRound(2), isCorrect: true, timeRemaining: 3000 },
-      { ...createMockGameRound(3), isCorrect: false, timeRemaining: 0 },
-      { ...createMockGameRound(4), isCorrect: true, timeRemaining: 7000 },
-      { ...createMockGameRound(5), isCorrect: false, timeRemaining: 0 },
+      { ...createMockGameRound(1), isCorrect: true, timeRemaining: 5000 }, // 5 seconds = tier 2 = 3 bonus points
+      { ...createMockGameRound(2), isCorrect: true, timeRemaining: 3000 }, // 3 seconds = tier 3 = 1 bonus point
+      { ...createMockGameRound(3), isCorrect: false, timeRemaining: 0 },   // incorrect = 0 points
+      { ...createMockGameRound(4), isCorrect: true, timeRemaining: 7000 }, // 7 seconds = tier 1 = 5 bonus points
+      { ...createMockGameRound(5), isCorrect: false, timeRemaining: 0 },   // incorrect = 0 points
+      { ...createMockGameRound(6), isCorrect: true, timeRemaining: 1000 }, // 1 second = tier 3 = 1 bonus point
     ];
     
     act(() => {
@@ -177,11 +178,85 @@ describe('useGameState Hook - Score Calculation', () => {
     });
     
     const session = result.current.session;
-    expect(session?.correctCount).toBe(3);
-    expect(session?.totalTimeBonus).toBe(150); // (5000 + 3000 + 7000) * 0.01
-    expect(session?.totalScore).toBe(153); // 3 + 150
-    expect(session?.badge).toBe(BadgeType.JUST_HUMAN);
+    expect(session?.correctCount).toBe(4); // 4 correct answers
+    expect(session?.totalTimeBonus).toBe(10); // 3 + 1 + 5 + 1 = 10 bonus points
+    expect(session?.totalScore).toBe(50); // (4 correct * 10) + 10 bonus = 50
+    expect(session?.badge).toBe(BadgeType.GOOD_SAMARITAN); // 4 correct = GOOD_SAMARITAN
     expect(session?.completed).toBe(true);
+  });
+
+  it('should calculate scores as whole numbers only', () => {
+    const { result } = renderHook(() => useGameState());
+    
+    const mockRounds = [
+      { ...createMockGameRound(1), isCorrect: true, timeRemaining: 8500 }, // 8.5 seconds = tier 1 = 5 bonus
+      { ...createMockGameRound(2), isCorrect: true, timeRemaining: 4500 }, // 4.5 seconds = tier 2 = 3 bonus
+      { ...createMockGameRound(3), isCorrect: true, timeRemaining: 2500 }, // 2.5 seconds = tier 3 = 1 bonus
+      { ...createMockGameRound(4), isCorrect: true, timeRemaining: 500 },  // 0.5 seconds = tier 4 = 0 bonus
+      { ...createMockGameRound(5), isCorrect: true, timeRemaining: 0 },    // 0 seconds = tier 4 = 0 bonus
+      { ...createMockGameRound(6), isCorrect: true, timeRemaining: 10000 }, // 10 seconds = tier 1 = 5 bonus
+    ];
+    
+    act(() => {
+      result.current.setSession({
+        userId: 'user123',
+        sessionId: 'session456',
+        startTime: Date.now(),
+        rounds: mockRounds,
+        totalScore: 0,
+        correctCount: 0,
+        totalTimeBonus: 0,
+        badge: BadgeType.HUMAN_IN_TRAINING,
+        completed: false,
+      });
+    });
+    
+    act(() => {
+      result.current.calculateFinalScore();
+    });
+    
+    const session = result.current.session;
+    expect(session?.correctCount).toBe(6); // All correct
+    expect(session?.totalTimeBonus).toBe(14); // 5 + 3 + 1 + 0 + 0 + 5 = 14
+    expect(session?.totalScore).toBe(74); // (6 * 10) + 14 = 74
+    expect(Number.isInteger(session?.totalScore)).toBe(true);
+    expect(Number.isInteger(session?.totalTimeBonus)).toBe(true);
+  });
+
+  it('should handle boundary values in tier calculations', () => {
+    const { result } = renderHook(() => useGameState());
+    
+    const mockRounds = [
+      { ...createMockGameRound(1), isCorrect: true, timeRemaining: 7000 }, // Exactly 7 seconds = tier 1
+      { ...createMockGameRound(2), isCorrect: true, timeRemaining: 6999 }, // Just under 7 seconds = tier 2
+      { ...createMockGameRound(3), isCorrect: true, timeRemaining: 4000 }, // Exactly 4 seconds = tier 2
+      { ...createMockGameRound(4), isCorrect: true, timeRemaining: 3999 }, // Just under 4 seconds = tier 3
+      { ...createMockGameRound(5), isCorrect: true, timeRemaining: 1000 }, // Exactly 1 second = tier 3
+      { ...createMockGameRound(6), isCorrect: true, timeRemaining: 999 },  // Just under 1 second = tier 4
+    ];
+    
+    act(() => {
+      result.current.setSession({
+        userId: 'user123',
+        sessionId: 'session456',
+        startTime: Date.now(),
+        rounds: mockRounds,
+        totalScore: 0,
+        correctCount: 0,
+        totalTimeBonus: 0,
+        badge: BadgeType.HUMAN_IN_TRAINING,
+        completed: false,
+      });
+    });
+    
+    act(() => {
+      result.current.calculateFinalScore();
+    });
+    
+    const session = result.current.session;
+    expect(session?.correctCount).toBe(6);
+    expect(session?.totalTimeBonus).toBe(13); // 5 + 3 + 3 + 1 + 1 + 0 = 13
+    expect(session?.totalScore).toBe(73); // (6 * 10) + 13 = 73
   });
 
   it('should assign correct badges based on score', () => {
@@ -251,9 +326,9 @@ describe('useGameState Hook - Game Flow', () => {
       sessionId: 'completed-session',
       startTime: Date.now(),
       rounds: [],
-      totalScore: 85,
+      totalScore: 53, // Whole number score
       correctCount: 4,
-      totalTimeBonus: 5,
+      totalTimeBonus: 13, // Whole number time bonus
       badge: BadgeType.GOOD_SAMARITAN,
       completed: true,
     };
@@ -298,7 +373,7 @@ describe('useGameState Hook - Game Flow', () => {
       isCorrect: true,
       correctAnswer: 'A' as const,
       aiImagePosition: 'B' as const,
-      roundScore: 51,
+      roundScore: 15, // Whole number score (10 base + 5 time bonus)
       gameComplete: false,
       nextRound: mockSession.rounds[1],
     };
@@ -336,12 +411,12 @@ describe('useGameState Hook - Game Flow', () => {
       isCorrect: true,
       correctAnswer: 'A' as const,
       aiImagePosition: 'B' as const,
-      roundScore: 51,
+      roundScore: 13, // Whole number score (10 base + 3 time bonus)
       gameComplete: true,
       finalResults: {
-        totalScore: 85,
+        totalScore: 53, // Whole number total score
         correctCount: 4,
-        timeBonus: 5,
+        timeBonus: 13, // Whole number time bonus
         badge: BadgeType.GOOD_SAMARITAN,
       },
     };
@@ -353,7 +428,7 @@ describe('useGameState Hook - Game Flow', () => {
     expect(result.current.gameState).toBe('results');
     expect(result.current.currentRound).toBeNull();
     expect(result.current.session?.completed).toBe(true);
-    expect(result.current.session?.totalScore).toBe(85);
+    expect(result.current.session?.totalScore).toBe(53);
   });
 });
 
@@ -393,9 +468,9 @@ describe('useGameState Hook - Navigation', () => {
         sessionId: 'session456',
         startTime: Date.now(),
         rounds: [],
-        totalScore: 85,
+        totalScore: 53, // Whole number score
         correctCount: 4,
-        totalTimeBonus: 5,
+        totalTimeBonus: 13, // Whole number time bonus
         badge: BadgeType.GOOD_SAMARITAN,
         completed: true,
       });
@@ -417,3 +492,22 @@ describe('useGameState Hook - Navigation', () => {
     expect(result.current.gameState).toBe('splash');
   });
 });
+
+// Helper function for creating mock game rounds
+function createMockGameRound(roundNumber: number): any {
+  return {
+    roundNumber,
+    imageA: {
+      url: `https://example.com/pair${roundNumber}-human.jpg`,
+      category: 'test',
+      isAI: false,
+    },
+    imageB: {
+      url: `https://example.com/pair${roundNumber}-ai.jpg`,
+      category: 'test',
+      isAI: true,
+    },
+    correctAnswer: 'A' as const,
+    aiImagePosition: 'B' as const,
+  };
+}
