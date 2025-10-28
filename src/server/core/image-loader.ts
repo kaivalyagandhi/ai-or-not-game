@@ -210,9 +210,7 @@ function getKnownPairsForCategory(category: ImageCategory): Array<{
     
     case ImageCategory.SCIENCE:
       return [
-        // Science category image pairs will be added when images are uploaded
-        // Expected format: pair1-human.jpg, pair1-ai.jpg, etc.
-        // Currently empty - images need to be uploaded to src/client/public/images/science/
+        { pairNumber: 1, humanFilename: 'pair1-human.jpeg', aiFilename: 'pair1-ai.jpeg' },
       ];
     
     default:

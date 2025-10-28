@@ -17,6 +17,7 @@ src/client/public/audio/
 ## File Specifications
 
 ### Background Music (`background-music.mp3`)
+
 - **Format**: MP3
 - **Duration**: 2-5 minutes (will loop)
 - **Quality**: 128-192 kbps, 44.1kHz
@@ -24,6 +25,7 @@ src/client/public/audio/
 - **Content**: Upbeat, non-distracting instrumental music
 
 ### Sound Effects (`.wav` files)
+
 - **Format**: WAV (16-bit, 44.1kHz) or MP3
 - **Duration**: Under 2 seconds each
 - **Size**: Under 500KB each
@@ -38,24 +40,25 @@ When running in development mode, audio development tools are available in the b
 
 ```javascript
 // Check audio system health
-audioDevTools.checkHealth()
+audioDevTools.checkHealth();
 
 // Generate diagnostic report
-audioDevTools.generateReport()
+audioDevTools.generateReport();
 
 // Check file sizes
-audioDevTools.checkFileSizes()
+audioDevTools.checkFileSizes();
 
 // Test file loading
-audioDevTools.testAudioFiles()
+audioDevTools.testAudioFiles();
 
 // Show setup instructions
-audioDevTools.showSetupInstructions()
+audioDevTools.showSetupInstructions();
 ```
 
 ## File Validation
 
 The system automatically validates:
+
 - ✅ File existence and accessibility
 - ✅ Browser format support
 - ✅ File size recommendations
@@ -79,17 +82,20 @@ The system automatically validates:
 ## Troubleshooting
 
 ### Files Not Loading
+
 - Check file names match exactly (case-sensitive)
 - Verify files are in correct directory
 - Test file URLs directly: `http://localhost:5173/audio/background-music.mp3`
 - Check browser console for error messages
 
 ### Poor Performance
+
 - Compress large files (background music <5MB, effects <500KB)
 - Use recommended formats (MP3 for music, WAV for effects)
 - Check file integrity with audio editing software
 
 ### Browser Compatibility
+
 - MP3 and WAV have best cross-browser support
 - Avoid exotic formats or high bitrates
 - Test on target browsers (Chrome, Firefox, Safari, Edge)
