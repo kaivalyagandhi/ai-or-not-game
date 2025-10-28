@@ -79,6 +79,37 @@ graph TB
 
 ## Components and Interfaces
 
+### UI Layout System
+
+#### Responsive Image Layout
+
+The game implements a responsive layout system that adapts to different screen sizes:
+
+**Mobile Layout (< 768px)**:
+- Images displayed in vertical stack configuration
+- Both images maintain 1:1 aspect ratio
+- Full width utilization with consistent spacing
+- Touch-optimized interaction areas
+
+**Desktop Layout (≥ 768px)**:
+- Images displayed horizontally side-by-side
+- Both images maintain 1:1 aspect ratio
+- Equal sizing with centered alignment
+- Hover states for enhanced interaction feedback
+
+#### Visual Feedback System
+
+**Selection Feedback**:
+- Correct selection: Green border (#46E870) with 3px thickness and 30% opacity outer glow
+- Incorrect selection: Red border (#F23C3C) with 3px thickness and 30% opacity outer glow
+- Rounded corners matching image container styling
+
+**Overlay Indicators**:
+- Selected AI image: Red circle (#F23C3C) with white X icon and "AI" label
+- Selected Human image: Green circle (#46E870) with white checkmark icon and "Human" label
+- Non-selected image: Colored border outline indicating its source type
+- No emoji symbols in overlay displays
+
 ### Client Components
 
 #### GameContainer
@@ -97,10 +128,11 @@ graph TB
 
 - **Purpose**: Individual round gameplay interface
 - **Features**:
-  - Side-by-side image display with randomized AI placement
-  - 15-second countdown timer
-  - Image selection handling with audio feedback
-  - Immediate feedback display highlighting the AI image
+  - Responsive image layout: vertical stack on mobile, horizontal side-by-side on desktop
+  - All images cropped to 1:1 aspect ratio for consistent presentation
+  - 15-second countdown timer with visual progress indicator
+  - Image selection handling with enhanced visual and audio feedback
+  - Immediate feedback display with custom overlay indicators and border styling
 
 #### EducationalContent
 
@@ -338,6 +370,80 @@ interface AudioConfig {
 - **File Validation**: Validate content file formats and encoding
 - **Update Handling**: Graceful handling of content updates during active games
 
+### CSS Implementation Details
+
+#### Responsive Layout Classes
+
+**Mobile-First Approach**:
+```css
+/* Base mobile layout - vertical stack */
+.image-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+/* Desktop layout - horizontal side-by-side */
+@media (min-width: 768px) {
+  .image-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+```
+
+**Image Styling**:
+```css
+.game-image {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+```
+
+#### Visual Feedback Styling
+
+**Border Feedback**:
+```css
+.correct-border {
+  border: 3px solid #46E870;
+  box-shadow: 0 0 20px rgba(70, 232, 112, 0.3);
+}
+
+.incorrect-border {
+  border: 3px solid #F23C3C;
+  box-shadow: 0 0 20px rgba(242, 60, 60, 0.3);
+}
+```
+
+**Overlay Indicators**:
+```css
+.overlay-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+}
+
+.ai-indicator {
+  background-color: #F23C3C;
+}
+
+.human-indicator {
+  background-color: #46E870;
+}
+```
+
 ### Data Validation
 
 #### Score Integrity
@@ -361,6 +467,9 @@ interface AudioConfig {
 #### Client Components
 
 - **Component Rendering**: Test all UI components render correctly including new educational and audio components
+- **Responsive Layout**: Verify mobile vertical stack and desktop horizontal layouts render correctly
+- **Image Aspect Ratios**: Test 1:1 aspect ratio maintenance across different screen sizes
+- **Visual Feedback**: Test correct/incorrect border styling and overlay indicators
 - **State Management**: Verify game state transitions and 15-second timer functionality
 - **User Interactions**: Test image selection, navigation flows, and audio controls
 - **Educational Content**: Test midgame educational content display after round 3
@@ -434,9 +543,11 @@ interface AudioConfig {
 
 #### Visual Accessibility
 
-- **Color Contrast**: Ensure sufficient contrast for all text and UI elements
+- **Color Contrast**: Ensure sufficient contrast for all text and UI elements, including new overlay indicators
+- **Color Blind Support**: Test feedback colors (#46E870 green, #F23C3C red) with color blind simulation
 - **Font Sizing**: Test readability across different font sizes
 - **Focus Indicators**: Clear focus indicators for all interactive elements
+- **Responsive Design**: Test accessibility across mobile and desktop layouts
 
 #### Motor Accessibility
 

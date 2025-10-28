@@ -8,16 +8,16 @@ This interactive React-based game runs directly within Reddit posts, providing a
 
 ## 🎯 What is Spot the Bot?
 
-Spot the Bot is a **daily visual challenge game** that tests your ability to distinguish between real photographs and AI-generated images. Built as a React web application that runs natively within Reddit posts using the Devvit platform, the game presents players with side-by-side image comparisons where they must identify which image is the REAL photograph (not the AI-generated one).
+Spot the Bot is a **daily visual challenge game** that tests your ability to distinguish between real photographs and AI-generated images. Built as a React web application that runs natively within Reddit posts using the Devvit platform, the game presents players with image comparisons where they must identify which image is the REAL photograph (not the AI-generated one).
 
 ### Core Game Mechanics
 - **6 rounds per game** with exactly 15 seconds per round
 - **6 image categories**: Animals, Architecture, Nature, Food, Products, and Science
-- **Side-by-side comparison**: Two images displayed simultaneously - one real, one AI-generated
+- **Responsive layout**: Images displayed vertically on mobile, side-by-side on desktop
 - **Time-pressure scoring**: Faster correct answers earn higher scores with time bonuses (0.01 points per millisecond remaining)
 - **Multiple attempts per day**: Players can attempt the challenge up to 2 times per day (unlimited in development mode)
 - **Educational break**: After round 3, players receive AI detection tips and facts about AI image generation
-- **Immediate feedback**: See the correct answer and explanation after each round with visual overlays (📸 Real Photo / 🤖 AI Generated)
+- **Visual feedback**: Custom overlay indicators show AI vs Human sources with colored borders and icons
 - **Audio enhancement**: Background music and sound effects create an immersive gaming experience
 - **Progressive difficulty**: Mixed categories and randomized AI placement keep players guessing
 
@@ -29,6 +29,12 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 - **Intelligent Scoring Algorithm**: Sophisticated time-based scoring system rewards both accuracy (1 point per correct answer) and speed (0.01 bonus points per millisecond remaining), creating strategic tension between careful analysis and quick decisions
 - **Educational Integration**: Midgame learning break after round 3 provides AI detection tips and fascinating facts about AI image generation with daily rotating content
 - **Immersive Audio Experience**: Background music and contextual sound effects enhance gameplay with user-controlled volume and mute options, gracefully degrading when audio files are unavailable
+
+### Advanced Visual Feedback System
+- **Custom Overlay Indicators**: Selected images show circular overlays with icons (✓ for Human, ✕ for AI) and clear labels, removing confusing emoji-based feedback
+- **Enhanced Border Styling**: Correct selections get green borders (#46E870) with glow effects, incorrect selections get red borders (#F23C3C) with glow effects
+- **Responsive Image Layout**: Mobile devices show images in vertical stack, desktop shows side-by-side comparison, all with 1:1 aspect ratio cropping
+- **Smart Visual Hierarchy**: Only selected images show overlay indicators, non-selected images show subtle border outlines to indicate their source
 
 ### Advanced Social & Community Features
 - **Dynamic Achievement System**: Earn performance-based badges with custom emoji and descriptions from 🤖 AI Whisperer (perfect score) to 🎓 Human in Training (learning mode)
@@ -43,7 +49,7 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 - **Anti-Cheat Protection**: Server-side timer validation with 3-second tolerance, rate limiting, session integrity checks, and comprehensive input validation to ensure fair play
 - **Progressive Web App Features**: Offline support with smart caching, pending request queuing, and automatic retry when connection is restored
 
-## 🎯 Step-by-Step: How to Plat
+## 🎯 Step-by-Step: How to Play
 
 ### Getting Started
 1. **Find the Game**: Look for Spot the Bot posts in participating subreddits or communities where the app is installed
@@ -53,78 +59,79 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 
 ### Complete Game Flow
 
-#### Pre-Game Setup (n)
+#### Pre-Game Setup
 The splash screen welcomes you with:
-- **Daily Challenge Display**: Shows the current date and live participant count with real-time upes
+- **Daily Challenge Display**: Shows the current date and live participant count with real-time updates
 - **Your Progress Tracking**: Displays remaining attempts (out of 2 per day) and your best score from previous attempts
 - **Game Rules Overview**: Clear instructions explaining the 6-round format, 15-second time limits, and scoring system
 
 #### Round-by-Round Gameplay (6 Rounds Total)
 
 **Each Round Structure:**
-- **Category Display**: See which cacience)
-- **Side-by-Side Images**: Two images displayed simultaneously - one real photograph, one AI-generated
+- **Category Display**: See which category you're playing (Animals, Architecture, Nature, Food, Products, or Science)
+- **Image Comparison**: Two images displayed - one real photograph, one AI-generated
+  - **Mobile Layout**: Images stacked vertically for easy comparison
+  - **Desktop Layout**: Images displayed side-by-side
 - **15-Second Timer**: Color-coded countdown timer with progress bar:
   - **Green** (11-15 seconds): Plenty of time to analyze
   - **Yellow** (6-10 seconds): Time to make a decision  
   - **Red** (1-5 seconds): Choose quickly!
 
 **Making Your Selection:**
-s
-2. **Click to Choose**: Click on the
-3. **Immediate Feedback**: See the correct answer revealerlays:
-   - Real photos show 📸 "Real Photo" overlay
-   - AI images show 🤖 "AI Generated" overlay
-4. **Score Display**: See whether you were correct (✅ Correct! or ❌ Incorrect) and your rounde
+1. **Analyze Both Images**: Look for AI tells like unnatural lighting, impossible geometry, or weird details
+2. **Click to Choose**: Click on the image you believe is the REAL photograph (not AI-generated)
+3. **Immediate Feedback**: See the correct answer with custom visual indicators:
+   - **Selected Image**: Shows circular overlay with ✓ (Human) or ✕ (AI) icon and label
+   - **Non-Selected Image**: Shows colored border outline indicating its source
+   - **Border Colors**: Green (#46E870) for correct, Red (#F23C3C) for incorrect with glow effects
+4. **Score Display**: See whether you were correct (✅ Correct! or ❌ Incorrect) and your round score
 5. **Auto-Advance**: Game automatically moves to the next round after 2 seconds
 
-ound 3)
-Halfway through the game,ive:
+#### Educational Break (After Round 3)
+Halfway through the game, you'll receive:
 - **AI Detection Tips**: Practical advice for spotting AI-generated images
 - **AI Facts**: Fascinating insights about AI image generation technology
 - **Daily Rotation**: New educational content provided each day
 - **Continue Button**: "Continue to Round 4" to resume gameplay
 
 #### Audio Experience (Optional)
-- **Background Music**: Atmospheric music d)
+- **Background Music**: Atmospheric music during gameplay
 - **Sound Effects**: Click sounds when selecting, success/failure sounds for feedback
 - **Audio Controls**: 🎵 button in top-right corner to adjust volume or mute
-e
+- **Graceful Degradation**: Game works perfectly even if audio files are unavailable
 
 #### Scoring System
 - **Base Points**: 1 point for each correct identification
 - **Time Bonus**: 0.01 bonus points per millisecond remaining when you answer correctly
-- **Maximum Score**: ~16 points per round (1 base + ~15 time bonus for instant corr
+- **Maximum Score**: ~16 points per round (1 base + ~15 time bonus for instant correct answers)
 - **Final Score**: Cumulative total across all 6 rounds with server-side validation
 
-System
+#### Badge Achievement System
 Your final performance determines your badge:
-- 🤖 **AI Whisperer** (6/6 correct): "Perfect score! You can spot AI-generateacy"
+- 🤖 **AI Whisperer** (6/6 correct): "Perfect score! You can spot AI-generated content with incredible accuracy"
 - 🕵️ **AI Detective** (5/6 correct): "Outstanding! You have excellent skills at detecting AI-generated content"
 - 👁️ **Good Samaritan** (4/6 correct): "Excellent work! You have a keen eye for distinguishing real from artificial"
 - 👤 **Just Human** (3/6 correct): "Not bad! You're getting the hang of spotting AI-generated images"
-- 🎓 **Human in Training** (≤2/6 correct): "Keep practicing! AI detection skill
-
-s
+- 🎓 **Human in Training** (≤2/6 correct): "Keep practicing! AI detection skills take time to develop"
 
 #### Final Results Screen
 After completing all 6 rounds:
 - **Total Score**: Your final score with decimal precision (e.g., "87.45")
 - **Performance Breakdown**: Correct answers (X/6) and total time bonus earned
 - **Badge Achievement**: Large badge display with custom emoji, title, and description
-s
-- **Inspirational Content**: 
+- **Leaderboard Position**: Your rank among all daily players with live updates
+- **Inspirational Content**: Daily rotating quotes and motivational messages
 
 #### Social Sharing Options
 **📤 Share Results**: Standard performance summary with score, badge, and rank
 **👥 Challenge Friends**: Personalized message with friendly challenge invitation
 
 Both modes support:
-ile
-- **Clipboard Fallback**: Auttification
+- **Native Sharing**: Uses device's built-in sharing on mobile
+- **Clipboard Fallback**: Automatic copy-to-clipboard with confirmation notification
 
-#### Multi-Tier Leaderboastem
-- **Daily Leaderboard**: Compete against all players for today (rese
+#### Multi-Tier Leaderboard System
+- **Daily Leaderboard**: Compete against all players for today (resets at 00:00 UTC)
 - **Weekly Rankings**: Top performers over the past 7 days
 - **All-Time Champions**: Highest scores since launch
 - **Live Updates**: Real-time position changes with green "Live" indicator
@@ -132,41 +139,40 @@ ile
 
 ### Game Rules & Fair Play
 
-nge System
-- **Multiple Attempts**: Up to 2 atteode)
-- **UTC Reset**: New challenges available aight UTC
-splayed
-- **Session Persistence**: Must complete starteg)
+#### Daily Challenge System
+- **Multiple Attempts**: Up to 2 attempts per day (unlimited in development mode)
+- **UTC Reset**: New challenges available daily at 00:00 UTC
+- **Best Score Tracking**: System remembers your highest score across attempts
+- **Session Persistence**: Must complete started games (can't restart mid-game)
 
 #### Anti-Cheat Protection
-- **Server-Side Timer Validation**: All 
-ring
+- **Server-Side Timer Validation**: All timing verified server-side with 3-second tolerance
 - **Rate Limiting**: Prevents spam and system abuse
-- **Input Validation**: All user inputs sanitized andated
+- **Input Validation**: All user inputs sanitized and validated
 
 ### Pro Tips for Success
 
-ques
-- **Detail Insp
-- **Lighting Consistency**: Look for unnatural lighting, impossible s
+#### Detection Techniques
+- **Detail Inspection**: Look closely at fine details like hair, fur, fabric textures
+- **Lighting Consistency**: Look for unnatural lighting, impossible shadows, or inconsistent light sources
 - **Geometric Logic**: Check for impossible architecture, floating objects, or perspective errors
-- **Human Elements**: Pay special attention to faces, hands, and human interactions -
+- **Human Elements**: Pay special attention to faces, hands, and human interactions - AI often struggles here
 
 #### Strategic Gameplay
 - **Trust Your Instincts**: The "uncanny valley" feeling is often a reliable AI indicator
-- **Balance Speed vs. Accuracy**: Time bonuses are significantre
+- **Balance Speed vs. Accuracy**: Time bonuses are significant, but accuracy is more important
 - **Category-Specific Patterns**: Each category has different AI tells:
   - **Animals**: Unnatural fur patterns, impossible anatomy, weird eyes
   - **Architecture**: Impossible geometry, floating elements, inconsistent perspective
   - **Nature**: Too-perfect landscapes, impossible weather combinations
   - **Food**: Perfect textures, impossible arrangements, unnatural lighting
-
-  - **Science**: Impossiblres
+  - **Products**: Too-perfect surfaces, impossible reflections
+  - **Science**: Impossible equipment configurations, unnatural lab setups
 
 #### Daily Practice Benefits
 - **Pattern Recognition**: Regular play helps you develop better AI detection skills over time
-- **Speed Improvement**: Practice helps you make faster, more confident decisionsure
-- **Category Familiarity**: Learn the specific tells and patterns for each image categor
+- **Speed Improvement**: Practice helps you make faster, more confident decisions
+- **Category Familiarity**: Learn the specific tells and patterns for each image category
 - **Competitive Edge**: Consistent play helps you climb the weekly and all-time leaderboards
 
 
