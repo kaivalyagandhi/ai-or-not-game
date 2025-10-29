@@ -125,49 +125,14 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   // Generate share message for challenging friends
   const generateShareMessage = () => {
     const badgeInfo = getBadgeInfo(session.badge);
-    const position = leaderboardPosition ? `#${leaderboardPosition}` : 'Unranked';
-    const attemptText = session.attemptNumber > 1 ? ` (Attempt ${session.attemptNumber})` : '';
-    const canPlayAgain = playAttempts && playAttempts.remainingAttempts > 0;
+    const dailyRank = leaderboardPosition ? `#${leaderboardPosition}` : '#?';
+    const totalPlayers = totalParticipants ? ` of ${totalParticipants}` : '';
     
-    // Show improvement if this is a second attempt and score improved
-    const improvementText = session.attemptNumber > 1 && playAttempts && session.totalScore > playAttempts.bestScore 
-      ? `\n🚀 Just improved from ${Math.round(playAttempts.bestScore)} points - getting better at this!` 
-      : '';
-    
-    // Show best score context if this is not the best attempt
-    const bestScoreContext = playAttempts && session.totalScore < playAttempts.bestScore 
-      ? `\n💪 My best score today is still ${Math.round(playAttempts.bestScore)} points though!` 
-      : '';
-    
-    // Encourage friends to play with context about attempts
-    let friendChallenge = '';
-    if (canPlayAgain) {
-      friendChallenge = `I still have ${playAttempts?.remainingAttempts} more attempt${playAttempts?.remainingAttempts === 1 ? '' : 's'} today - going to try to beat this score! 💪
-
-Want to see if you can beat me before I get my next try? 😏`;
-    } else {
-      const attemptContext = session.attemptNumber > 1 
-        ? 'After using both my daily attempts, this is my final score for today!' 
-        : 'Used my daily attempts and this is where I landed!';
-      
-      friendChallenge = `${attemptContext}
-
-Think you can spot AI better than me? You get 2 attempts per day - give it a shot! 🎯`;
-    }
-    
-    return `Hey friends! 👋 Just finished today's AI or Not? challenge:
-
-🤖 Daily AI Detection Results:
-📊 Final Score: ${Math.round(session.totalScore)} points${attemptText}
+    return `I just finished today's AI or Not? challenge:
 ✅ Correct Guesses: ${session.correctCount}/6 images
 🏆 Badge Earned: ${badgeInfo.emoji} ${badgeInfo.title}
-📈 Daily Rank: ${position}${totalParticipants ? ` of ${totalParticipants} players` : ''}${improvementText}${bestScoreContext}
-
-${friendChallenge}
-
-Some of these AI images are getting scary good - it's actually a fun challenge! 🤯
-
-#AIorNot #AIChallenge #FriendsChallenge`;
+📈 Daily Rank: ${dailyRank}${totalPlayers} players
+Want to see if you can beat me before I get my next try?`;
   };
 
   // Handle share button click
@@ -178,7 +143,6 @@ Some of these AI images are getting scary good - it's actually a fun challenge! 
       if (navigator.share) {
         // Use native sharing if available (mobile)
         await navigator.share({
-          title: 'AI or Not? - Challenge Your Friends!',
           text: shareText,
         });
       } else {
@@ -264,11 +228,11 @@ Some of these AI images are getting scary good - it's actually a fun challenge! 
   const badgeInfo = getBadgeInfo(session.badge);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-6">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary-50 to-primary-200 p-6">
       <div className="max-w-md w-full space-y-6">
         {/* Header */}
         <div className={`text-center transition-all duration-500 ${showHeader ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-primary-500 mb-2">
             Challenge Complete!
           </h1>
           <p className="text-gray-600">
@@ -281,7 +245,7 @@ Some of these AI images are getting scary good - it's actually a fun challenge! 
           {/* Score Display */}
           <div className="bg-white rounded-lg p-6 shadow-lg">
             <div className="text-center mb-4">
-              <div className="text-4xl font-bold text-indigo-600 mb-2">
+              <div className="text-4xl font-bold text-primary-500 mb-2">
                 {Math.round(session.totalScore)}
               </div>
               <div className="text-sm text-gray-500 uppercase tracking-wide">
@@ -318,7 +282,7 @@ Some of these AI images are getting scary good - it's actually a fun challenge! 
                 </div>
               </div>
               <div>
-                <div className="text-2xl font-semibold text-blue-600">
+                <div className="text-2xl font-semibold text-green-600">
                   +{Math.round(session.totalTimeBonus)}
                 </div>
                 <div className="text-xs text-gray-500 leading-tight">
@@ -351,16 +315,16 @@ Some of these AI images are getting scary good - it's actually a fun challenge! 
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <div className="text-sm text-gray-500 uppercase tracking-wide">
-                  RANKINGS
+                  DAILY RANKINGS
                 </div>
               </div>
               {loading ? (
                 <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500"></div>
                 </div>
               ) : leaderboardPosition ? (
                 <div>
-                  <div className="text-2xl font-bold text-indigo-600">
+                  <div className="text-2xl font-bold text-primary-500">
                     #{leaderboardPosition}
                   </div>
                   {totalParticipants && (
@@ -379,34 +343,48 @@ Some of these AI images are getting scary good - it's actually a fun challenge! 
               {onViewLeaderboard && (
                 <button
                   onClick={onViewLeaderboard}
-                  className="mt-3 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+                  className="mt-3 w-full bg-secondary-500 hover:bg-secondary-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm btn-text"
                 >
                   <span>🏆</span>
-                  View Leaderboard
+                  Leaderboard
                 </button>
               )}
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-3">
+          {/* Action Buttons - Vertical Layout */}
+          <div className="flex flex-col justify-between h-full space-y-3">
+            {/* Post AI tip Button */}
+            <button
+              onClick={() => {/* TODO: Implement AI tip functionality */}}
+              className="w-full bg-secondary-500 hover:bg-secondary-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm btn-text"
+            >
+              <span>💡</span>
+              Post AI tip
+            </button>
+
             {/* Challenge Friends Button */}
             <button
               onClick={handleShare}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+              className="w-full bg-secondary-500 hover:bg-secondary-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm btn-text"
             >
               <span>👥</span>
               Challenge Friends
             </button>
 
-            {/* Play Again Button - only show if attempts remain */}
-            {playAttempts && playAttempts.remainingAttempts > 0 && onPlayAgain && (
+            {/* Play Again Button - show regardless of attempts, but with different states */}
+            {onPlayAgain && (
               <button
-                onClick={onPlayAgain}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+                onClick={playAttempts && playAttempts.remainingAttempts > 0 ? onPlayAgain : undefined}
+                disabled={!playAttempts || playAttempts.remainingAttempts === 0}
+                className={`w-full font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm btn-text ${
+                  playAttempts && playAttempts.remainingAttempts > 0
+                    ? 'bg-secondary-500 hover:bg-secondary-600 text-white'
+                    : 'bg-gray-400 text-white cursor-not-allowed'
+                }`}
               >
                 <span>🎮</span>
-                Play Again
+                {playAttempts && playAttempts.remainingAttempts > 0 ? 'Play Again' : 'Play Again Tomorrow!'}
               </button>
             )}
           </div>
@@ -417,7 +395,7 @@ Some of these AI images are getting scary good - it's actually a fun challenge! 
 
       {/* Toast Notification */}
       {showToast && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-success-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
           <div className="flex items-center gap-2">
             <span>✅</span>
             Results copied to clipboard!

@@ -316,16 +316,16 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
 
   // Get timer color based on remaining time
   const getTimerColor = () => {
-    if (timeRemaining > 6) return 'text-green-600';
-    if (timeRemaining > 3) return 'text-yellow-600';
-    return 'text-red-600';
+    if (timeRemaining > 6) return 'text-green-600'; // Normal green for high time
+    if (timeRemaining > 3) return 'text-secondary-600'; // Secondary color for medium time
+    return 'text-error-600'; // Maroon red for low time
   };
 
   // Get progress bar color
   const getProgressColor = () => {
-    if (timeRemaining > 6) return 'bg-green-500';
-    if (timeRemaining > 3) return 'bg-yellow-500';
-    return 'bg-red-500';
+    if (timeRemaining > 6) return 'bg-green-500'; // Normal green for high time
+    if (timeRemaining > 3) return 'bg-secondary-500'; // Secondary color (#ffb800) for medium time
+    return 'bg-error-500'; // Maroon red for low time
   };
 
   return (
@@ -370,23 +370,23 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
             {isSubmitting && !showFeedback ? (
               // Show loading spinner during submission
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#3da8ff]"></div>
               </div>
             ) : showFeedback && !isTimeout && feedbackData ? (
               // Show points feedback after submission
               feedbackData.roundScore !== undefined && feedbackData.roundScore > 0 ? (
-                <span style={{ color: '#46E870' }}>
+                <span style={{ color: '#22c55e' }}>
                   +{Math.round(feedbackData.roundScore)} points
                 </span>
               ) : (
-                <span style={{ color: '#F23C3C' }}>
+                <span style={{ color: '#8b0000' }}>
                   No points
                 </span>
               )
             ) : showFeedback && isTimeout ? (
               "Time's Up!"
             ) : (
-              "Which image is REAL?"
+              "Which image is not AI?"
             )}
           </h2>
         </div>

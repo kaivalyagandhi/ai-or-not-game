@@ -129,7 +129,7 @@ describe('EducationalContent Component', () => {
     expect(screen.getByText(/3 of 6 rounds complete/i)).toBeInTheDocument();
     
     // Check progress bar by class and style
-    const progressBar = document.querySelector('.bg-indigo-600.h-2.rounded-full');
+    const progressBar = document.querySelector('.bg-\\[\\#3da8ff\\].h-2.rounded-full');
     expect(progressBar).toBeInTheDocument();
     expect(progressBar).toHaveStyle({ width: '50%' });
   });
@@ -231,7 +231,7 @@ describe('EducationalContent Component', () => {
 
     // Check continue button styling
     const continueButton = screen.getByText(/continue to round 4/i);
-    expect(continueButton).toHaveClass('bg-indigo-600', 'hover:bg-indigo-700');
+    expect(continueButton).toHaveClass('bg-[#3da8ff]', 'hover:bg-[#2d96e6]');
   });
 
   it('should handle multiple rapid clicks on continue button', async () => {
@@ -303,8 +303,7 @@ describe('EducationalContent Component', () => {
       expect(screen.getByText(/midgame learning break/i)).toBeInTheDocument();
     });
 
-    // Check for emojis
-    expect(screen.getByText('🎓')).toBeInTheDocument(); // Header emoji
+    // Check for emojis (graduation cap emoji removed)
     expect(screen.getByText('💡')).toBeInTheDocument(); // Tip emoji
     expect(screen.getByText('🤖')).toBeInTheDocument(); // AI fact emoji
   });

@@ -199,6 +199,22 @@ export interface PlayAttemptsResponse {
   error?: string;
 }
 
+export interface DailyPlayCountResponse {
+  success: boolean;
+  playCount?: number;
+  maxAttempts?: number;
+  remainingAttempts?: number;
+  error?: string;
+}
+
+export interface WeeklyUserRankResponse {
+  success: boolean;
+  userRank?: number | null;
+  score?: number | null;
+  totalParticipants?: number;
+  error?: string;
+}
+
 export interface EducationalContentResponse {
   success: boolean;
   tips?: string[];

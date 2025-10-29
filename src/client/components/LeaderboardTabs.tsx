@@ -230,7 +230,7 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
             onClick={() => handleTabChange(tab.id)}
             className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
               activeTab === tab.id
-                ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50'
+                ? 'text-primary-500 border-b-2 border-primary-500 bg-primary-50'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -242,13 +242,13 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
 
       {/* User Rank Summary */}
       {userRank && !loading && (
-        <div className="p-4 bg-indigo-50 border-b border-indigo-100">
+        <div className="p-4 bg-primary-50 border-b border-primary-100">
           <div className="text-center">
-            <div className="text-sm text-indigo-600 font-medium">Your Rank</div>
-            <div className="text-2xl font-bold text-indigo-700">
+            <div className="text-sm text-primary-500 font-medium">Your Rank</div>
+            <div className="text-2xl font-bold text-primary-600">
               #{userRank}
             </div>
-            <div className="text-xs text-indigo-500">
+            <div className="text-xs text-primary-400">
               out of {totalParticipants.toLocaleString()} players
             </div>
           </div>
@@ -260,7 +260,7 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-center space-y-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto"></div>
               <p className="text-gray-500">Loading leaderboard...</p>
             </div>
           </div>
@@ -271,7 +271,7 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
               <p className="text-red-600">{error}</p>
               <button
                 onClick={() => fetchLeaderboard(activeTab)}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+                className="bg-secondary-500 hover:bg-secondary-600 text-white px-4 py-2 rounded-lg text-sm transition-colors btn-text"
               >
                 Try Again
               </button>
@@ -303,7 +303,7 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
                         key={`${entry.userId}-${entry.completedAt}`}
                         className={`p-4 transition-colors ${
                           isUser 
-                            ? 'bg-indigo-50 border-l-4 border-indigo-500' 
+                            ? 'bg-primary-50 border-l-4 border-primary-400' 
                             : 'hover:bg-gray-50'
                         }`}
                       >
@@ -319,7 +319,7 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
                                 : rank === 3
                                 ? 'bg-orange-100 text-orange-800'
                                 : isUser
-                                ? 'bg-indigo-100 text-indigo-800'
+                                ? 'bg-primary-100 text-primary-600'
                                 : 'bg-gray-50 text-gray-600'
                             }`}>
                               {rank <= 3 ? (
@@ -335,11 +335,11 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center space-x-2">
                                 <p className={`text-sm font-medium truncate ${
-                                  isUser ? 'text-indigo-900' : 'text-gray-900'
+                                  isUser ? 'text-primary-800' : 'text-gray-900'
                                 }`}>
                                   {entry.username}
                                   {isUser && (
-                                    <span className="ml-2 text-xs text-indigo-600 font-normal">
+                                    <span className="ml-2 text-xs text-primary-500 font-normal">
                                       (You)
                                     </span>
                                   )}
@@ -358,7 +358,7 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
                           {/* Score */}
                           <div className="text-right">
                             <div className={`text-lg font-bold ${
-                              isUser ? 'text-indigo-700' : 'text-gray-900'
+                              isUser ? 'text-primary-600' : 'text-gray-900'
                             }`}>
                               {formatScore(entry.score)}
                             </div>
@@ -378,21 +378,21 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
                   
                   {/* User's actual rank row when outside top 10 */}
                   {showEllipsis && userEntry && userRank && (
-                    <div className="p-4 transition-colors bg-indigo-50 border-l-4 border-indigo-500">
+                    <div className="p-4 transition-colors bg-primary-50 border-l-4 border-primary-400">
                       <div className="flex items-center justify-between">
                         {/* Rank and User Info */}
                         <div className="flex items-center space-x-3">
                           {/* Rank */}
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold bg-indigo-100 text-indigo-800">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold bg-primary-100 text-primary-600">
                             {userRank}
                           </div>
 
                           {/* User Info */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2">
-                              <p className="text-sm font-medium truncate text-indigo-900">
+                              <p className="text-sm font-medium truncate text-primary-800">
                                 {userEntry.username}
-                                <span className="ml-2 text-xs text-indigo-600 font-normal">
+                                <span className="ml-2 text-xs text-primary-500 font-normal">
                                   (You)
                                 </span>
                               </p>
@@ -409,7 +409,7 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
 
                         {/* Score */}
                         <div className="text-right">
-                          <div className="text-lg font-bold text-indigo-700">
+                          <div className="text-lg font-bold text-primary-600">
                             {formatScore(userEntry.score)}
                           </div>
                           <div className="text-xs text-gray-500">points</div>

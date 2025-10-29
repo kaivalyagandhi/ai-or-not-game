@@ -1,5 +1,5 @@
 {
-  "enabled": true,
+  "enabled": false,
   "name": "Template Cleanup Assistant",
   "description": "Detects when a user is ready to start building their own game and offers to remove the template Three.js Earth visualization code while preserving the Devvit project structure",
   "version": "1",

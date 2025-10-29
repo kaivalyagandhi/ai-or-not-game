@@ -135,7 +135,7 @@ describe('Game Workflow - Complete User Journey', () => {
     for (let round = 1; round <= 6; round++) {
       // Should show round info
       expect(screen.getByText(new RegExp(`round ${round} of 6`, 'i'))).toBeInTheDocument();
-      expect(screen.getByText(/which image is real/i)).toBeInTheDocument();
+      expect(screen.getByText(/which image is not ai/i)).toBeInTheDocument();
 
       // Should show timer
       expect(screen.getByText('10')).toBeInTheDocument();

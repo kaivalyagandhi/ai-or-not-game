@@ -237,7 +237,7 @@ describe('Complete 6-Round Gameplay Integration', () => {
     // 2. Round 1 - should show 6-round progression
     await waitFor(() => {
       expect(screen.getByText(/round 1 of 6/i)).toBeInTheDocument();
-      expect(screen.getByText(/which image is real/i)).toBeInTheDocument();
+      expect(screen.getByText(/which image is not ai/i)).toBeInTheDocument();
       expect(screen.getByText('10')).toBeInTheDocument(); // 10-second timer
     });
 

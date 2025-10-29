@@ -135,7 +135,7 @@ export const App = () => {
         {(() => {
           switch (gameState) {
             case 'splash':
-              return <SplashScreen onStartGame={handleStartGame} />;
+              return <SplashScreen onStartGame={handleStartGame} onViewLeaderboard={goToLeaderboard} />;
             
             case 'playing':
               if (!currentRound || !session?.sessionId) {

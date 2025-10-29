@@ -131,7 +131,7 @@ describe('LeaderboardTabs Component', () => {
     });
 
     // Should highlight active tab
-    expect(weeklyTab).toHaveClass('bg-indigo-600');
+    expect(weeklyTab).toHaveClass('bg-[#f0f8ff]');
   });
 
   it('should display user ranks correctly', async () => {

@@ -1,5 +1,5 @@
 {
-  "enabled": true,
+  "enabled": false,
   "name": "Devvit Fetch API Guide",
   "description": "Monitors for external API/fetch requests and provides guidance on Devvit's fetch capabilities, domain allowlists, and review process",
   "version": "1",

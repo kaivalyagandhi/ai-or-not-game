@@ -44,10 +44,10 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 p-4">
         <div className="max-w-xl w-full bg-white rounded-xl shadow-lg p-6">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
             <p className="text-gray-600">Loading educational content...</p>
           </div>
         </div>
@@ -56,12 +56,11 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 p-4">
       <div className="max-w-xl w-full bg-white rounded-xl shadow-lg p-6">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="text-4xl mb-3">🎓</div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-primary-500">
             Midgame Learning Break
           </h2>
         </div>
@@ -81,14 +80,14 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
         {/* Content Cards */}
         <div className="space-y-4 mb-6">
           {/* Detection Tip */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4">
+          <div className="border border-gray-200 rounded-lg p-4">
             <div className="flex items-start">
               <div className="text-xl mr-3 mt-1">💡</div>
               <div>
-                <h3 className="text-base font-semibold text-green-800 mb-2">
+                <h3 className="text-base font-semibold text-secondary-500 mb-2">
                   AI Image Detection Tip
                 </h3>
-                <p className="text-green-700 leading-relaxed text-sm">
+                <p className="text-gray-600 leading-relaxed text-sm educational-body">
                   {tip}
                 </p>
               </div>
@@ -96,14 +95,14 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
           </div>
 
           {/* AI Fact */}
-          <div className="bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-200 rounded-lg p-4">
+          <div className="border border-gray-200 rounded-lg p-4">
             <div className="flex items-start">
               <div className="text-xl mr-3 mt-1">🤖</div>
               <div>
-                <h3 className="text-base font-semibold text-purple-800 mb-2">
+                <h3 className="text-base font-semibold text-secondary-500 mb-2">
                   AI Fact
                 </h3>
-                <p className="text-purple-700 leading-relaxed text-sm">
+                <p className="text-gray-600 leading-relaxed text-sm educational-body">
                   {fact}
                 </p>
               </div>
@@ -118,7 +117,7 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
             <span>3 of 6 rounds complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-indigo-600 h-2 rounded-full" style={{ width: '50%' }}></div>
+            <div className="bg-primary-500 h-2 rounded-full" style={{ width: '50%' }}></div>
           </div>
         </div>
 
@@ -126,7 +125,7 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
         <div className="text-center">
           <button
             onClick={onContinue}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+            className="bg-secondary-500 hover:bg-secondary-600 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg btn-text"
           >
             Continue Playing!
           </button>

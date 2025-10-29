@@ -8,6 +8,8 @@ import {
   StartGameRequest,
   SubmitAnswerResponse,
   SubmitAnswerRequest,
+  DailyPlayCountResponse,
+  WeeklyUserRankResponse,
 } from '../shared/types/api';
 import { redis, reddit, createServer, context, getServerPort, realtime } from '@devvit/web/server';
 import { securityErrorHandler } from './middleware/security';
@@ -321,6 +323,30 @@ router.get('/api/game/play-attempts', async (_req, res): Promise<void> => {
   }
 });
 
+// Daily play count endpoint - returns number of plays completed today
+router.get<object, DailyPlayCountResponse>('/api/game/daily-play-count', async (_req, res): Promise<void> => {
+  try {
+    // Get current user ID from Reddit context
+    const username = await getCurrentUsername();
+    const userId = username; // Use username as user ID
+
+    const playStats = await getUserPlayStats(userId);
+
+    res.json({
+      success: true,
+      playCount: playStats.attempts,
+      maxAttempts: playStats.maxAttempts,
+      remainingAttempts: playStats.remainingAttempts,
+    });
+  } catch (error) {
+    console.error('Error in /api/game/daily-play-count:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
 router.post('/api/game/increment-attempts', async (_req, res): Promise<void> => {
   try {
     // Get current user ID from Reddit context
@@ -551,6 +577,41 @@ router.get('/api/leaderboard/user-rank/:type', async (req, res): Promise<void> =
     });
   } catch (error) {
     console.error('Error in /api/leaderboard/user-rank:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+// Weekly user rank endpoint - specific endpoint for weekly rankings
+router.get<object, WeeklyUserRankResponse>('/api/leaderboard/user-rank/weekly', async (_req, res): Promise<void> => {
+  try {
+    // Get current user ID from Reddit context
+    const username = await getCurrentUsername();
+    const userId = username; // Use username as user ID
+
+    const rankData = await getUserRank(userId, 'weekly');
+
+    if (!rankData) {
+      const totalParticipants = await getLeaderboardParticipantCount('weekly');
+      res.json({
+        success: true,
+        userRank: null,
+        score: null,
+        totalParticipants,
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      userRank: rankData.rank,
+      score: rankData.score,
+      totalParticipants: rankData.totalParticipants,
+    });
+  } catch (error) {
+    console.error('Error in /api/leaderboard/user-rank/weekly:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
