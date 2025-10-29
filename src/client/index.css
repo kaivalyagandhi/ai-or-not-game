@@ -230,3 +230,33 @@
 .game-image {
   border-radius: 16px; /* Slightly smaller radius for inner image to match 20px outer radius */
 }
+
+/* Results Screen Responsive Layout - Matching GameRound breakpoint */
+.results-horizontal-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+/* Reddit feed optimized breakpoint - same as GameRound */
+@media (min-width: 480px) {
+  .results-horizontal-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Splash Screen Responsive Layout - Matching GameRound breakpoint */
+.splash-horizontal-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+/* Reddit feed optimized breakpoint - same as GameRound */
+@media (min-width: 480px) {
+  .splash-horizontal-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+}

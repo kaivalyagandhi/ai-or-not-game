@@ -28,6 +28,11 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   } | null>(null);
   const connectionRef = useRef<any>(null);
   
+  // Animation states
+  const [showHeader, setShowHeader] = useState(false);
+  const [showFirstRow, setShowFirstRow] = useState(false);
+  const [showSecondRow, setShowSecondRow] = useState(false);
+  
   // Audio controls
   const audio = useAudio();
 
@@ -37,40 +42,40 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
       case BadgeType.AI_WHISPERER:
         return {
           emoji: '🤖',
-          title: 'AI Whisperer',
-          description: 'Perfect score! You can spot AI-generated content with incredible accuracy.',
+          title: 'AI WHISPERER',
+          description: 'Perfect score! Incredible accuracy.',
           color: 'text-yellow-600',
           bgColor: 'bg-yellow-100',
         };
       case BadgeType.AI_DETECTIVE:
         return {
           emoji: '🕵️',
-          title: 'AI Detective',
-          description: 'Outstanding! You have excellent skills at detecting AI-generated content.',
+          title: 'AI DETECTIVE',
+          description: 'Outstanding detection skills!',
           color: 'text-purple-600',
           bgColor: 'bg-purple-100',
         };
       case BadgeType.GOOD_SAMARITAN:
         return {
           emoji: '👁️',
-          title: 'Good Samaritan',
-          description: 'Excellent work! You have a keen eye for distinguishing real from artificial.',
+          title: 'GOOD SAMARITAN',
+          description: 'Excellent eye for detail!',
           color: 'text-blue-600',
           bgColor: 'bg-blue-100',
         };
       case BadgeType.JUST_HUMAN:
         return {
           emoji: '👤',
-          title: 'Just Human',
-          description: 'Not bad! You\'re getting the hang of spotting AI-generated images.',
+          title: 'JUST HUMAN',
+          description: 'Getting the hang of it!',
           color: 'text-green-600',
           bgColor: 'bg-green-100',
         };
       case BadgeType.HUMAN_IN_TRAINING:
         return {
           emoji: '🎓',
-          title: 'Human in Training',
-          description: 'Keep practicing! AI detection skills take time to develop.',
+          title: 'HUMAN IN TRAINING',
+          description: 'Keep practicing!',
           color: 'text-gray-600',
           bgColor: 'bg-gray-100',
         };
@@ -117,7 +122,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
     }
   };
 
-  // Generate share message for general sharing
+  // Generate share message for challenging friends
   const generateShareMessage = () => {
     const badgeInfo = getBadgeInfo(session.badge);
     const position = leaderboardPosition ? `#${leaderboardPosition}` : 'Unranked';
@@ -126,46 +131,12 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
     
     // Show improvement if this is a second attempt and score improved
     const improvementText = session.attemptNumber > 1 && playAttempts && session.totalScore > playAttempts.bestScore 
-      ? `\n🚀 Improved from my previous best: ${playAttempts.bestScore.toFixed(2)} points!` 
+      ? `\n🚀 Just improved from ${Math.round(playAttempts.bestScore)} points - getting better at this!` 
       : '';
     
     // Show best score context if this is not the best attempt
     const bestScoreContext = playAttempts && session.totalScore < playAttempts.bestScore 
-      ? `\n💪 My best today: ${playAttempts.bestScore.toFixed(2)} points` 
-      : '';
-    
-    // Encourage replay or challenge others
-    const challengeText = canPlayAgain 
-      ? `I still have ${playAttempts?.remainingAttempts} attempt${playAttempts?.remainingAttempts === 1 ? '' : 's'} left - going for a higher score!` 
-      : 'Can you beat my score? Try today\'s challenge!';
-    
-    return `🤖 Spot the Bot - Daily Challenge Results 🤖
-
-📊 Score: ${session.totalScore.toFixed(2)} points${attemptText}
-✅ Correct: ${session.correctCount}/6
-⚡ Time Bonus: +${session.totalTimeBonus.toFixed(2)}
-🏆 Badge: ${badgeInfo.emoji} ${badgeInfo.title}
-📈 Rank: ${position}${totalParticipants ? ` of ${totalParticipants}` : ''}${improvementText}${bestScoreContext}
-
-${challengeText}
-#SpotTheBot #AIChallenge`;
-  };
-
-  // Generate share message specifically for friends
-  const generateFriendsShareMessage = () => {
-    const badgeInfo = getBadgeInfo(session.badge);
-    const position = leaderboardPosition ? `#${leaderboardPosition}` : 'Unranked';
-    const attemptText = session.attemptNumber > 1 ? ` (Attempt ${session.attemptNumber})` : '';
-    const canPlayAgain = playAttempts && playAttempts.remainingAttempts > 0;
-    
-    // Show improvement if this is a second attempt and score improved
-    const improvementText = session.attemptNumber > 1 && playAttempts && session.totalScore > playAttempts.bestScore 
-      ? `\n🚀 Just improved from ${playAttempts.bestScore.toFixed(2)} points - getting better at this!` 
-      : '';
-    
-    // Show best score context if this is not the best attempt
-    const bestScoreContext = playAttempts && session.totalScore < playAttempts.bestScore 
-      ? `\n💪 My best score today is still ${playAttempts.bestScore.toFixed(2)} points though!` 
+      ? `\n💪 My best score today is still ${Math.round(playAttempts.bestScore)} points though!` 
       : '';
     
     // Encourage friends to play with context about attempts
@@ -187,7 +158,7 @@ Think you can spot AI better than me? You get 2 attempts per day - give it a sho
     return `Hey friends! 👋 Just finished today's Spot the Bot challenge:
 
 🤖 Daily AI Detection Results:
-📊 Final Score: ${session.totalScore.toFixed(2)} points${attemptText}
+📊 Final Score: ${Math.round(session.totalScore)} points${attemptText}
 ✅ Correct Guesses: ${session.correctCount}/6 images
 🏆 Badge Earned: ${badgeInfo.emoji} ${badgeInfo.title}
 📈 Daily Rank: ${position}${totalParticipants ? ` of ${totalParticipants} players` : ''}${improvementText}${bestScoreContext}
@@ -199,39 +170,9 @@ Some of these AI images are getting scary good - it's actually a fun challenge! 
 #SpotTheBot #AIChallenge #FriendsChallenge`;
   };
 
-  // Handle general share button click
+  // Handle share button click
   const handleShare = async () => {
     const shareText = generateShareMessage();
-    
-    try {
-      if (navigator.share) {
-        // Use native sharing if available (mobile)
-        await navigator.share({
-          title: 'Spot the Bot - My Results',
-          text: shareText,
-        });
-      } else {
-        // Fallback to clipboard
-        await navigator.clipboard.writeText(shareText);
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
-      }
-    } catch (error) {
-      console.error('Error sharing:', error);
-      // Fallback to clipboard even if share fails
-      try {
-        await navigator.clipboard.writeText(shareText);
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
-      } catch (clipboardError) {
-        console.error('Clipboard error:', clipboardError);
-      }
-    }
-  };
-
-  // Handle share with friends button click
-  const handleShareWithFriends = async () => {
-    const shareText = generateFriendsShareMessage();
     
     try {
       if (navigator.share) {
@@ -247,7 +188,7 @@ Some of these AI images are getting scary good - it's actually a fun challenge! 
         setTimeout(() => setShowToast(false), 3000);
       }
     } catch (error) {
-      console.error('Error sharing with friends:', error);
+      console.error('Error sharing:', error);
       // Fallback to clipboard even if share fails
       try {
         await navigator.clipboard.writeText(shareText);
@@ -297,26 +238,23 @@ Some of these AI images are getting scary good - it's actually a fun challenge! 
     fetchLeaderboardPosition();
     setupRealtimeConnection();
     
-    // Play ending sound based on performance
-    const playEndingSound = () => {
-      if (session.correctCount >= 5) {
-        // Excellent performance (5-6 correct)
-        audio?.playSuccessSound();
-      } else if (session.correctCount >= 3) {
-        // Good performance (3-4 correct)
-        audio?.playSuccessSound();
-      } else {
-        // Poor performance (0-2 correct)
-        audio?.playFailureSound();
-      }
+    // Don't play ending sound after final round - let the game end naturally without additional audio
+    // The success/failure sounds during gameplay are sufficient feedback
+    
+    // Staggered animation sequence
+    const animationSequence = async () => {
+      // Show header first
+      setTimeout(() => setShowHeader(true), 100);
+      // Show first row (score and badge)
+      setTimeout(() => setShowFirstRow(true), 400);
+      // Show second row (rankings and buttons) after first row is visible
+      setTimeout(() => setShowSecondRow(true), 800);
     };
     
-    // Delay the sound slightly to let the component render
-    const soundTimeout = setTimeout(playEndingSound, 500);
+    animationSequence();
     
     // Cleanup on unmount
     return () => {
-      clearTimeout(soundTimeout);
       if (connectionRef.current) {
         connectionRef.current.disconnect();
       }
@@ -329,198 +267,152 @@ Some of these AI images are getting scary good - it's actually a fun challenge! 
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-6">
       <div className="max-w-md w-full space-y-6">
         {/* Header */}
-        <div className="text-center">
-          <div className="text-6xl mb-4">🎉</div>
+        <div className={`text-center transition-all duration-500 ${showHeader ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Challenge Complete!
           </h1>
           <p className="text-gray-600">
-            Here's how you did today
+            {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
           </p>
         </div>
 
-        {/* Score Display */}
-        <div className="bg-white rounded-lg p-6 shadow-lg">
-          <div className="text-center mb-4">
-            <div className="text-4xl font-bold text-indigo-600 mb-2">
-              {session.totalScore.toFixed(2)}
-            </div>
-            <div className="text-sm text-gray-500 uppercase tracking-wide">
-              Total Score {session.attemptNumber > 1 ? `(Attempt ${session.attemptNumber})` : ''}
-            </div>
-            
-            {/* Show improvement or best score context */}
-            {session.attemptNumber > 1 && playAttempts && (
-              <div className="mt-2">
-                {session.totalScore > playAttempts.bestScore ? (
-                  <div className="text-sm text-green-600 font-medium">
-                    🚀 Improved from {playAttempts.bestScore.toFixed(2)} points!
-                  </div>
-                ) : session.totalScore < playAttempts.bestScore ? (
-                  <div className="text-sm text-orange-600 font-medium">
-                    💪 Best today: {playAttempts.bestScore.toFixed(2)} points
-                  </div>
-                ) : (
-                  <div className="text-sm text-blue-600 font-medium">
-                    🎯 Matched your best score!
-                  </div>
-                )}
+        {/* Score and Badge - Horizontal Layout */}
+        <div className={`results-horizontal-layout transition-all duration-500 ${showFirstRow ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          {/* Score Display */}
+          <div className="bg-white rounded-lg p-6 shadow-lg">
+            <div className="text-center mb-4">
+              <div className="text-4xl font-bold text-indigo-600 mb-2">
+                {Math.round(session.totalScore)}
               </div>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-semibold text-green-600">
-                {session.correctCount}
-              </div>
-              <div className="text-xs text-gray-500">Correct Answers</div>
-            </div>
-            <div>
-              <div className="text-2xl font-semibold text-blue-600">
-                +{session.totalTimeBonus.toFixed(2)}
-              </div>
-              <div className="text-xs text-gray-500">Time Bonus</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Badge Display */}
-        <div className={`${badgeInfo.bgColor} rounded-lg p-6 text-center`}>
-          <div className="text-5xl mb-3">{badgeInfo.emoji}</div>
-          <h3 className={`text-xl font-bold ${badgeInfo.color} mb-2`}>
-            {badgeInfo.title}
-          </h3>
-          <p className="text-sm text-gray-700">
-            {badgeInfo.description}
-          </p>
-        </div>
-
-        {/* Inspirational Content - Daily rotating quotes and jokes */}
-        {inspirationalContent && (
-          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-6 text-center">
-            <div className="text-3xl mb-3">✨</div>
-            <p className="text-gray-700 italic leading-relaxed text-sm md:text-base">
-              "{inspirationalContent}"
-            </p>
-            <div className="text-xs text-gray-500 mt-2">
-              Daily inspiration • New content every day
-            </div>
-          </div>
-        )}
-
-        {/* Leaderboard Position */}
-        <div className="bg-white rounded-lg p-4 shadow-sm">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
               <div className="text-sm text-gray-500 uppercase tracking-wide">
-                Daily Leaderboard
+                Total Score {session.attemptNumber > 1 ? `(Attempt ${session.attemptNumber})` : ''}
               </div>
-              {isConnected && (
-                <div className="flex items-center">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse mr-1"></div>
-                  <span className="text-xs text-green-600">Live</span>
+              
+              {/* Show improvement or best score context */}
+              {session.attemptNumber > 1 && playAttempts && (
+                <div className="mt-2">
+                  {session.totalScore > playAttempts.bestScore ? (
+                    <div className="text-sm text-green-600 font-medium">
+                      🚀 Improved from {Math.round(playAttempts.bestScore)} points!
+                    </div>
+                  ) : session.totalScore < playAttempts.bestScore ? (
+                    <div className="text-sm text-orange-600 font-medium">
+                      💪 Best today: {Math.round(playAttempts.bestScore)} points
+                    </div>
+                  ) : (
+                    <div className="text-sm text-blue-600 font-medium">
+                      🎯 Matched your best score!
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
-              </div>
-            ) : leaderboardPosition ? (
+
+            <div className="grid grid-cols-2 gap-4 text-center">
               <div>
-                <div className="text-2xl font-bold text-indigo-600">
-                  #{leaderboardPosition}
+                <div className="text-2xl font-semibold text-green-600">
+                  {session.correctCount}
                 </div>
-                {totalParticipants && (
-                  <div className="text-sm text-gray-500">
-                    out of {totalParticipants.toLocaleString()} players
-                  </div>
-                )}
+                <div className="text-xs text-gray-500 leading-tight">
+                  Correct<br />Answers
+                </div>
               </div>
-            ) : (
-              <div className="text-gray-500">
-                Position not available
+              <div>
+                <div className="text-2xl font-semibold text-blue-600">
+                  +{Math.round(session.totalTimeBonus)}
+                </div>
+                <div className="text-xs text-gray-500 leading-tight">
+                  Time<br />Bonus
+                </div>
               </div>
-            )}
+            </div>
+          </div>
+
+          {/* Badge Display */}
+          <div className={`${badgeInfo.bgColor} rounded-lg p-6 text-center`}>
+            <div className="mb-3">
+              <div className="text-4xl mb-2">{badgeInfo.emoji}</div>
+              <h3 className={`text-xl font-bold ${badgeInfo.color}`}>
+                {badgeInfo.title}
+              </h3>
+            </div>
+            <p className="text-sm text-gray-700">
+              {badgeInfo.description}
+            </p>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="space-y-3">
-          {/* Enhanced Sharing Options */}
-          <div className="grid grid-cols-2 gap-3">
+
+
+        {/* Rankings and Action Buttons - Horizontal Layout */}
+        <div className={`results-horizontal-layout transition-all duration-500 ${showSecondRow ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          {/* Rankings Section */}
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="text-sm text-gray-500 uppercase tracking-wide">
+                  RANKINGS
+                </div>
+              </div>
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+                </div>
+              ) : leaderboardPosition ? (
+                <div>
+                  <div className="text-2xl font-bold text-indigo-600">
+                    #{leaderboardPosition}
+                  </div>
+                  {totalParticipants && (
+                    <div className="text-sm text-gray-500">
+                      out of {totalParticipants.toLocaleString()} players
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-gray-500">
+                  Position not available
+                </div>
+              )}
+              
+              {/* Integrated View Leaderboard Button */}
+              {onViewLeaderboard && (
+                <button
+                  onClick={onViewLeaderboard}
+                  className="mt-3 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+                >
+                  <span>🏆</span>
+                  View Leaderboard
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            {/* Challenge Friends Button */}
             <button
               onClick={handleShare}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
-            >
-              <span>📤</span>
-              Share Results
-            </button>
-            <button
-              onClick={handleShareWithFriends}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
             >
               <span>👥</span>
               Challenge Friends
             </button>
+
+            {/* Play Again Button - only show if attempts remain */}
+            {playAttempts && playAttempts.remainingAttempts > 0 && onPlayAgain && (
+              <button
+                onClick={onPlayAgain}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+              >
+                <span>🎮</span>
+                Play Again
+              </button>
+            )}
           </div>
-
-          {/* Play Again Button - only show if attempts remain */}
-          {playAttempts && playAttempts.remainingAttempts > 0 && onPlayAgain && (
-            <button
-              onClick={onPlayAgain}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
-            >
-              <span>🎮</span>
-              Play Again ({playAttempts.remainingAttempts} left)
-            </button>
-          )}
-
-          {onViewLeaderboard && (
-            <button
-              onClick={onViewLeaderboard}
-              className="w-full bg-white hover:bg-gray-50 text-gray-900 font-semibold py-3 px-6 rounded-lg border border-gray-300 transition-colors duration-200 flex items-center justify-center gap-2"
-            >
-              <span>🏆</span>
-              View Leaderboard
-            </button>
-          )}
-
-          {onPlayAgain && (
-            <button
-              onClick={onPlayAgain}
-              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
-            >
-              Back to Home
-            </button>
-          )}
         </div>
 
-        {/* Footer */}
-        <div className="text-center">
-          {playAttempts && playAttempts.remainingAttempts > 0 ? (
-            <div className="space-y-1">
-              <p className="text-xs text-gray-400">
-                {playAttempts.remainingAttempts} attempt{playAttempts.remainingAttempts === 1 ? '' : 's'} remaining today
-              </p>
-              <p className="text-xs text-indigo-600 font-medium">
-                {session.totalScore >= playAttempts.bestScore 
-                  ? 'Great score! Share with friends or try to beat it!' 
-                  : 'Think you can improve? Give it another shot!'}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-1">
-              <p className="text-xs text-gray-400">
-                All attempts used for today
-              </p>
-              <p className="text-xs text-indigo-600 font-medium">
-                Share your results and come back tomorrow for a new challenge!
-              </p>
-            </div>
-          )}
-        </div>
+
       </div>
 
       {/* Toast Notification */}

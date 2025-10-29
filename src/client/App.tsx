@@ -182,6 +182,7 @@ export const App = () => {
                   <LeaderboardTabs
                     currentUserId={session?.userId}
                     onClose={goBackFromLeaderboard}
+                    onBack={goBackFromLeaderboard}
                   />
                 </div>
               );

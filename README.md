@@ -2,35 +2,52 @@
 
 **Can you tell AI from reality?**
 
-Spot the Bot is an engaging daily challenge game built on Reddit's Devvit platform where players test their ability to distinguish between real photographs and AI-generated images. Each day brings a fresh set of 6 image pairs across 5 different categories (Animals, Architecture, Nature, Food, Products), challenging users to identify which image was created by a human versus artificial intelligence.
+Spot the Bot is an engaging daily challenge game built on Reddit's Devvit platform where players test their ability to distinguish between real photographs and AI-generated images. Each day brings a fresh set of 6 image pairs across 6 different categories (Animals, Architecture, Nature, Food, Products, Science), challenging users to identify which image is the REAL photograph (not AI-generated).
 
 This interactive React-based game runs directly within Reddit posts, providing a seamless gaming experience with real-time leaderboards, achievement badges, social sharing features, and simplified audio controls. Players compete against a 10-second timer each round and against each other in a daily test of visual perception and AI detection skills, with up to 2 attempts per day to achieve their best score.
 
-The game features a responsive mobile-first design optimized for Reddit's viewing experience, enhanced visual feedback with custom overlay indicators, simplified audio controls with one-click toggle functionality, comprehensive educational content system, and advanced timeout handling with improved visual feedback and extended learning opportunities.
+The game features a responsive mobile-first design optimized for Reddit's viewing experience, enhanced visual feedback with custom overlay indicators, simplified audio controls with one-click toggle functionality, comprehensive educational content system with midgame learning breaks, advanced timeout handling with extended learning opportunities, and smooth animated transitions throughout the user experience.
+
+## 🎯 What is Spot the Bot?
+
+**Spot the Bot** is a daily AI detection challenge game that tests your ability to distinguish between real photographs and AI-generated images. Built natively for Reddit using the Devvit platform, the game runs directly within Reddit posts and challenges players to identify which of two images is the REAL photograph (not AI-generated) across 6 rounds with 10-second timers.
+
+**Key Features:**
+- **Daily Fresh Content**: New image pairs generated every day across 6 categories (Animals, Architecture, Nature, Food, Products, Science)
+- **Educational Integration**: Midgame learning breaks with AI detection tips and fascinating facts about AI image generation, randomly selected from comprehensive libraries (50+ tips, 50+ facts)
+- **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings, plus up to 2 attempts per day with best score tracking
+- **Enhanced Audio Experience**: Background music and sound effects with simple one-click toggle controls (🎵/🔇), enhanced sound effects at 3.6x volume for clarity
+- **Reddit-Native Experience**: Seamless integration with Reddit accounts, no external apps or logins required
+- **Mobile-Optimized Design**: Responsive layout with vertical image stacking on mobile, transitioning to side-by-side at 480px breakpoint for optimal Reddit feed viewing
+- **Custom Visual Feedback**: Overlay indicators with colored circles, icons (✕ for AI, ✓ for Human), and clear labels show image sources
+- **Enhanced Border Styling**: Color-coded borders with glow effects - green (#46E870) for correct answers, red (#F23C3C) for incorrect answers
 
 ## 🎯 Current Game Status
 
 **Fully Functional & Production Ready** ✅
 
-The game is complete and ready for players with all core systems implemented:
+The game is complete and ready for players with all core systems implemented and recently enhanced with smooth animations:
 - **6-round gameplay** with 10-second timers and tier-based whole-number scoring system
-- **5 active image categories** (Animals, Architecture, Nature, Food, Products)
+- **6 active image categories** (Animals, Architecture, Nature, Food, Products, Science)
 - **Advanced timeout handling** with server-side processing, 3-second animated countdown, and extended learning feedback
-- **Simplified audio system** with one-click toggle controls (🎵/🔇), enhanced sound effects at 3x volume, and immediate session-start background music
+- **Optimized audio system** with one-click toggle controls (🎵/🔇), enhanced sound effects at 1.8x volume (recently reduced for better balance), balanced background music at 0.15x volume for clarity, and immediate session-start background music
 - **Educational content system** with fresh AI detection tips and facts randomly loaded from comprehensive libraries (50+ tips, 50+ facts)
 - **Real-time features** including live participant counts, leaderboard updates, and "Live" indicators via Devvit Realtime API
-- **Enhanced visual feedback** with custom overlay indicators (✕ for AI, ✓ for Human), colored borders with glow effects, and responsive mobile-first design
-- **Multiple daily attempts** (2 per day) with best score tracking, improvement notifications, and attempt context in sharing
+- **Enhanced visual feedback** with loading states during answer processing, prominent score display in header area, custom overlay indicators (✕ for AI, ✓ for Human), colored borders with glow effects, and responsive mobile-first design
+- **Smooth animated transitions** with staggered reveal animations on results screen for enhanced user experience
+- **Multiple daily attempts** (2 per day) with best score tracking, improvement notifications, and streamlined "Play Again" button
 - **Comprehensive error handling** with offline support, retry logic with exponential backoff, and graceful degradation
 - **Improved UI organization** with combined round/category labels, cleaner date display, and Reddit-optimized responsive layout
 
-## 🎮 What is Spot the Bot?
+## 🎮 Game Overview
 
 Spot the Bot is a **daily visual challenge game** that tests your ability to distinguish between real photographs and AI-generated images. Built as a React web application that runs natively within Reddit posts using the Devvit platform, the game presents players with image comparisons where they must identify which image is the REAL photograph (not the AI-generated one).
 
+The game features a modern, streamlined interface with dynamic date display that automatically shows the current date in a clean format on both the splash screen and results screen. Players experience enhanced visual feedback throughout their journey, from the initial splash screen through the final results display, with custom overlay indicators, colored borders, smooth loading states, and simplified audio controls that provide immediate feedback on their choices.
+
 ### Core Game Mechanics
 - **6 rounds per game** with exactly 10 seconds per round and immediate visual feedback
-- **5 active image categories**: Animals, Architecture, Nature, Food, and Products (Science category infrastructure ready)
+- **6 active image categories**: Animals, Architecture, Nature, Food, Products, and Science
 - **Reddit-optimized responsive design**: Images displayed in a responsive grid that adapts from vertical stack on mobile to horizontal side-by-side at 480px breakpoint for optimal Reddit feed viewing
 - **Tier-based scoring system**: 10 points per correct answer + time bonuses (5 points for 7-10 seconds, 3 points for 4-6 seconds, 1 point for 1-3 seconds, 0 points for 0 seconds)
 - **Multiple attempts per day**: Players can attempt the challenge up to 2 times per day with best score tracking and improvement notifications (unlimited in development mode)
@@ -42,17 +59,42 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 
 ## 🎮 Current Game Implementation
 
-Based on the latest code analysis, Spot the Bot is a fully functional AI detection game with the following implemented features:
+Based on the latest code analysis, Spot the Bot is a fully functional AI detection game with a modern, polished interface featuring the following implemented features:
 
 ### Complete Game Flow
-- **Splash Screen**: Welcome screen with live participant counter, remaining attempts display, and best score tracking
+- **Splash Screen**: Welcome screen with game instructions, current date display, and "Start Playing" button
 - **6-Round Gameplay**: Each round presents two images (one real, one AI-generated) with 10-second timer and combined round/category labels
-- **Educational Break**: After round 3, players receive fresh AI detection tips and facts randomly selected from comprehensive content libraries (50 tips, 50 facts)
-- **Results Screen**: Final scoring with badge achievement, leaderboard position, inspirational content, and enhanced social sharing options
-- **Real-Time Features**: Live participant counts and leaderboard updates via Devvit Realtime API with "Live" indicators
+- **Educational Break**: After round 3, players receive fresh AI detection tips and facts randomly selected from comprehensive content libraries (50+ tips, 50+ facts)
+- **Results Screen**: Modern results display with "Challenge Complete!" header, dynamic date formatting, final scoring with badge achievement, leaderboard position, inspirational content, enhanced social sharing options, and smooth staggered animations for improved user experience
+- **Leaderboard View**: Comprehensive leaderboard with daily, weekly, and all-time rankings featuring top 10 display with smart user positioning
+
+### Enhanced User Experience
+- **Loading State Management**: Comprehensive loading indicators during answer processing with spinner animations and status messages
+- **Custom Visual Feedback**: Overlay indicators appear only on selected images during feedback, showing colored circles with icons (✕ for AI, ✓ for Human) and clear labels
+- **Responsive Image Layout**: Mobile-first design with images stacked vertically on mobile devices, transitioning to side-by-side comparison at 480px breakpoint for optimal Reddit feed viewing
+- **Enhanced Border Styling**: Color-coded borders (green #46E870 for correct, red #F23C3C for incorrect) with subtle glow effects and consistent 20px rounded corners
+- **Advanced Timeout Handling**: Server-side timeout processing with 3-second animated countdown, "Time's Up!" message, and extended learning feedback showing correct answers
+- **Smooth Animations**: Staggered reveal animations on results screen with header appearing first, followed by score/badge section, then rankings/actions for enhanced visual flow
+
+### Current Visual Design
+- **Modern Interface**: Clean, polished design with streamlined visual hierarchy and "Challenge Complete!" header
+- **Dynamic Date Display**: Current date shown in clean format using JavaScript's toLocaleDateString for accurate, real-time formatting
+- **Enhanced Visual Hierarchy**: Streamlined layout with better spacing and typography
+- **Consistent Branding**: Clean, modern theme throughout the interface emphasizing the AI detection challenge
+- **Loading State Feedback**: Comprehensive loading indicators during answer processing with spinner and status messages
+- **Custom Overlay System**: Selective overlay indicators that appear only on selected images during feedback with clear AI/Human labeling
+
+### Simplified Audio System
+- **One-Click Controls**: Simple toggle button (🎵/🔇) positioned in top-right corner for instant audio enable/disable
+- **Real-Time Audio Management**: Audio changes take effect immediately during gameplay without requiring restart
+- **Enhanced Sound Effects**: Success/failure sounds at 1.8x volume (recently reduced from 3.6x for better balance) for clear audibility above background music
+- **Balanced Background Music**: Background music at reduced volume (0.15x) to ensure sound effects are clearly audible
+- **Immediate Background Music**: Background music starts automatically when audio system initializes (if enabled)
+- **Graceful Degradation**: Game works perfectly even when audio files are unavailable with comprehensive error handling
+- **Persistent Preferences**: Audio settings saved to localStorage and maintained throughout game sessions
 
 ### Advanced Timeout System
-The game features sophisticated timeout handling that was recently enhanced:
+The game features sophisticated timeout handling:
 - **Server-Side Processing**: When time expires, the game submits a timeout request to the server using the wrong answer with 0 time remaining to ensure proper incorrect scoring and accurate game state management
 - **Extended Visual Feedback**: 3-second animated countdown with "Time's Up!" message displayed prominently, with highlighted correct answer showing overlay indicators for enhanced learning
 - **Proper State Management**: Server maintains accurate game session state even during timeout scenarios with comprehensive validation and proper round progression
@@ -61,67 +103,61 @@ The game features sophisticated timeout handling that was recently enhanced:
 - **Learning Enhancement**: Extended viewing time (3 seconds) helps players understand AI detection patterns from missed opportunities with clear visual indicators
 - **Error Handling**: Comprehensive fallback mechanisms ensure smooth gameplay during network issues with graceful degradation and proper timeout handling
 
-### Simplified Audio System
-- **One-Click Controls**: Simple toggle button (🎵/🔇) positioned in top-right corner, replacing complex dropdown controls with immediate state changes
-- **Real-Time Audio Control**: Audio changes take effect immediately during gameplay without requiring restart or page refresh, with localStorage persistence
-- **Enhanced Sound Effects**: Success/failure sounds at 3x volume (volume * 3.6) for clear audibility above background music, with audio toggle compliance
-- **Session-Level Audio**: Background music starts immediately when audio system initializes (if enabled) and continues throughout entire session with proper lifecycle management
-- **Smart Audio Management**: Improved background music initialization with tracking guards, automatic playback control, and audio context unlocking on user interaction
-- **Graceful Degradation**: Game works perfectly even when audio files are unavailable with comprehensive validation, development tools, and fallback handling
-
 ### Enhanced Visual Feedback System
 - **Custom Overlay Indicators**: Selected images show circular overlays with white icons (✕ for AI, ✓ for Human) and clear labels ("AI" or "Human")
 - **Enhanced Border Styling**: Color-coded borders (green #46E870 for correct, red #F23C3C for incorrect) with 30% opacity glow effects
 - **Mobile-First Responsive Layout**: Images adapt from single column on mobile to side-by-side on desktop with consistent 1:1 aspect ratio
 - **Smart Visual States**: Clear progression from default → selection → feedback states with smooth transitions and 20px rounded corners
 
-## 🌟 What Makes This Game Innovative
+## 🌟 What Makes This Game Innovative & Unique
+
+Spot the Bot stands out as a pioneering AI detection game that combines entertainment with practical digital literacy skills. Here's what makes it truly innovative:
 
 ### Cutting-Edge AI Detection Challenge
-- **Daily Fresh Content**: New image sets generated every day at 00:00 UTC with completely randomized categories, AI placement, and difficulty progression across 5 diverse image categories (Animals, Architecture, Nature, Food, Products)
-- **Real-Time Social Competition**: Live participant counter shows how many players have attempted today's challenge, with real-time updates as new players join via Devvit's Realtime API and "Live" indicators
+- **Daily Fresh Content**: New image sets generated every day with completely randomized categories, AI placement, and difficulty progression across 6 diverse image categories (Animals, Architecture, Nature, Food, Products, Science)
 - **Intelligent Scoring Algorithm**: Sophisticated tier-based scoring system rewards both accuracy (10 points per correct answer) and speed (5/3/1/0 bonus points based on remaining time), creating strategic tension between careful analysis and quick decisions under intense 10-second time pressure
 - **Educational Integration**: Midgame learning break after round 3 provides AI detection tips and fascinating facts about AI image generation with fresh content randomly selected for each game session from comprehensive libraries (50+ tips, 50+ facts)
-- **Immersive Audio Experience**: Background music starts immediately when enabled, contextual sound effects at enhanced volume (3x) for clarity, simplified one-click toggle controls (🎵/🔇) with real-time state changes, and graceful degradation when audio files are unavailable
+- **Immersive Audio Experience**: Background music starts immediately when enabled at balanced volume (0.15x), contextual sound effects at enhanced volume (3.6x) for clarity, simplified one-click toggle controls (🎵/🔇) with real-time state changes, and graceful degradation when audio files are unavailable
 
-### Reddit-Native Gaming Experience
-- **Seamless Integration**: Built specifically for Reddit using Devvit platform, running directly within Reddit posts without external redirects
-- **Native Authentication**: Automatic user authentication through Reddit accounts, no separate login required
-- **Community-Driven**: Designed for Reddit's social environment with built-in sharing, leaderboards, and community competition
-- **Mobile-Optimized**: Responsive design specifically tailored for Reddit's mobile-heavy user base with touch-friendly controls
+### First-of-Its-Kind Reddit-Native Gaming Experience
+- **Revolutionary Platform Integration**: The first comprehensive AI detection game built natively for Reddit using Devvit platform, running directly within Reddit posts without external redirects or app downloads
+- **Zero-Friction Authentication**: Automatic user authentication through Reddit accounts eliminates barriers to entry - no separate login, registration, or account creation required
+- **Community-Centric Design**: Purpose-built for Reddit's social environment with integrated sharing, real-time leaderboards, and community competition that leverages Reddit's existing social graph
+- **Mobile-First Reddit Optimization**: Responsive design specifically tailored for Reddit's mobile-heavy user base with touch-friendly controls and 480px breakpoint optimized for Reddit feed viewing
 
-### Advanced Visual Intelligence Testing
-- **Sophisticated AI Detection**: Uses real AI-generated images from modern models, providing authentic training for spotting deepfakes and synthetic content
-- **Multi-Category Challenge**: Tests detection skills across diverse image types (Animals, Architecture, Nature, Food, Products) each with unique AI tells
-- **Progressive Learning**: Educational content system teaches players to identify specific AI artifacts and patterns
-- **Real-World Relevance**: Builds practical skills for identifying AI-generated content in an era of increasing synthetic media
+### Advanced Visual Intelligence Testing with Real-World Impact
+- **Authentic AI Detection Training**: Uses real AI-generated images from modern models (not simulated content), providing genuine training for spotting deepfakes and synthetic media in the wild
+- **Multi-Dimensional Challenge System**: Tests detection skills across 6 diverse image categories each with unique AI artifacts and tells, creating a comprehensive visual intelligence assessment
+- **Adaptive Learning Integration**: Midgame educational breaks provide fresh AI detection tips and facts randomly selected from comprehensive libraries, ensuring varied learning experiences across multiple sessions
+- **Critical Digital Literacy**: Builds practical, transferable skills for identifying AI-generated content in an era of increasing synthetic media, deepfakes, and misinformation
 
-### Reddit-Optimized Visual Design
-- **Custom Overlay Indicators**: Selected images show circular overlays (80px desktop, 70px mobile) with white icons (✕ for AI, ✓ for Human) and clear labels ("AI" or "Human") positioned at center with proper z-index layering
-- **Enhanced Border Styling**: Colored borders with 3px thickness - green (#46E870) for correct answers, red (#F23C3C) for incorrect answers, both with 30% opacity glow effects and rounded corners (20px border radius)
-- **Reddit Feed Responsive Layout**: Images displayed in responsive grid optimized for Reddit's viewing experience - single column on mobile transitioning to side-by-side at 480px breakpoint (max-width 600px, centered) for optimal Reddit feed integration
-- **Smart Visual States**: Clear visual progression from default state → selection state → feedback state with smooth transitions (0.2s ease-in-out), consistent 1:1 aspect ratio maintained with object-fit cover, and proper hover effects
+### Revolutionary User Experience Features
+- **Custom Visual Feedback**: Overlay indicators with colored circles (80px desktop, 70px mobile), icons (✕ for AI, ✓ for Human), and clear labels provide immediate understanding of image sources
+- **Enhanced Border Styling**: Color-coded borders with 3px thickness - green (#46E870) for correct answers, red (#F23C3C) for incorrect answers, both with 30% opacity glow effects and 20px rounded corners
+- **Responsive Design**: Mobile-first approach with images stacked vertically on mobile, transitioning to side-by-side at 480px breakpoint optimized for Reddit feeds (max-width 600px, centered)
+- **Loading State Management**: Comprehensive loading indicators during answer processing with spinner animations and feedback for better user experience
+- **Advanced Timeout Handling**: Server-side timeout processing with 3-second animated countdown, "Time's Up!" message, and extended learning feedback showing correct answers with visual indicators
+- **Multiple Daily Attempts**: Up to 2 attempts per day with best score tracking, improvement notifications, and attempt context in sharing messages
+- **Polished Animations**: Smooth staggered reveal animations on results screen create an engaging, professional user experience with timed transitions
 
 ### Advanced Audio System
 - **One-Click Audio Toggle**: Simple music icon button (🎵/🔇) positioned in top-right corner to instantly enable or disable all audio with immediate effect and localStorage persistence
 - **Real-Time Audio Control**: Audio changes take effect immediately during gameplay without requiring restart or page refresh, with synchronous state updates
-- **Enhanced Sound Effects**: Success and failure sounds at 3x volume (volume * 3.6) for clear audibility above background music, with audio toggle compliance
-- **Session-Level Audio**: Background music starts immediately when audio system initializes (if enabled) with proper lifecycle management and initialization tracking
-- **Smart Audio Context Management**: Automatic audio context unlocking on user interaction to comply with browser autoplay policies, with retry mechanisms
-- **Silent Timeout Feedback**: No audio effects during timeout scenarios to avoid misleading players about performance
-- **Graceful Degradation**: Game works perfectly even when audio files are unavailable with comprehensive error handling, development tools, and fallback mechanisms
+- **Enhanced Sound Effects**: Success and failure sounds at 1.8x volume (recently reduced from 3.6x for better balance) for clear audibility above background music, with audio toggle compliance
+- **Session-Level Audio**: Background music starts immediately when audio system initializes (if enabled) with proper lifecycle management
+- **Graceful Degradation**: Game works perfectly even when audio files are unavailable with comprehensive error handling and fallback mechanisms
 
 ### Advanced Social & Community Features
 - **Dynamic Achievement System**: Earn performance-based badges with custom emoji and descriptions from 🤖 AI Whisperer (perfect score) to 🎓 Human in Training (learning mode)
-- **Multi-Tier Live Leaderboards**: Real-time daily, weekly, and all-time rankings with live position updates, user highlighting, and total participant tracking
-- **Enhanced Social Sharing**: Two sharing modes - general results sharing and friend challenge sharing with personalized messages, attempt tracking, and improvement notifications
+- **Multi-Tier Leaderboards**: Daily, weekly, and all-time rankings with user highlighting and total participant tracking
+- **Enhanced Social Sharing**: Friend challenge sharing with personalized messages, attempt tracking, and improvement notifications
 - **Community-Driven Competition**: Built natively for Reddit with automatic user authentication, username display, and seamless social features
 
 ### Technical Innovation & User Experience
 - **Serverless Architecture**: Built on Devvit's modern serverless platform with Redis persistence for game state, session management, and leaderboard data
 - **Comprehensive Error Resilience**: Advanced error boundaries, network retry logic with exponential backoff, offline detection, and graceful degradation with local caching and fallback mechanisms
-- **Reddit-Optimized Responsive Design**: Touch-optimized interface with adaptive layouts specifically designed for Reddit's mobile-heavy user base, with 480px breakpoint optimized for Reddit feed viewing and mobile-first approach
-- **Anti-Cheat Protection**: Server-side timer validation with 3-second tolerance, rate limiting, session integrity checks, comprehensive input validation, and abuse detection to ensure fair play
+- **Reddit-Optimized Responsive Design**: Touch-optimized interface with adaptive layouts specifically designed for Reddit's mobile-heavy user base
+- **Anti-Cheat Protection**: Server-side timer validation, rate limiting, session integrity checks, comprehensive input validation, and abuse detection to ensure fair play
 - **Progressive Web App Features**: Offline support with smart caching, pending request queuing, automatic retry when connection is restored, and comprehensive error handling
 
 ## 🎯 Step-by-Step: How to Play
@@ -129,25 +165,29 @@ The game features sophisticated timeout handling that was recently enhanced:
 ### Getting Started
 1. **Find the Game**: Look for Spot the Bot posts in participating subreddits or communities where the app is installed
 2. **Launch the App**: Click the "Launch App" button in the Reddit post to open the game in full-screen webview mode
-3. **Welcome Screen**: You'll see today's date (in shorter format showing just month and day), game instructions explaining the 6-round format with 10-second timers, and scoring system details
+3. **Welcome Screen**: You'll see today's date (dynamically formatted showing month and day), game instructions explaining the 6-round format with 10-second timers, and scoring system details
 4. **Audio Setup**: Optional - the audio system initializes automatically with background music starting immediately if enabled. Use the audio toggle button (🎵/🔇) in the top-right corner to enable/disable background music and sound effects at any time during gameplay
-5. **Join the Challenge**: Click "Start Playing" to begin your daily challenge and automatically register as a participant
+5. **Join the Challenge**: Click "Start Playing!" to begin your daily challenge and automatically register as a participant
 
 ### Complete Game Flow
 
-#### Pre-Game Setup
+#### Pre-Game Setup (Splash Screen)
 The splash screen welcomes you with:
-- **Daily Challenge Display**: Shows the current date in a clean format (month and day) with the game title and description
-- **Game Rules Overview**: Clear instructions explaining the 6-round format, 10-second time limits, and scoring system
-- **Start Playing Button**: Large, prominent button to begin your daily challenge
+- **Daily Challenge Display**: Shows the current date in a clean format (month and day) with the game title "Spot the Bot" and tagline "Can you tell AI from reality?"
+- **Game Rules Overview**: Clear instructions explaining the 6-round format, 10-second time limits, and scoring system with numbered steps:
+  1. Pick the REAL photo from 6 pairs
+  2. 10 seconds per round
+  3. Faster = higher score!
+- **Audio System**: Optional audio toggle (🎵/🔇) in the top-right corner for background music and sound effects
+- **Start Playing Button**: Large, prominent "Start Playing!" button to begin your daily challenge
 
 #### Round-by-Round Gameplay (6 Rounds Total)
 
 **Each Round Structure:**
-- **Combined Round Info**: See round number and category together (e.g., "Round 1 of 6 (Category: Animals)") displayed in a fixed header at the top-left for cleaner organization
+- **Combined Round Info**: See round number and category together (e.g., "ROUND 1 OF 6 (Animals)") displayed in a fixed header at the top-left for cleaner organization
 - **Image Comparison**: Two images displayed - one real photograph, one AI-generated
   - **Mobile Layout**: Images stacked vertically in a single column for easy thumb navigation (max-width 400px, centered)
-  - **Reddit Feed Layout**: At 480px and above, images transition to side-by-side comparison optimized for Reddit's viewing experience (max-width 600px, centered)
+  - **Desktop Layout**: At 480px and above, images transition to side-by-side comparison optimized for Reddit's viewing experience (max-width 600px, centered)
   - **Visual Design**: All images maintain 1:1 aspect ratio with 20px rounded corners and consistent spacing
 - **10-Second Timer**: Color-coded countdown timer with progress bar:
   - **Green** (7-10 seconds): Plenty of time to analyze
@@ -155,52 +195,32 @@ The splash screen welcomes you with:
   - **Red** (1-3 seconds): Choose quickly!
 
 **Making Your Selection:**
-1. **Analyze Both Images**: Look for AI tells like unnatural lighting, impossible geometry, or weird details
+1. **Analyze Both Images**: Look for AI tells like unnatural lighting, impossible geometry, extra fingers, or weird details
 2. **Click to Choose**: Click on the image you believe is the REAL photograph (not AI-generated)
-3. **Loading State**: See a loading spinner while your answer is being processed
+3. **Loading State**: See a loading spinner and "Checking your answer..." message while your answer is being processed
 4. **Immediate Visual Feedback**: See the correct answer with enhanced visual indicators:
    - **Overlay Indicators**: Selected images show circular overlays (80px on desktop, 70px on mobile) with white icons (✕ for AI, ✓ for Human) and clear labels ("AI" or "Human")
    - **Border Feedback**: Green borders (#46E870) for correct answers or red borders (#F23C3C) for incorrect answers, both with subtle glow effects and 20px rounded corners
    - **Non-Selected Images**: Show subtle border outlines indicating their source without overlays
 5. **Score Display**: See your round score prominently displayed in the header area as whole numbers (e.g., "+13 points" in green or "No points" in red)
-6. **Auto-Advance**: Game automatically moves to the next round after 2 seconds
+6. **Audio Feedback**: Success or failure sounds play (if audio enabled) to reinforce your performance
+7. **Auto-Advance**: Game automatically moves to the next round after 2 seconds
 
 **Enhanced Timeout Handling:**
-- **Server-Side Timeout Processing**: When time expires, the game submits a timeout request to the server using the wrong answer with 0 time remaining to maintain proper game state and scoring
-- **Extended Feedback Duration**: Timeout scenarios display correct answer for 3 seconds with animated countdown timer replacing the normal timer display
-- **Clear Visual Indication**: "Time's Up!" message replaces the round question, with animated countdown timer displayed prominently for better visual clarity
-- **Fair Scoring**: Timeout results in 0 points and counts as incorrect for accurate badge calculation with server-side validation
-- **Silent Feedback**: No audio effects during timeout scenarios to avoid misleading players about performance
-- **Learning Opportunity**: Extended viewing time (3 seconds) helps players learn AI detection patterns from missed opportunities with clear visual indicators
-- **Visual Feedback**: Correct answer shown with overlay indicators (✕ for AI, ✓ for Human) and colored borders for both selected and non-selected images
-- **Proper Game Progression**: Server maintains accurate session state even during timeout scenarios with comprehensive error handling and fallback mechanisms
+- **Server-Side Processing**: When time expires, the game submits a timeout request to maintain proper game state and scoring
+- **Extended Feedback Duration**: Timeout scenarios display correct answer for 3 seconds with animated countdown timer
+- **Clear Visual Indication**: "Time's Up!" message replaces the round question, with animated countdown displayed prominently
+- **Fair Scoring**: Timeout results in 0 points and counts as incorrect for accurate badge calculation
+- **Silent Feedback**: No audio effects during timeout scenarios to avoid misleading players
+- **Learning Opportunity**: Extended viewing time (3 seconds) helps players learn AI detection patterns with clear visual indicators
 
 #### Educational Break (After Round 3)
 Halfway through the game, you'll receive a focused learning break:
 - **AI Detection Tips**: Practical advice for spotting AI-generated images (randomly selected from 50+ tips)
 - **AI Facts**: Fascinating insights about AI image generation technology (randomly selected from 50+ facts)
 - **Fresh Content Each Session**: New educational content provided for every game session
-- **Streamlined Design**: Clean, focused presentation with progress indicator showing 3 of 6 rounds complete
-- **Continue Button**: "Continue Playing!" to resume gameplay
-
-#### Enhanced Visual Feedback System
-- **Loading State Indicators**: Clear loading spinner and "Checking your answer..." message during answer submission
-- **Prominent Score Display**: Round scores appear prominently in the header area with color-coded feedback:
-  - **Points Earned**: Green text showing "+X points" when you score points
-  - **No Points**: Red text showing "No points" when you don't score
-- **Smooth State Transitions**: Clear visual progression from selection → loading → feedback → next round
-- **Improved User Experience**: Players always know what's happening during answer processing
-
-#### Simplified Audio Experience (Optional)
-- **Background Music**: Atmospheric music that starts immediately when the audio system initializes (if enabled) and continues throughout the session with proper lifecycle management
-- **Enhanced Sound Effects**: Success/failure sounds for correct/incorrect answers at 3x volume for clear audibility above background music
-- **One-Click Audio Toggle**: Simple music icon button (🎵/🔇) positioned in top-right corner to instantly enable/disable all audio with immediate effect and real-time state changes
-- **Real-Time Audio Control**: Audio changes take effect immediately during gameplay without requiring restart or page refresh, with synchronous state updates
-- **Session-Level Audio**: Audio preference maintained throughout your entire game session with localStorage persistence and initialization tracking
-- **Smart Audio Management**: Improved background music lifecycle with initialization guards, automatic playback control, and audio context unlocking on user interaction
-- **Graceful Degradation**: Game works perfectly even if audio files are unavailable, with comprehensive audio validation, development tools, and fallback mechanisms
-- **Audio Context Management**: Smart audio unlocking on user interaction to comply with browser autoplay policies with retry mechanisms
-- **Silent Timeout Feedback**: No audio effects during timeout scenarios to avoid misleading players about performance
+- **Progress Indicator**: Shows 3 of 6 rounds complete with visual progress bar
+- **Continue Button**: "Continue Playing!" to resume gameplay for rounds 4-6
 
 #### Scoring System
 - **Base Points**: 10 points for each correct identification
@@ -216,48 +236,40 @@ Halfway through the game, you'll receive a focused learning break:
 
 #### Badge Achievement System
 Your final performance determines your badge:
-- 🤖 **AI Whisperer** (6/6 correct): "Perfect score! You can spot AI-generated content with incredible accuracy"
-- 🕵️ **AI Detective** (5/6 correct): "Outstanding! You have excellent skills at detecting AI-generated content"
-- 👁️ **Good Samaritan** (4/6 correct): "Excellent work! You have a keen eye for distinguishing real from artificial"
-- 👤 **Just Human** (3/6 correct): "Not bad! You're getting the hang of spotting AI-generated images"
-- 🎓 **Human in Training** (≤2/6 correct): "Keep practicing! AI detection skills take time to develop"
+- **🤖 AI Whisperer** (6/6 correct): Perfect score! Incredible accuracy.
+- **🕵️ AI Detective** (5/6 correct): Outstanding detection skills!
+- **👁️ Good Samaritan** (4/6 correct): Excellent eye for detail!
+- **👤 Just Human** (3/6 correct): Getting the hang of it!
+- **🎓 Human in Training** (0-2/6 correct): Keep practicing!
 
-#### Final Results Screen
-After completing all 6 rounds:
-- **Total Score**: Your final score displayed prominently with attempt number if multiple attempts
-- **Performance Breakdown**: Correct answers (X/6) and total time bonus earned
-- **Badge Achievement**: Large badge display with custom emoji, title, and description based on performance:
-  - 🤖 **AI Whisperer** (6/6 correct): "Perfect score! You can spot AI-generated content with incredible accuracy"
-  - 🕵️ **AI Detective** (5/6 correct): "Outstanding! You have excellent skills at detecting AI-generated content"
-  - 👁️ **Good Samaritan** (4/6 correct): "Excellent work! You have a keen eye for distinguishing real from artificial"
-  - 👤 **Just Human** (3/6 correct): "Not bad! You're getting the hang of spotting AI-generated images"
-  - 🎓 **Human in Training** (≤2/6 correct): "Keep practicing! AI detection skills take time to develop"
-- **Leaderboard Position**: Your rank among all daily players with live updates via real-time connection
-- **Inspirational Content**: Fresh quotes and motivational messages loaded from server content for each session
-- **Improvement Tracking**: Shows score improvements from previous attempts and best score context
-- **Attempt Status**: Displays remaining attempts and encourages replay if attempts are available
+#### Results Screen Experience
+After completing your challenge, you'll see:
+- **Animated Header**: Modern "Challenge Complete!" title with current date that smoothly fades in first
+- **Achievement Celebration**: Your badge and score prominently displayed with improvement tracking and attempt context, appearing in the second animation wave
+- **Leaderboard Position**: Your rank among all daily players with total participant count
+- **Inspirational Content**: Fresh motivational quotes or humorous content loaded from server libraries
+- **Enhanced Sharing Options** (appearing in the final animation wave): 
+  - **Challenge Friends**: Share personalized messages with attempt tracking and improvement notifications
+  - **View Leaderboard**: See daily, weekly, and all-time rankings
+  - **Play Again**: Available if you have remaining attempts (up to 2 per day) with streamlined button text
+- **Smooth Transitions**: Staggered animations create a polished, engaging results reveal experience
 
-#### Social Sharing Options
-**📤 Share Results**: Standard performance summary with score, badge, rank, and attempt context
-**👥 Challenge Friends**: Personalized message with friendly challenge invitation and attempt tracking
+#### Simplified Audio Experience (Optional)
+- **Background Music**: Atmospheric music that starts immediately when enabled and continues throughout the session
+- **Enhanced Sound Effects**: Success/failure sounds for correct/incorrect answers at 1.8x volume (recently reduced for better balance) for clear audibility
+- **One-Click Audio Toggle**: Simple music icon button (🎵/🔇) positioned in top-right corner to instantly enable/disable all audio
+- **Real-Time Audio Control**: Audio changes take effect immediately during gameplay without requiring restart
+- **Session-Level Audio**: Audio preference maintained throughout your entire game session
+- **Graceful Degradation**: Game works perfectly even if audio files are unavailable
 
-Both modes support:
-- **Native Sharing**: Uses device's built-in sharing API on mobile devices
-- **Clipboard Fallback**: Automatic copy-to-clipboard with toast notification confirmation
-- **Smart Messaging**: Different messages based on attempt number, score improvements, and remaining attempts
-- **Encouragement Context**: Messages adapt based on whether you can still play again or have used all attempts
-- **Improvement Notifications**: Shows score improvements from previous attempts when applicable
-- **Contextual Challenges**: Friend challenges include information about remaining attempts and best scores
+### Daily Challenge Features
+- **Fresh Content Daily**: New image pairs generated every day across all 6 categories
+- **Multiple Attempts**: Up to 2 attempts per day with best score tracking
+- **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings
+- **Social Sharing**: Challenge friends with personalized messages including your scores and improvement
+- **Educational Value**: Learn practical AI detection skills through gameplay and educational content
 
-#### Multi-Tier Leaderboard System
-- **Daily Leaderboard**: Compete against all players for today (resets at 00:00 UTC)
-- **Weekly Rankings**: Top performers over the past 7 days
-- **All-Time Champions**: Highest scores since launch
-- **Live Updates**: Real-time position changes with green "Live" indicator via Devvit Realtime API
-- **Detailed Stats**: Username, score, correct count (✅ X/6), time bonus (⚡ +XX.XX), and badge emoji
-- **User Highlighting**: Your own entry is highlighted with special styling and "(You)" indicator
-- **Rank Medals**: Top 3 positions display gold 🥇, silver 🥈, and bronze 🥉 medals
-- **Real-Time Notifications**: Live updates when new players join or rankings change
+
 
 ### Game Rules & Fair Play
 
@@ -321,7 +333,7 @@ Both modes support:
 #### Real-time & Social Features
 - **Live Updates**: Real-time participant counting and leaderboard updates via Devvit Realtime API
 - **Multi-tier Leaderboards**: Daily, weekly, and all-time rankings with live position updates
-- **Enhanced Sharing**: Two sharing modes (general results and friend challenges) with personalized messages
+- **Enhanced Sharing**: Friend challenge sharing with personalized messages and attempt tracking
 - **Community Integration**: Built natively for Reddit with automatic user authentication
 
 #### User Experience & Design
@@ -358,7 +370,7 @@ The game is **fully functional and production-ready** with all core systems impl
 - **Reddit-optimized responsive design** with mobile-first approach and 480px breakpoint for optimal Reddit feed viewing
 - Anti-cheat protection and play limit enforcement
 
-#### Recent Updates ⚡
+#### Recent Updates ⏱️
 - **Enhanced Visual Feedback System**: Improved round feedback display with loading states during answer submission and prominent score display in the header area
 - **Educational Content Streamlining**: Simplified midgame learning break with cleaner, more focused presentation and removed redundant instructional text
 - **UI Organization Improvements**: Combined round number and category information into a single, cleaner label format (e.g., "Round 1 of 6 (Category: Animals)") positioned on the left side using formatRoundLabel utility
@@ -367,6 +379,8 @@ The game is **fully functional and production-ready** with all core systems impl
 - **Enhanced Timeout Handling**: Added "Time's Up!" message display in place of timer with improved visual layout, 3-second animated countdown for better visual clarity, and proper visual feedback
 - **Responsive Layout Optimization**: Updated image container layout with Reddit-optimized breakpoints (480px transition) for better Reddit feed integration and mobile-first design
 - **Enhanced Visual Consistency**: Improved spacing and sizing with consistent overlay indicators (80px desktop, 70px mobile) across all screen sizes
+- **Modern Icon Updates**: Replaced lightning bolt (⚡) icons with timer emoji (⏱️) for time bonus displays throughout the interface for better visual clarity
+- **Whole Number Scoring**: Updated all score displays to show whole numbers without decimal places for cleaner, easier-to-read results
 
 #### In Development 🚧
 - **Science Category**: Image content for the 6th category (infrastructure ready, awaiting image uploads)
@@ -378,13 +392,15 @@ The game is **fully functional and production-ready** with all core systems impl
 
 ## 🎨 Recent Updates & Enhancements
 
-### 🔥 Latest Update: Enhanced Audio System & UI Improvements
-The game recently received significant audio system improvements and UI enhancements based on user feedback, including improved timeout visual layout:
+### 🔥 Latest Update: Optimized Audio Balance & Enhanced Sound Experience
+The game recently received significant audio system improvements and UI enhancements based on user feedback, including improved timeout visual layout and modern interface updates. **Most Recent Change**: Background music volume has been reduced from 0.3x to 0.15x (50% reduction) to ensure sound effects at 3.6x volume remain clearly audible and prominent during gameplay.
 
 **Latest Audio System Improvements:**
 - **Simplified Audio Controls**: Replaced complex dropdown controls with simple one-click toggle button (🎵/🔇) positioned in top-right corner
 - **Real-Time Audio Control**: Audio changes take effect immediately during gameplay without requiring restart, with synchronous state updates and localStorage persistence
-- **Enhanced Sound Effects**: Success and failure sounds increased to 3x volume (volume * 3.6) for better audibility above background music with audio toggle compliance
+- **Enhanced Sound Effects**: Success and failure sounds increased to 3.6x volume (volume * 3.6) for better audibility above background music with audio toggle compliance
+- **Balanced Background Music**: Background music volume reduced to 0.15x (half of previous 0.3x) to ensure sound effects remain prominent and clear
+- **Improved Audio Loop Handling**: Enhanced background music loop management with proper volume respect during loop transitions
 - **Immediate Audio Playback**: Background music starts immediately when audio system initializes (if enabled) with proper lifecycle management and initialization tracking
 - **Smart Background Music Management**: Improved lifecycle management with initialization guards, automatic playback control, and audio context unlocking on user interaction
 - **Graceful Degradation**: Game works perfectly even when audio files are unavailable with comprehensive validation, development tools, and fallback mechanisms
@@ -406,8 +422,9 @@ The game recently received significant audio system improvements and UI enhancem
 - **Robust Error Handling**: Comprehensive fallback mechanisms ensure smooth gameplay even during network issues
 
 **UI & Visual Improvements:**
+- **Modern Interface**: Updated results screen with clean "Challenge Complete!" header and streamlined design
+- **Dynamic Date Display**: Results screen now shows current date using JavaScript's toLocaleDateString for accurate, real-time formatting
 - **Combined Round Labels**: Round number and category now displayed together (e.g., "Round 1 of 6 (Category: Animals)") positioned on the left side for cleaner organization
-- **Simplified Date Display**: Splash screen now shows shorter date format (month and day only) for cleaner appearance
 - **Enhanced Visual Feedback**: Custom overlay indicators with colored circles, icons (✕ for AI, ✓ for Human), and clear labels
 - **Improved Timeout Layout**: "Time's Up!" message and countdown timer now displayed with improved visual clarity for better user experience
 - **Responsive Design**: Mobile-first approach with images stacked vertically on mobile, side-by-side on desktop
@@ -429,7 +446,7 @@ The game recently received significant audio system improvements and UI enhancem
 
 These improvements make the game more accessible and intuitive while maintaining the strategic balance between speed and accuracy.ameplay even if content loading fails
 
-#### Audio System Simplification & Enhancement ⚡
+#### Audio System Simplification & Enhancement ⏱️
 The game recently received major audio system improvements:
 
 **Enhanced State Management:**
@@ -464,7 +481,7 @@ The game recently received major audio system improvements:
 - Graceful degradation ensures game works perfectly even when audio files are unavailable
 - Comprehensive audio validation and development tools for debugging
 
-#### Major Scoring System Overhaul ⚡
+#### Major Scoring System Overhaul ⏱️
 The game recently received a complete scoring system redesign for better user experience:
 
 **Previous System (Decimal-based):**
@@ -488,7 +505,7 @@ The game recently received a complete scoring system redesign for better user ex
 - **Reddit-Optimized Responsive Layout**: Images adapt from single column on mobile (max-width 400px, centered) to side-by-side at 480px breakpoint (max-width 600px, centered) with consistent 1:1 aspect ratio
 - **Responsive Layout Refinements**: Better visual consistency between mobile and desktop layouts with optimized spacing (1rem mobile, 1.5rem desktop) and Reddit feed integration
 
-#### Enhanced Timeout Handling ⚡
+#### Enhanced Timeout Handling ⏱️
 The game recently received major timeout handling improvements for better user experience:
 
 **Latest Timeout Improvements:**
@@ -527,7 +544,7 @@ The game recently received major timeout handling improvements for better user e
 - **Real-Time Audio Updates**: Audio changes now take effect immediately during gameplay without requiring restart
 
 ### Visual Feedback Enhancements
-The game recently received major visual feedback improvements to create a more intuitive and engaging experience:
+The game recently received major visual feedback improvements to create a more intuitive and engaging experience, including enhanced loading states and prominent score display:
 
 ### Custom Overlay Indicator System
 - **Selective Display**: Overlay indicators now appear only on the selected image during feedback
@@ -695,7 +712,7 @@ src/
 - **Score Calculation**: Tier-based bonus system (5/3/1 points based on remaining time) with server-side validation and whole number scoring
 - **Badge Assignment**: Automatic badge calculation based on performance with 5 achievement tiers (6 correct = AI Whisperer, 5 = AI Detective, etc.)
 - **Content Management**: Fresh educational content system with random selection from comprehensive libraries and caching
-- **Social Sharing**: Native sharing API with clipboard fallback and two sharing modes (results and friend challenges)
+- **Social Sharing**: Native sharing API with clipboard fallback for friend challenges
 - **Error Resilience**: Comprehensive error boundaries, network retry logic with exponential backoff, offline detection via `useErrorHandler`
 - **Session Management**: Secure Redis-based persistence with local storage caching and session validation
 - **Network Optimization**: Smart retry logic with exponential backoff, offline detection, and pending request queuing

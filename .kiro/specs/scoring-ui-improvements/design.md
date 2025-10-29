@@ -2,246 +2,218 @@
 
 ## Overview
 
-This design document outlines the implementation approach for simplifying the Spot the Bot scoring system and enhancing the user interface. The changes focus on replacing the current millisecond-based scoring with a tier-based system, improving visual feedback with better positioned and animated point displays, and enhancing photo styling for clearer selection feedback.
+This design focuses on creating a more compact, mobile-optimized layout for the scoring system and leaderboard components. The primary goal is to eliminate vertical scrolling while maintaining all functionality and improving information density through strategic horizontal layouts and simplified displays.
 
 ## Architecture
 
-### Scoring System Architecture
+### Component Structure
 
-The scoring system will be updated in both client and server components to ensure consistency:
+The design will modify two main components:
+- **ResultsScreen**: The Challenge Complete screen showing player results
+- **LeaderboardTabs**: The leaderboard display with rankings
 
-**Server-Side Changes:**
-- Update `calculateRoundScore()` function in `src/server/core/game-logic.ts`
-- Modify score validation logic in `src/server/utils/validation.ts`
-- Update leaderboard storage to handle whole numbers
+### Layout Strategy
 
-**Client-Side Changes:**
-- Update score calculation in `src/client/hooks/useGameState.ts`
-- Modify score display components to show whole numbers
-- Update local score tracking and validation
-
-### UI Enhancement Architecture
-
-**Component Updates:**
-- Enhance `GameRound.tsx` for improved points display and photo styling
-- Update CSS classes in `src/client/index.css` for new visual effects
-- Add animation utilities for rainbow confetti effect
+The design employs a horizontal-first approach to maximize screen real estate:
+1. **Horizontal Pairing**: Related elements are placed side-by-side
+2. **Single-line Text**: Multi-line descriptions are condensed to single lines
+3. **Simplified Displays**: Remove unnecessary footer text and indicators
+4. **Top 10 Focus**: Limit leaderboard to essential entries with smart user positioning
 
 ## Components and Interfaces
 
-### Scoring Logic Component
+### ResultsScreen Layout Changes
 
-**Location:** `src/server/core/game-logic.ts`
-
-**Updated Function:**
+#### Score and Badge Horizontal Layout
 ```typescript
-export function calculateRoundScore(isCorrect: boolean, timeRemaining: number): number {
-  if (!isCorrect) {
-    return 0; // No points for incorrect answers
-  }
+// Current: Vertical stacking
+<ScoreCard />
+<BadgeCard />
 
-  const correctnessPoints = 10; // Base points for correct answer
-  
-  // Tier-based time bonus (convert milliseconds to seconds)
-  const secondsRemaining = Math.floor(timeRemaining / 1000);
-  let timeBonus = 0;
-  
-  if (secondsRemaining >= 7) {
-    timeBonus = 5;
-  } else if (secondsRemaining >= 4) {
-    timeBonus = 3;
-  } else if (secondsRemaining >= 1) {
-    timeBonus = 1;
-  }
-  // 0 seconds remaining = 0 bonus points
-  
-  return correctnessPoints + timeBonus;
-}
+// New: Horizontal layout
+<div className="grid grid-cols-2 gap-4">
+  <ScoreCard />
+  <BadgeCard />
+</div>
 ```
 
-### Points Display Component
+#### Badge Card Redesign
+```typescript
+// Current: Vertical badge layout
+<div className="text-center">
+  <div className="emoji" />
+  <h3 className="title" />
+  <p className="description" />
+</div>
 
-**Location:** `src/client/components/GameRound.tsx`
+// New: Horizontal badge layout with single-line description
+<div className="flex items-center gap-3">
+  <span className="emoji" />
+  <div>
+    <h3 className="title" />
+    <p className="description truncate" />
+  </div>
+</div>
+```
 
-**Enhanced Points Display:**
-- Position adjustment: Move 4 pixels down from current position
-- Font size increase: Larger text for better visibility
-- Animation integration: Rainbow confetti for positive scores
+#### Rankings and CTA Horizontal Layout
+```typescript
+// Current: Vertical stacking
+<RankingsSection />
+<CTAButtons />
 
-### Photo Styling Component
+// New: Horizontal layout
+<div className="grid grid-cols-2 gap-4">
+  <RankingsSection />
+  <CTAButtons />
+</div>
+```
 
-**Location:** `src/client/index.css`
+### LeaderboardTabs Enhancements
 
-**Updated CSS Classes:**
-```css
-.game-image-button.selected,
-.game-image-button.correct-feedback,
-.game-image-button.incorrect-feedback {
-  border-width: 6px; /* Updated from 3px */
-  border-radius: 3px; /* Added rounded corners */
+#### Header Redesign
+```typescript
+// Current: Left-aligned with Live indicator
+<div className="flex items-center gap-3">
+  <h2>Leaderboard</h2>
+  <LiveIndicator />
+</div>
+
+// New: Center-aligned with back button
+<div className="flex items-center justify-between">
+  <BackButton />
+  <h2 className="text-center flex-1">Leaderboard</h2>
+  <div /> {/* Spacer for balance */}
+</div>
+```
+
+#### Top 10 with Smart User Positioning
+```typescript
+interface LeaderboardDisplay {
+  entries: LeaderboardEntry[];
+  userRank?: number;
+  showEllipsis: boolean;
 }
+
+// Logic for user positioning
+const getDisplayEntries = (entries: LeaderboardEntry[], userRank?: number) => {
+  const top10 = entries.slice(0, 10);
+  
+  if (!userRank || userRank <= 10) {
+    return { entries: top10, showEllipsis: false };
+  }
+  
+  const userEntry = entries.find(e => e.userId === currentUserId);
+  return {
+    entries: [...top10, userEntry].filter(Boolean),
+    showEllipsis: true
+  };
+};
 ```
 
 ## Data Models
 
-### Score Data Structure
+### Updated Display Formatting
 
-**Updated Score Fields:**
-- All score values stored as integers (no decimals)
-- Time bonus calculated as discrete tiers (1, 3, 5, or 0)
-- Total scores always whole numbers
-
-**Database Schema Impact:**
-- No schema changes required (Redis already supports integers)
-- Existing decimal scores will be preserved for historical data
-- New scores will be whole numbers only
-
-### Animation Data Structure
-
-**Confetti Animation Configuration:**
+#### Number Formatting
 ```typescript
-interface ConfettiConfig {
-  enabled: boolean;
-  duration: number; // milliseconds
-  colors: string[]; // rainbow colors
-  particleCount: number;
-  spread: number;
-}
+// Remove decimals from all numerical displays
+const formatScore = (score: number): string => Math.round(score).toString();
+const formatTimeBonus = (bonus: number): string => `+${Math.round(bonus)}`;
+```
+
+#### Icon Updates
+```typescript
+// Replace lightning bolt with timer emoji
+const TIMER_ICON = '⏱️'; // Instead of '⚡'
+```
+
+### Responsive Grid System
+
+```typescript
+// Responsive breakpoints for horizontal layouts
+const layoutClasses = {
+  scoreAndBadge: "grid grid-cols-1 md:grid-cols-2 gap-4",
+  rankingsAndCTA: "grid grid-cols-1 md:grid-cols-2 gap-4",
+  ctaButtons: "grid grid-cols-2 gap-3"
+};
 ```
 
 ## Error Handling
 
-### Scoring Validation
+### Layout Overflow Protection
+- Implement text truncation for long badge descriptions
+- Add responsive breakpoints to stack elements vertically on very small screens
+- Ensure minimum touch target sizes for mobile interaction
 
-**Server-Side Validation:**
-- Validate time remaining is within expected range (0-15000ms)
-- Ensure calculated scores are whole numbers
-- Verify tier-based bonus calculation accuracy
-
-**Client-Side Validation:**
-- Validate score display formatting
-- Handle animation state management
-- Ensure proper fallback for animation failures
-
-### UI Error Handling
-
-**Animation Failures:**
-- Graceful degradation if confetti animation fails
-- Fallback to simple score display without animation
-- Error logging for debugging animation issues
-
-**Styling Failures:**
-- CSS fallbacks for border styling
-- Ensure game remains playable if styling fails
-- Progressive enhancement approach
+### Data Fallbacks
+- Handle cases where user rank is not available
+- Provide fallback content for empty leaderboards
+- Graceful degradation when realtime connection fails
 
 ## Testing Strategy
 
-### Unit Testing
+### Layout Testing
+1. **Viewport Testing**: Verify layouts work across different screen sizes
+2. **Content Length Testing**: Test with various username and description lengths
+3. **Data State Testing**: Test with different user ranking scenarios
 
-**Scoring Logic Tests:**
-- Test tier-based calculation for all time ranges
-- Verify whole number outputs for all scenarios
-- Test edge cases (0 seconds, boundary values)
+### Responsive Design Testing
+```typescript
+// Test cases for responsive behavior
+const testCases = [
+  { viewport: '320px', description: 'Mobile portrait' },
+  { viewport: '768px', description: 'Tablet portrait' },
+  { viewport: '1024px', description: 'Desktop' }
+];
+```
 
-**Component Tests:**
-- Test points display positioning and sizing
-- Verify animation triggering conditions
-- Test photo border styling updates
+### User Experience Testing
+1. **Navigation Flow**: Test back button functionality from leaderboard
+2. **Touch Targets**: Verify button sizes meet accessibility standards
+3. **Information Density**: Ensure all content remains readable in compact layout
 
-### Integration Testing
+## Implementation Approach
 
-**Score Flow Testing:**
-- End-to-end score calculation from client to server
-- Leaderboard integration with new scoring system
-- Session persistence with whole number scores
+### Phase 1: ResultsScreen Layout
+1. Implement horizontal score and badge layout
+2. Redesign badge card with inline emoji and title
+3. Create horizontal rankings and CTA section
+4. Update number formatting throughout
 
-**UI Integration Testing:**
-- Test complete round flow with new UI elements
-- Verify responsive behavior across devices
-- Test animation performance and cleanup
+### Phase 2: LeaderboardTabs Enhancement
+1. Add back button to header
+2. Center-align leaderboard title
+3. Implement top 10 display logic
+4. Add ellipsis and user rank positioning
+5. Remove footer text
 
-### Visual Testing
+### Phase 3: Icon and Text Updates
+1. Replace lightning bolt icons with timer emoji
+2. Remove Live indicator from header
+3. Ensure all numbers display without decimals
+4. Test single-line text truncation
 
-**Screenshot Comparison:**
-- Before/after comparison of points display positioning
-- Verify photo border thickness and radius changes
-- Confirm animation visual quality
+### Phase 4: Mobile Optimization
+1. Add responsive breakpoints
+2. Test touch interaction areas
+3. Verify no vertical scrolling required
+4. Optimize for common mobile screen sizes
 
-**Cross-Browser Testing:**
-- Test confetti animation across different browsers
-- Verify CSS styling consistency
-- Test performance impact of animations
+## Design Decisions and Rationales
 
-## Implementation Phases
+### Horizontal Layout Choice
+- **Rationale**: Maximizes use of available screen width, especially important on mobile devices where vertical space is limited
+- **Trade-off**: May require responsive stacking on very narrow screens
 
-### Phase 1: Scoring System Update
-1. Update server-side scoring calculation
-2. Modify client-side score handling
-3. Update validation logic
-4. Test score calculation accuracy
+### Top 10 Leaderboard Limit
+- **Rationale**: Reduces cognitive load and focuses attention on top performers while still showing user position
+- **Implementation**: Smart ellipsis system maintains user context without overwhelming the display
 
-### Phase 2: Points Display Enhancement
-1. Adjust points display positioning
-2. Increase font size for better visibility
-3. Implement rainbow confetti animation
-4. Test animation performance and cleanup
+### Single-line Badge Descriptions
+- **Rationale**: Maintains information while reducing vertical space usage
+- **Implementation**: CSS truncation with ellipsis for overflow text
 
-### Phase 3: Photo Styling Updates
-1. Update CSS for 6px borders
-2. Add 3px border-radius styling
-3. Test visual feedback consistency
-4. Verify responsive behavior
-
-### Phase 4: Integration and Testing
-1. End-to-end testing of all changes
-2. Performance testing with animations
-3. Cross-browser compatibility testing
-4. User acceptance testing
-
-## Performance Considerations
-
-### Animation Performance
-
-**Optimization Strategies:**
-- Use CSS animations where possible for better performance
-- Implement animation cleanup to prevent memory leaks
-- Consider reduced motion preferences for accessibility
-- Limit animation duration to maintain game flow
-
-### Scoring Performance
-
-**Calculation Efficiency:**
-- Tier-based calculation is more efficient than decimal math
-- Reduced floating-point operations improve performance
-- Simpler validation logic reduces server load
-
-## Accessibility Considerations
-
-### Animation Accessibility
-
-**Reduced Motion Support:**
-- Respect `prefers-reduced-motion` CSS media query
-- Provide option to disable animations
-- Ensure core functionality works without animations
-
-### Visual Accessibility
-
-**Enhanced Borders:**
-- Improved border thickness aids visibility
-- Rounded corners provide softer visual experience
-- Maintain sufficient color contrast for feedback
-
-## Browser Compatibility
-
-### CSS Features
-
-**Border Radius Support:**
-- Supported in all modern browsers
-- Graceful degradation for older browsers
-- No impact on core functionality
-
-**Animation Support:**
-- CSS animations widely supported
-- JavaScript fallback for older browsers
-- Progressive enhancement approach
+### Removal of Decimal Places
+- **Rationale**: Cleaner visual appearance and easier mental processing of scores
+- **Implementation**: Math.round() for all score displays while maintaining precision in calculations

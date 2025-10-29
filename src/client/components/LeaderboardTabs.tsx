@@ -7,11 +7,13 @@ type LeaderboardType = 'daily' | 'weekly' | 'all-time';
 interface LeaderboardTabsProps {
   currentUserId?: string | undefined;
   onClose?: () => void;
+  onBack?: () => void;
 }
 
 export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({ 
   currentUserId, 
-  onClose 
+  onClose,
+  onBack 
 }) => {
   const [activeTab, setActiveTab] = useState<LeaderboardType>('daily');
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
@@ -28,6 +30,22 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
     { id: 'weekly' as LeaderboardType, label: 'Weekly', icon: '📊' },
     { id: 'all-time' as LeaderboardType, label: 'All Time', icon: '🏆' },
   ];
+
+  // Get display entries with top 10 logic and user positioning
+  const getDisplayEntries = (allEntries: LeaderboardEntry[], userRank?: number | null) => {
+    const top10 = allEntries.slice(0, 10);
+    
+    if (!userRank || userRank <= 10 || !currentUserId) {
+      return { entries: top10, showEllipsis: false, userEntry: null };
+    }
+    
+    const userEntry = allEntries.find(e => e.userId === currentUserId);
+    return {
+      entries: top10,
+      showEllipsis: true,
+      userEntry: userEntry || null
+    };
+  };
 
   // Fetch leaderboard data
   const fetchLeaderboard = async (type: LeaderboardType) => {
@@ -88,7 +106,7 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
 
   // Format score display
   const formatScore = (score: number) => {
-    return score.toFixed(2);
+    return Math.round(score).toString();
   };
 
   // Check if entry is current user
@@ -179,14 +197,17 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
     <div className="flex flex-col h-full max-h-screen bg-white">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <div className="flex items-center gap-3">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+            aria-label="Back to results"
+          >
+            <span className="text-xl">←</span>
+          </button>
+        )}
+        <div className="flex-1 text-center">
           <h2 className="text-xl font-bold text-gray-900">Leaderboard</h2>
-          {isConnected && (
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1"></div>
-              <span className="text-xs text-green-600">Live</span>
-            </div>
-          )}
         </div>
         {onClose && (
           <button
@@ -195,6 +216,9 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
           >
             <span className="text-2xl">×</span>
           </button>
+        )}
+        {!onClose && onBack && (
+          <div className="w-8"></div>
         )}
       </div>
 
@@ -265,92 +289,142 @@ export const LeaderboardTabs: React.FC<LeaderboardTabsProps> = ({
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
-            {entries.map((entry, index) => {
-              const rank = index + 1;
-              const isUser = isCurrentUser(entry);
+            {(() => {
+              const { entries: displayEntries, showEllipsis, userEntry } = getDisplayEntries(entries, userRank);
               
               return (
-                <div
-                  key={`${entry.userId}-${entry.completedAt}`}
-                  className={`p-4 transition-colors ${
-                    isUser 
-                      ? 'bg-indigo-50 border-l-4 border-indigo-500' 
-                      : 'hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    {/* Rank and User Info */}
-                    <div className="flex items-center space-x-3">
-                      {/* Rank */}
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                        rank === 1 
-                          ? 'bg-yellow-100 text-yellow-800' 
-                          : rank === 2 
-                          ? 'bg-gray-100 text-gray-800'
-                          : rank === 3
-                          ? 'bg-orange-100 text-orange-800'
-                          : isUser
-                          ? 'bg-indigo-100 text-indigo-800'
-                          : 'bg-gray-50 text-gray-600'
-                      }`}>
-                        {rank <= 3 ? (
-                          <span>
-                            {rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}
-                          </span>
-                        ) : (
-                          rank
-                        )}
-                      </div>
+                <>
+                  {displayEntries.map((entry, index) => {
+                    const rank = index + 1;
+                    const isUser = isCurrentUser(entry);
+                    
+                    return (
+                      <div
+                        key={`${entry.userId}-${entry.completedAt}`}
+                        className={`p-4 transition-colors ${
+                          isUser 
+                            ? 'bg-indigo-50 border-l-4 border-indigo-500' 
+                            : 'hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          {/* Rank and User Info */}
+                          <div className="flex items-center space-x-3">
+                            {/* Rank */}
+                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                              rank === 1 
+                                ? 'bg-yellow-100 text-yellow-800' 
+                                : rank === 2 
+                                ? 'bg-gray-100 text-gray-800'
+                                : rank === 3
+                                ? 'bg-orange-100 text-orange-800'
+                                : isUser
+                                ? 'bg-indigo-100 text-indigo-800'
+                                : 'bg-gray-50 text-gray-600'
+                            }`}>
+                              {rank <= 3 ? (
+                                <span>
+                                  {rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}
+                                </span>
+                              ) : (
+                                rank
+                              )}
+                            </div>
 
-                      {/* User Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2">
-                          <p className={`text-sm font-medium truncate ${
-                            isUser ? 'text-indigo-900' : 'text-gray-900'
-                          }`}>
-                            {entry.username}
-                            {isUser && (
-                              <span className="ml-2 text-xs text-indigo-600 font-normal">
-                                (You)
+                            {/* User Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center space-x-2">
+                                <p className={`text-sm font-medium truncate ${
+                                  isUser ? 'text-indigo-900' : 'text-gray-900'
+                                }`}>
+                                  {entry.username}
+                                  {isUser && (
+                                    <span className="ml-2 text-xs text-indigo-600 font-normal">
+                                      (You)
+                                    </span>
+                                  )}
+                                </p>
+                                <span className="text-lg">
+                                  {getBadgeEmoji(entry.badge)}
+                                </span>
+                              </div>
+                              <div className="flex items-center space-x-4 text-xs text-gray-500">
+                                <span>✅ {entry.correctCount}/6</span>
+                                <span>⏱️ +{Math.round(entry.timeBonus)}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Score */}
+                          <div className="text-right">
+                            <div className={`text-lg font-bold ${
+                              isUser ? 'text-indigo-700' : 'text-gray-900'
+                            }`}>
+                              {formatScore(entry.score)}
+                            </div>
+                            <div className="text-xs text-gray-500">points</div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  
+                  {/* Ellipsis row when user is outside top 10 */}
+                  {showEllipsis && (
+                    <div className="p-4 text-center text-gray-400">
+                      <span className="text-lg">⋯</span>
+                    </div>
+                  )}
+                  
+                  {/* User's actual rank row when outside top 10 */}
+                  {showEllipsis && userEntry && userRank && (
+                    <div className="p-4 transition-colors bg-indigo-50 border-l-4 border-indigo-500">
+                      <div className="flex items-center justify-between">
+                        {/* Rank and User Info */}
+                        <div className="flex items-center space-x-3">
+                          {/* Rank */}
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold bg-indigo-100 text-indigo-800">
+                            {userRank}
+                          </div>
+
+                          {/* User Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-2">
+                              <p className="text-sm font-medium truncate text-indigo-900">
+                                {userEntry.username}
+                                <span className="ml-2 text-xs text-indigo-600 font-normal">
+                                  (You)
+                                </span>
+                              </p>
+                              <span className="text-lg">
+                                {getBadgeEmoji(userEntry.badge)}
                               </span>
-                            )}
-                          </p>
-                          <span className="text-lg">
-                            {getBadgeEmoji(entry.badge)}
-                          </span>
+                            </div>
+                            <div className="flex items-center space-x-4 text-xs text-gray-500">
+                              <span>✅ {userEntry.correctCount}/6</span>
+                              <span>⏱️ +{Math.round(userEntry.timeBonus)}</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-4 text-xs text-gray-500">
-                          <span>✅ {entry.correctCount}/6</span>
-                          <span>⚡ +{entry.timeBonus.toFixed(2)}</span>
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* Score */}
-                    <div className="text-right">
-                      <div className={`text-lg font-bold ${
-                        isUser ? 'text-indigo-700' : 'text-gray-900'
-                      }`}>
-                        {formatScore(entry.score)}
+                        {/* Score */}
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-indigo-700">
+                            {formatScore(userEntry.score)}
+                          </div>
+                          <div className="text-xs text-gray-500">points</div>
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-500">points</div>
                     </div>
-                  </div>
-                </div>
+                  )}
+                </>
               );
-            })}
+            })()}
           </div>
         )}
       </div>
 
-      {/* Footer */}
-      {!loading && !error && entries.length > 0 && (
-        <div className="p-4 border-t border-gray-200 bg-gray-50">
-          <div className="text-center text-sm text-gray-500">
-            Showing top {entries.length} of {totalParticipants.toLocaleString()} players
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };
