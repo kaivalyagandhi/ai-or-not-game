@@ -71,11 +71,11 @@ export function getCurrentWeekUTC(): string {
 export const DailyGameKeys = {
   /**
    * Key for storing daily game configuration and image set
-   * Format: daily_game:YYYY-MM-DD
+   * Format: daily_game:YYYY-MM-DD:v2 (v2 = updated with new image collection)
    */
   gameState: (date?: string): string => {
     const gameDate = date || getCurrentDateUTC();
-    return `${KEY_PREFIXES.DAILY_GAME}${KEY_SEPARATOR}${gameDate}`;
+    return `${KEY_PREFIXES.DAILY_GAME}${KEY_SEPARATOR}${gameDate}${KEY_SEPARATOR}v2`;
   },
 
   /**

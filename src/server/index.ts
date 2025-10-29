@@ -873,10 +873,33 @@ router.get('/api/debug/clear-daily-state', async (_req, res): Promise<void> => {
     
     console.log('Cleared daily game state for:', today);
     
+    // Also force regenerate with new image collection
+    console.log('Regenerating daily game state with updated images...');
+    const imageCollection = createImageCollection();
+    const resetResult = await resetDailyGameState(redis, imageCollection);
+    
+    if (resetResult.success && resetResult.gameState) {
+      console.log('Daily game state regenerated successfully');
+      console.log('New category order:', resetResult.gameState.categoryOrder);
+      console.log('New rounds count:', resetResult.gameState.imageSet.length);
+      
+      // Log first few image URLs to verify new images are loaded
+      resetResult.gameState.imageSet.slice(0, 3).forEach((round, index) => {
+        console.log(`Round ${index + 1} (${round.category}):`, {
+          imageA: round.imageA.url,
+          imageB: round.imageB.url,
+        });
+      });
+    }
+    
     res.json({
       success: true,
-      message: 'Daily game state cleared',
+      message: 'Daily game state cleared and regenerated with updated images',
       date: today,
+      newGameState: resetResult.success ? {
+        categoryOrder: resetResult.gameState?.categoryOrder,
+        roundCount: resetResult.gameState?.imageSet.length,
+      } : null,
     });
   } catch (error) {
     console.error('Error clearing daily game state:', error);
