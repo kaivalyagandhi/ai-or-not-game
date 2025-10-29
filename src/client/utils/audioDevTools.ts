@@ -74,9 +74,8 @@ const testAudioFiles = async (): Promise<void> => {
   
   const audioFiles = [
     '/audio/background-music.mp3',
-    '/audio/click-sound.wav',
-    '/audio/success-sound.wav',
-    '/audio/failure-sound.wav'
+    '/audio/success-sound.mp3',
+    '/audio/failure-sound.mp3'
   ];
   
   for (const file of audioFiles) {
@@ -107,13 +106,11 @@ const showSetupInstructions = (): void => {
 
 2. Add these files to src/client/public/audio/:
    - background-music.mp3 (2-5 minutes, <5MB)
-   - click-sound.wav (<2 seconds, <500KB)
-   - success-sound.wav (<2 seconds, <500KB)
-   - failure-sound.wav (<2 seconds, <500KB)
+   - success-sound.mp3 (<2 seconds, <500KB)
+   - failure-sound.mp3 (<2 seconds, <500KB)
 
 3. File format recommendations:
-   - Background music: MP3, 128-192 kbps
-   - Sound effects: WAV, 16-bit, 44.1kHz
+   - All audio files: MP3, 128-192 kbps
 
 4. Test your setup:
    - Run: audioDevTools.checkHealth()

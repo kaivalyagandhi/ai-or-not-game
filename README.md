@@ -2,24 +2,24 @@
 
 **Can you tell AI from reality?**
 
-Spot the Bot is an engaging daily challenge game built on Reddit's Devvit platform where players test their ability to distinguish between real photographs and AI-generated images. Each day brings a fresh set of image pairs across different categories, challenging users to identify which image was created by a human versus artificial intelligence.
+Spot the Bot is an engaging daily challenge game built on Reddit's Devvit platform where players test their ability to distinguish between real photographs and AI-generated images. Each day brings a fresh set of 6 image pairs across 5 different categories (Animals, Architecture, Nature, Food, Products), challenging users to identify which image was created by a human versus artificial intelligence.
 
-This interactive React-based game runs directly within Reddit posts, providing a seamless gaming experience with real-time leaderboards, achievement badges, social sharing features, and simplified audio controls. Players compete against the clock and each other in a daily test of visual perception and AI detection skills.
+This interactive React-based game runs directly within Reddit posts, providing a seamless gaming experience with real-time leaderboards, achievement badges, social sharing features, and simplified audio controls. Players compete against a 10-second timer each round and against each other in a daily test of visual perception and AI detection skills, with up to 2 attempts per day to achieve their best score.
 
 ## 🎯 Current Game Status
 
 **Fully Functional & Production Ready** ✅
 
 The game is complete and ready for players with all core systems implemented:
-- **6-round gameplay** with 10-second timers and whole-number scoring
+- **6-round gameplay** with 10-second timers and whole-number scoring system
 - **5 active image categories** (Animals, Architecture, Nature, Food, Products)
-- **Advanced timeout handling** with server-side processing and 3-second feedback
-- **Simplified audio system** with one-click toggle controls (🎵/🔇)
-- **Educational content** with fresh tips and facts each session
+- **Advanced timeout handling** with server-side processing and 3-second animated feedback
+- **Simplified audio system** with one-click toggle controls (🎵/🔇) and enhanced sound effects
+- **Educational content** with fresh AI detection tips and facts loaded for each session
 - **Real-time features** including live participant counts and leaderboard updates
-- **Enhanced visual feedback** with custom overlay indicators and responsive design
-- **Multiple daily attempts** (2 per day) with best score tracking
-- **Comprehensive error handling** and offline support
+- **Enhanced visual feedback** with custom overlay indicators and responsive mobile-first design
+- **Multiple daily attempts** (2 per day) with best score tracking and improvement notifications
+- **Comprehensive error handling** with offline support and graceful degradation
 
 ## 🎮 What is Spot the Bot?
 
@@ -28,13 +28,13 @@ Spot the Bot is a **daily visual challenge game** that tests your ability to dis
 ### Core Game Mechanics
 - **6 rounds per game** with exactly 10 seconds per round
 - **5 active image categories**: Animals, Architecture, Nature, Food, and Products (Science category infrastructure ready)
-- **Responsive layout**: Images displayed in a responsive grid that adapts from vertical stack on mobile to side-by-side on desktop
+- **Mobile-first responsive design**: Images displayed in a responsive grid that adapts from vertical stack on mobile to horizontal side-by-side on desktop
 - **Whole number scoring system**: 10 points per correct answer + tier-based time bonuses (5 points for 7-10 seconds, 3 points for 4-6 seconds, 1 point for 1-3 seconds)
 - **Multiple attempts per day**: Players can attempt the challenge up to 2 times per day (unlimited in development mode)
-- **Educational break**: After round 3, players receive AI detection tips and facts about AI image generation with fresh content each session
-- **Enhanced visual feedback**: Custom overlay indicators with colored circles, icons, and labels show AI vs Human sources
-- **Simplified audio system**: Background music and sound effects with one-click toggle controls (🎵/🔇)
-- **Advanced timeout handling**: Server-side timeout processing with 3-second feedback display, animated countdown, and proper game state management
+- **Educational break**: After round 3, players receive fresh AI detection tips and facts loaded randomly from comprehensive content libraries
+- **Enhanced visual feedback**: Custom overlay indicators with colored circles, icons (✕ for AI, ✓ for Human), and labels show image sources
+- **Simplified audio system**: Background music and sound effects with one-click toggle controls (🎵/🔇) and 3x volume boost for clarity
+- **Advanced timeout handling**: Server-side timeout processing with 3-second animated countdown, proper game state management, and learning-focused feedback
 - **Progressive difficulty**: Mixed categories and randomized AI placement keep players guessing
 
 ## 🎮 Current Game Implementation
@@ -43,43 +43,46 @@ Based on the latest code analysis, Spot the Bot is a fully functional AI detecti
 
 ### Complete Game Flow
 - **Splash Screen**: Welcome screen with live participant counter, remaining attempts display, and best score tracking
-- **6-Round Gameplay**: Each round presents two images (one real, one AI-generated) with 10-second timer
-- **Educational Break**: After round 3, players receive fresh AI detection tips and facts from comprehensive content libraries
-- **Results Screen**: Final scoring with badge achievement, leaderboard position, and social sharing options
-- **Real-Time Features**: Live participant counts and leaderboard updates via Devvit Realtime API
+- **6-Round Gameplay**: Each round presents two images (one real, one AI-generated) with 10-second timer and combined round/category labels
+- **Educational Break**: After round 3, players receive fresh AI detection tips and facts randomly selected from comprehensive content libraries (50 tips, 50 facts)
+- **Results Screen**: Final scoring with badge achievement, leaderboard position, inspirational content, and enhanced social sharing options
+- **Real-Time Features**: Live participant counts and leaderboard updates via Devvit Realtime API with "Live" indicators
 
 ### Advanced Timeout System
 The game features sophisticated timeout handling that was recently enhanced:
 - **Server-Side Processing**: When time expires, the game submits a timeout request to the server using the wrong answer with 0 time remaining to ensure proper incorrect scoring
-- **Proper State Management**: Server maintains accurate game session state even during timeout scenarios
-- **Visual Feedback**: 3-second countdown with "Time's Up!" message and highlighted correct answer
-- **Fair Scoring**: Timeout results in 0 points and counts as incorrect for accurate badge calculations
-- **Error Handling**: Comprehensive fallback mechanisms ensure smooth gameplay during network issues
+- **Proper State Management**: Server maintains accurate game session state even during timeout scenarios with comprehensive validation
+- **Extended Visual Feedback**: 3-second animated countdown with "Time's Up!" message and highlighted correct answer for enhanced learning
+- **Fair Scoring**: Timeout results in 0 points and counts as incorrect for accurate badge calculations with server-side validation
+- **Silent Feedback**: No audio effects during timeout to avoid misleading players about performance
+- **Error Handling**: Comprehensive fallback mechanisms ensure smooth gameplay during network issues with graceful degradation
 
-### Audio System
-- **Simplified Controls**: One-click toggle button (🎵/🔇) for all audio
-- **Background Music**: Starts immediately when game begins, stops when game ends
-- **Enhanced Sound Effects**: Success/failure sounds at 3x volume for clarity
-- **Graceful Degradation**: Game works perfectly even when audio files are unavailable
+### Simplified Audio System
+- **One-Click Controls**: Simple toggle button (🎵/🔇) replacing complex dropdown controls
+- **Real-Time Audio Control**: Audio changes take effect immediately during gameplay without requiring restart
+- **Enhanced Sound Effects**: Success/failure sounds at 3x volume (volume * 3.6) for clarity above background music
+- **Session-Level Audio**: Background music starts immediately when audio system loads (if enabled) and continues throughout session
+- **Smart Audio Management**: Improved background music lifecycle with better state tracking and immediate playback when audio is enabled
+- **Graceful Degradation**: Game works perfectly even when audio files are unavailable with comprehensive validation
 
-### Visual Feedback System
-- **Custom Overlay Indicators**: Selected images show circular overlays with icons (✕ for AI, ✓ for Human) and labels
-- **Enhanced Borders**: Color-coded borders (green for correct, red for incorrect) with glow effects
-- **Responsive Layout**: Images adapt from vertical stack on mobile to side-by-side on desktop
-- **Consistent Aspect Ratios**: All images maintain 1:1 aspect ratio with 20px rounded corners
+### Enhanced Visual Feedback System
+- **Custom Overlay Indicators**: Selected images show circular overlays with white icons (✕ for AI, ✓ for Human) and clear labels ("AI" or "Human")
+- **Enhanced Border Styling**: Color-coded borders (green #46E870 for correct, red #F23C3C for incorrect) with 30% opacity glow effects
+- **Mobile-First Responsive Layout**: Images adapt from single column on mobile to side-by-side on desktop with consistent 1:1 aspect ratio
+- **Smart Visual States**: Clear progression from default → selection → feedback states with smooth transitions and 20px rounded corners
 
 ## 🎮 What Makes This Game Innovative
 
 ### Cutting-Edge AI Detection Challenge
-- **Daily Fresh Content**: New image sets generated every day at 00:00 UTC with completely randomized categories, AI placement, and difficulty progression across 5 diverse image categories
+- **Daily Fresh Content**: New image sets generated every day at 00:00 UTC with completely randomized categories, AI placement, and difficulty progression across 5 diverse image categories (Animals, Architecture, Nature, Food, Products)
 - **Real-Time Social Competition**: Live participant counter shows how many players have attempted today's challenge, with real-time updates as new players join via Devvit's Realtime API
 - **Intelligent Scoring Algorithm**: Sophisticated tier-based scoring system rewards both accuracy (10 points per correct answer) and speed (5/3/1 bonus points based on remaining time), creating strategic tension between careful analysis and quick decisions under intense 10-second time pressure
-- **Educational Integration**: Midgame learning break after round 3 provides AI detection tips and fascinating facts about AI image generation with fresh content loaded for each game session from comprehensive libraries (50 tips, 50 facts)
-- **Immersive Audio Experience**: Background music and contextual sound effects enhance gameplay with simplified one-click toggle controls (🎵/🔇), gracefully degrading when audio files are unavailable
+- **Educational Integration**: Midgame learning break after round 3 provides AI detection tips and fascinating facts about AI image generation with fresh content loaded randomly for each game session from comprehensive libraries (50 tips, 50 facts)
+- **Immersive Audio Experience**: Background music and contextual sound effects enhance gameplay with simplified one-click toggle controls (🎵/🔇), with immediate audio initialization when enabled and graceful degradation when audio files are unavailable
 
 ### Enhanced Visual Feedback System
 - **Custom Overlay Indicators**: Selected images show circular overlays with white icons (✕ for AI, ✓ for Human) and clear labels ("AI" or "Human")
-- **Enhanced Border Styling**: Selected images get blue borders during selection, correct answers get green borders (#46E870), incorrect get red borders (#F23C3C) with glow effects
+- **Enhanced Border Styling**: Selected images get colored borders during selection, correct answers get green borders (#46E870), incorrect get red borders (#F23C3C) with glow effects
 - **Responsive Grid Layout**: Images displayed in a responsive grid that adapts from single column on mobile to side-by-side on desktop, all with consistent 1:1 aspect ratio and 20px border radius
 - **Smart Visual States**: Clear visual progression from default state → selection state → feedback state with smooth transitions and hover effects
 
@@ -110,7 +113,7 @@ The game features sophisticated timeout handling that was recently enhanced:
 1. **Find the Game**: Look for Spot the Bot posts in participating subreddits or communities where the app is installed
 2. **Launch the App**: Click the "Launch App" button in the Reddit post to open the game in full-screen webview mode
 3. **Welcome Screen**: You'll see today's date, a live participant counter showing how many players have joined today, your remaining attempts (out of 2 per day), and your best score from previous attempts
-4. **Audio Setup**: Optional - click the audio toggle button (🎵/🔇) in the top-right corner to enable/disable background music and sound effects
+4. **Audio Setup**: Optional - the audio system initializes automatically with background music starting immediately if enabled. Use the audio toggle button (🎵/🔇) in the top-right corner to enable/disable background music and sound effects at any time during gameplay
 5. **Join the Challenge**: Click "Start Playing" to begin your daily challenge (button will be disabled if you've used all daily attempts)
 
 ### Complete Game Flow
@@ -161,11 +164,12 @@ Halfway through the game, you'll receive:
 - **Continue Button**: "Continue to Round 4" to resume gameplay
 
 #### Simplified Audio Experience (Optional)
-- **Background Music**: Atmospheric music during gameplay that starts immediately when you begin playing and stops when the game ends
+- **Background Music**: Atmospheric music that starts immediately when the audio system initializes (if enabled) and continues throughout the session
 - **Enhanced Sound Effects**: Success/failure sounds for correct/incorrect answers at 3x volume for clarity above background music
 - **One-Click Audio Toggle**: Simple music icon button (🎵/🔇) in top-right corner to instantly enable/disable all audio
 - **Real-Time Audio Control**: Audio changes take effect immediately during gameplay without requiring restart
-- **Session-Level Audio**: Audio preference maintained throughout your entire game session
+- **Session-Level Audio**: Audio preference maintained throughout your entire game session with localStorage persistence
+- **Smart Audio Management**: Improved background music lifecycle with initialization tracking and automatic playback when enabled
 - **Graceful Degradation**: Game works perfectly even if audio files are unavailable, with comprehensive audio validation and development tools
 - **Audio Context Management**: Smart audio unlocking on user interaction to comply with browser autoplay policies
 - **Silent Timeout Feedback**: No audio effects during timeout scenarios to avoid misleading players
@@ -325,16 +329,16 @@ The game is **fully functional and production-ready** with all core systems impl
 
 ## 🎨 Recent Updates & Enhancements
 
-### 🔥 Latest Update: Enhanced Timeout Handling & Audio System Improvements
-The game recently received significant timeout handling improvements and audio system enhancements based on user feedback:
+### 🔥 Latest Update: Enhanced Audio System & UI Improvements
+The game recently received significant audio system improvements and UI enhancements based on user feedback:
 
-**Latest Timeout Handling Improvements:**
-- **Server-Side Timeout Processing**: Implemented proper server communication for timeout scenarios to maintain game state integrity
-- **Improved Countdown Logic**: Fixed countdown timer to properly show complete sequence (3, 2, 1, 0) before transitioning
-- **Smoother Transitions**: Added precise timing controls to ensure countdown animations complete before round progression
-- **Better Visual Feedback**: Enhanced countdown display with proper state management and cleaner transitions
-- **Consistent Timing**: Standardized timeout feedback duration at 3 seconds with animated countdown for optimal learning
-- **Fallback Handling**: Comprehensive error handling for timeout scenarios with graceful degradation
+**Latest Audio System Improvements:**
+- **Simplified Audio Controls**: Replaced complex dropdown controls with simple one-click toggle button (🎵/🔇)
+- **Real-Time Audio Control**: Audio changes take effect immediately during gameplay without requiring restart
+- **Enhanced Sound Effects**: Success and failure sounds increased to 3x volume (volume * 3.6) for better audibility above background music
+- **Immediate Audio Playback**: Background music starts immediately when audio system loads (if enabled) with proper initialization tracking
+- **Smart Background Music Management**: Improved lifecycle management with initialization guards and automatic playback control
+- **Graceful Degradation**: Game works perfectly even when audio files are unavailable with comprehensive validation and error handling
 
 **Enhanced Timeout Handling:**
 - **Server-Side Processing**: Timeout scenarios now properly communicate with the server using wrong answers to maintain accurate game state and scoring
@@ -345,12 +349,12 @@ The game recently received significant timeout handling improvements and audio s
 - **Learning Enhancement**: Extended viewing time helps players understand AI detection patterns
 - **Robust Error Handling**: Comprehensive fallback mechanisms ensure smooth gameplay even during network issues
 
-**Audio System Simplification:**
-- **One-Click Audio Toggle**: Replaced complex dropdown controls with simple music icon button (🎵/🔇)
-- **Real-Time Audio Control**: Audio changes take effect immediately during gameplay without requiring restart
-- **Enhanced Sound Effects**: Success and failure sounds increased to 3x volume for better audibility above background music
-- **Session-Level Audio**: Background music starts immediately when game begins and audio preference persists throughout session
-- **Graceful Degradation**: Game works perfectly even when audio files are unavailable with comprehensive validation
+**UI & Visual Improvements:**
+- **Combined Round Labels**: Round number and category now displayed together (e.g., "Round 1 of 6 (Category: Animals)")
+- **Enhanced Visual Feedback**: Custom overlay indicators with colored circles, icons (✕ for AI, ✓ for Human), and clear labels
+- **Responsive Design**: Mobile-first approach with images stacked vertically on mobile, side-by-side on desktop
+- **Improved Border Styling**: Color-coded borders (green #46E870 for correct, red #F23C3C for incorrect) with glow effects
+- **Consistent Aspect Ratios**: All images maintain 1:1 aspect ratio with 20px rounded corners across all screen sizes
 
 **Fresh Educational Content System:**
 - **Dynamic Content Loading**: Fresh educational content loaded for each game session using `fetchRandomContentFresh()` function
@@ -364,30 +368,28 @@ The game recently received significant timeout handling improvements and audio s
 - **Better Balance**: Time bonuses provide meaningful rewards without overwhelming the accuracy component
 - **User-Friendly Display**: Scores are now easy to understand whole numbers instead of confusing decimals
 
-These improvements make the game more accessible and intuitive while maintaining the strategic balance between speed and accuracy.
-
-### Latest Code Improvements
-
-#### Fresh Educational Content System ⚡
-The game recently received a major educational content system upgrade:
-
-**Dynamic Content Loading:**
-- Added `fetchRandomContentFresh()` function for fresh content each session
-- Educational content no longer cached, ensuring unique tips and facts every game
-- Random selection from comprehensive libraries (50 tips, 50 facts)
-- Enhanced learning experience with varied content across multiple sessions
-
-**Content Library Expansion:**
-- Comprehensive AI detection tips covering hands, lighting, textures, and more (50 total tips)
-- Fascinating AI facts about image generation technology and capabilities (50 total facts)
-- Server-managed JSON files (`educational-tips.json`, `ai-facts.json`) for easy content updates and maintenance
-- Graceful fallback system ensures uninterrupted gameplay even if content loading fails
+These improvements make the game more accessible and intuitive while maintaining the strategic balance between speed and accuracy.ameplay even if content loading fails
 
 #### Audio System Simplification & Enhancement ⚡
-The game recently received major audio system improvements for better user experience:
+The game recently received major audio system improvements:
 
-**Simplified Audio Controls:**
-- Replaced complex dropdown volume controls with single toggle button using music icon (🎵/🔇)
+**Enhanced State Management:**
+- Added `isBackgroundMusicPlaying` state tracking for better audio control
+- Improved background music lifecycle management throughout game sessions
+- Better synchronization between audio controls and actual playback state
+- Enhanced audio context unlocking on user interaction for browser compatibility
+
+**Immediate Audio Playback:**
+- Background music now starts immediately when audio system loads (if enabled) with initialization tracking
+- Removed delays and waiting for user interaction for background music with proper state management
+- Improved audio initialization flow with duplicate initialization prevention for better user experience
+- Enhanced audio loading and playback management with comprehensive error handling
+
+**Simplified User Interface:**
+- Streamlined audio toggle button with clear visual feedback (🎵/🔇)
+- Removed complex dropdown controls in favor of one-click audio management
+- Real-time audio state updates without requiring game restart
+- Persistent audio preferences across game sessions with localStorage integration icon (🎵/🔇)
 - One-click audio enable/disable with immediate effect during gameplay
 - Real-time audio state changes without requiring game restart
 - Audio preference persists throughout entire game session with localStorage
@@ -431,7 +433,7 @@ The game recently received a complete scoring system redesign for better user ex
 The game recently received major timeout handling improvements for better user experience:
 
 **Latest Timeout Improvements:**
-- **Server Integration**: Implemented proper server-side timeout processing to maintain accurate game state and session integrity
+- **Server Integration**: Implemented proper server-side timeout processing using wrong answers to maintain accurate game state and fair scoring
 - **Refined Countdown Logic**: Fixed countdown timer to properly display complete sequence (3, 2, 1, 0) before transitioning
 - **Smoother State Transitions**: Added precise timing controls with small delays to ensure countdown animations complete before round progression
 - **Enhanced Visual Feedback**: Improved countdown display with better state management and cleaner visual transitions

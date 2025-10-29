@@ -8,6 +8,7 @@ export interface AudioControls {
   playFailureSound: () => void;
   setAudioEnabled: (enabled: boolean) => void;
   isAudioEnabled: () => boolean;
+  isBackgroundMusicPlaying: () => boolean;
 }
 
 // Audio context

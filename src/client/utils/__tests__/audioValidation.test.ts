@@ -16,9 +16,8 @@ import {
 vi.mock('../audio.js', () => ({
   AUDIO_PATHS: {
     BACKGROUND_MUSIC: '/audio/background-music.mp3',
-    CLICK_SOUND: '/audio/click-sound.wav',
-    SUCCESS_SOUND: '/audio/success-sound.wav',
-    FAILURE_SOUND: '/audio/failure-sound.wav',
+    SUCCESS_SOUND: '/audio/success-sound.mp3',
+    FAILURE_SOUND: '/audio/failure-sound.mp3',
   },
   validateAudioFile: vi.fn(),
   getAudioFileExtension: vi.fn(),
@@ -189,7 +188,7 @@ describe('Audio Validation - System Health', () => {
 
     // Mock the error message for missing files
     vi.mocked(validateAudioFile).mockImplementation(async (path) => {
-      if (path === '/audio/success-sound.wav') {
+      if (path === '/audio/success-sound.mp3') {
         throw new Error('File could not be loaded');
       }
       return false;

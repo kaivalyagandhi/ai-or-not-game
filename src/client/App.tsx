@@ -1,4 +1,4 @@
-import { ErrorInfo, useEffect, useCallback } from 'react';
+import { ErrorInfo, useCallback } from 'react';
 import { 
   SplashScreen, 
   GameRound, 
@@ -42,34 +42,19 @@ export const App = () => {
     // Unlock audio context on user interaction
     await AudioContextManager.getInstance().unlockAudioContext();
     
-    // Start the game first to initialize session
-    startGame();
-    
-    // Start background music immediately when session begins if audio is enabled
-    if (audioSystemRef.current?.isAudioEnabled()) {
+    // Try to start background music only if it's not already playing
+    // This handles the case where auto-start failed due to browser restrictions
+    if (audioSystemRef.current?.isAudioEnabled() && !audioSystemRef.current?.isBackgroundMusicPlaying()) {
+      console.log('🎮 Starting background music on user interaction');
       audioSystemRef.current?.playBackgroundMusic();
     }
+    
+    // Start the game - background music continues throughout
+    startGame();
   };
 
-  // Handle game state changes for audio
-  useEffect(() => {
-    switch (gameState) {
-      case 'playing':
-        // Start background music immediately when session begins if audio is enabled
-        if (audioSystemRef.current?.isAudioEnabled()) {
-          audioSystemRef.current?.playBackgroundMusic();
-        }
-        break;
-      case 'results':
-        // Stop background music when game ends
-        audioSystemRef.current?.stopBackgroundMusic();
-        break;
-      case 'splash':
-        // Stop background music when returning to splash
-        audioSystemRef.current?.stopBackgroundMusic();
-        break;
-    }
-  }, [gameState]);
+  // Background music is now handled automatically by AudioSystem
+  // It starts when the component loads and continues throughout the game
 
   // Error boundary error handler
   const handleErrorBoundaryError = (error: Error, errorInfo: ErrorInfo) => {

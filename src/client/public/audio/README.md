@@ -9,9 +9,8 @@ Place the following audio files in this directory with **exact** names:
 ```
 src/client/public/audio/
 ├── background-music.mp3    # Background music (loops during gameplay)
-├── click-sound.wav         # Click sound effect
-├── success-sound.wav       # Success sound effect
-└── failure-sound.wav       # Failure sound effect
+├── success-sound.mp3       # Success sound effect
+└── failure-sound.mp3       # Failure sound effect
 ```
 
 ## File Specifications
@@ -24,15 +23,14 @@ src/client/public/audio/
 - **Size**: Under 5MB
 - **Content**: Upbeat, non-distracting instrumental music
 
-### Sound Effects (`.wav` files)
+### Sound Effects (`.mp3` files)
 
-- **Format**: WAV (16-bit, 44.1kHz) or MP3
+- **Format**: MP3
 - **Duration**: Under 2 seconds each
 - **Size**: Under 500KB each
 - **Content**:
-  - `click-sound.wav`: Subtle click/tap sound
-  - `success-sound.wav`: Positive, rewarding sound (chime, ding)
-  - `failure-sound.wav`: Gentle negative sound (soft buzz, low tone)
+  - `success-sound.mp3`: Positive, rewarding sound (chime, ding)
+  - `failure-sound.mp3`: Gentle negative sound (soft buzz, low tone)
 
 ## Development Tools
 
@@ -91,12 +89,12 @@ The system automatically validates:
 ### Poor Performance
 
 - Compress large files (background music <5MB, effects <500KB)
-- Use recommended formats (MP3 for music, WAV for effects)
+- Use recommended formats (MP3 for all audio files)
 - Check file integrity with audio editing software
 
 ### Browser Compatibility
 
-- MP3 and WAV have best cross-browser support
+- MP3 has excellent cross-browser support
 - Avoid exotic formats or high bitrates
 - Test on target browsers (Chrome, Firefox, Safari, Edge)
 

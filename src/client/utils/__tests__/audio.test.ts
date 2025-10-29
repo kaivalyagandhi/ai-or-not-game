@@ -45,17 +45,15 @@ global.AudioContext = vi.fn(() => mockAudioContext) as any;
 describe('Audio Utils - Constants and Configuration', () => {
   it('should have correct audio file paths', () => {
     expect(AUDIO_PATHS.BACKGROUND_MUSIC).toBe('/audio/background-music.mp3');
-    expect(AUDIO_PATHS.CLICK_SOUND).toBe('/audio/click-sound.wav');
-    expect(AUDIO_PATHS.SUCCESS_SOUND).toBe('/audio/success-sound.wav');
-    expect(AUDIO_PATHS.FAILURE_SOUND).toBe('/audio/failure-sound.wav');
+    expect(AUDIO_PATHS.SUCCESS_SOUND).toBe('/audio/success-sound.mp3');
+    expect(AUDIO_PATHS.FAILURE_SOUND).toBe('/audio/failure-sound.mp3');
   });
 
   it('should have correct default audio configuration', () => {
     expect(DEFAULT_AUDIO_CONFIG).toEqual({
       backgroundMusic: '/audio/background-music.mp3',
-      clickSound: '/audio/click-sound.wav',
-      successSound: '/audio/success-sound.wav',
-      failureSound: '/audio/failure-sound.wav',
+      successSound: '/audio/success-sound.mp3',
+      failureSound: '/audio/failure-sound.mp3',
       enabled: true,
       volume: 0.7,
     });

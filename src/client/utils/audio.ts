@@ -3,8 +3,8 @@ import type { AudioConfig } from '../../shared/types/index.js';
 // Audio file naming conventions and paths
 export const AUDIO_PATHS = {
   BACKGROUND_MUSIC: '/audio/background-music.mp3',
-  SUCCESS_SOUND: '/audio/success-sound.wav',
-  FAILURE_SOUND: '/audio/failure-sound.wav',
+  SUCCESS_SOUND: '/audio/success-sound.mp3',
+  FAILURE_SOUND: '/audio/failure-sound.mp3',
 } as const;
 
 // Default audio configuration

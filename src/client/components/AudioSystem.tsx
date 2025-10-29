@@ -30,12 +30,13 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
     
     const audioFiles = useRef<AudioFiles>({});
     const backgroundMusicRef = useRef<HTMLAudioElement | null>(null);
+    const isInitialized = useRef(false);
 
     // Audio file paths (static to prevent re-renders)
     const audioFilePaths = {
       backgroundMusic: '/audio/background-music.mp3',
-      successSound: '/audio/success-sound.wav',
-      failureSound: '/audio/failure-sound.wav',
+      successSound: '/audio/success-sound.mp3',
+      failureSound: '/audio/failure-sound.mp3',
     };
 
     // Load audio files with error handling
@@ -61,6 +62,13 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
     // Initialize audio system
     useEffect(() => {
       const initializeAudio = async () => {
+        // Prevent multiple initializations
+        if (isInitialized.current) {
+          console.log('🎵 Audio system already initialized, skipping');
+          return;
+        }
+        
+        isInitialized.current = true;
         setHasError(false);
 
         try {
@@ -80,8 +88,28 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
           // Set up background music
           if (backgroundMusic) {
             backgroundMusic.loop = true;
-            backgroundMusic.volume = volume * 0.3; // Background music at lower volume
+            backgroundMusic.volume = audioEnabled ? volume * 0.3 : 0;
             backgroundMusicRef.current = backgroundMusic;
+            
+            // Add event listeners for debugging
+            backgroundMusic.addEventListener('play', () => {
+              console.log('🎵 Background music started playing');
+            });
+            
+            backgroundMusic.addEventListener('pause', () => {
+              console.log('⏸️ Background music paused');
+            });
+            
+            backgroundMusic.addEventListener('ended', () => {
+              console.log('🔚 Background music ended');
+            });
+            
+            // Start background music immediately when loaded (if audio enabled)
+            if (audioEnabled) {
+              backgroundMusic.play().catch((error) => {
+                console.warn('Failed to auto-start background music:', error);
+              });
+            }
           }
 
           // Check if any files loaded successfully
@@ -103,6 +131,15 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
       };
 
       initializeAudio();
+      
+      // Cleanup function
+      return () => {
+        if (backgroundMusicRef.current) {
+          backgroundMusicRef.current.pause();
+          backgroundMusicRef.current = null;
+        }
+        isInitialized.current = false;
+      };
     }, [loadAudioFile]); // Only depend on loadAudioFile, which depends on volume
 
     // Update volume for all audio files
@@ -145,7 +182,7 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
         }
       });
       
-      // Update background music volume if it's playing
+      // Update background music volume immediately (no play/pause, just volume)
       if (backgroundMusicRef.current) {
         backgroundMusicRef.current.volume = enabled ? volume * 0.3 : 0;
       }
@@ -164,15 +201,22 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
       return audioEnabled;
     }, [audioEnabled]);
 
+    // Get current background music playing state
+    const isBackgroundMusicPlayingState = useCallback(() => {
+      return backgroundMusicRef.current ? !backgroundMusicRef.current.paused : false;
+    }, []);
+
     // Public methods for playing sounds
     const playBackgroundMusic = useCallback(() => {
-      if (!audioEnabled || !backgroundMusicRef.current) return;
+      if (!backgroundMusicRef.current) return;
       
-      backgroundMusicRef.current.volume = volume * 0.3;
-      backgroundMusicRef.current.currentTime = 0;
-      backgroundMusicRef.current.play().catch((error) => {
-        console.warn('Failed to play background music:', error);
-      });
+      // Only start if paused AND audio is enabled
+      if (backgroundMusicRef.current.paused && audioEnabled) {
+        backgroundMusicRef.current.volume = volume * 0.3;
+        backgroundMusicRef.current.play().catch((error) => {
+          console.warn('Failed to play background music:', error);
+        });
+      }
     }, [audioEnabled, volume]);
 
     const stopBackgroundMusic = useCallback(() => {
@@ -214,7 +258,8 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
       playFailureSound,
       setAudioEnabled: setAudioEnabledState,
       isAudioEnabled: isAudioEnabledState,
-    }), [playBackgroundMusic, stopBackgroundMusic, playSuccessSound, playFailureSound, setAudioEnabledState, isAudioEnabledState]);
+      isBackgroundMusicPlaying: isBackgroundMusicPlayingState,
+    }), [playBackgroundMusic, stopBackgroundMusic, playSuccessSound, playFailureSound, setAudioEnabledState, isAudioEnabledState, isBackgroundMusicPlayingState]);
 
     if (hasError) {
       return null; // Graceful degradation - game continues without audio
