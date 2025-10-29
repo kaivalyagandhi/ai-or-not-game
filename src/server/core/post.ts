@@ -1,26 +1,35 @@
 import { context, reddit } from '@devvit/web/server';
 
-export const createPost = async () => {
+export const createPost = async (customTitle?: string, customDescription?: string) => {
   const { subredditName } = context;
   if (!subredditName) {
     throw new Error('subredditName is required');
   }
 
+  // Generate dynamic date
+  const date = new Date().toLocaleString('en-US', {
+    month: 'long',
+    day: 'numeric',
+  });
+
+  const title = customTitle || 'AI or Not?';
+  const description = customDescription || `Daily Challenge - ${date}`;
+
   return await reddit.submitCustomPost({
     splash: {
       // Splash Screen Configuration
-      appDisplayName: 'ai-or-not',
-      backgroundUri: 'default-splash.png',
-      buttonLabel: 'Tap to Start',
-      description: 'An exciting interactive experience',
-      heading: 'Welcome to the Game!',
-      appIconUri: 'default-icon.png',
+      appDisplayName: 'AI or Not?',
+      backgroundUri: 'splash.png',
+      buttonLabel: 'Start Challenge',
+      description: description,
+      heading: 'AI or Not?',
+      appIconUri: 'icon.png',
     },
     postData: {
       gameState: 'initial',
       score: 0,
     },
     subredditName: subredditName,
-    title: 'ai-or-not',
+    title: title,
   });
 };

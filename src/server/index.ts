@@ -759,6 +759,51 @@ router.post('/internal/menu/post-create', async (_req, res): Promise<void> => {
   }
 });
 
+// API endpoint to create a new post programmatically
+router.post('/api/create-post', async (req, res): Promise<void> => {
+  try {
+    const { title, description } = req.body;
+    
+    const post = await createPost(title, description);
+
+    res.json({
+      success: true,
+      postId: post.id,
+      postUrl: `https://reddit.com/r/${context.subredditName}/comments/${post.id}`,
+      message: 'Post created successfully'
+    });
+  } catch (error) {
+    console.error(`Error creating post via API: ${error}`);
+    res.status(400).json({
+      success: false,
+      message: 'Failed to create post',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// API endpoint to create a daily challenge post
+router.post('/api/create-daily-post', async (_req, res): Promise<void> => {
+  try {
+    // Create post with dynamic date
+    const post = await createPost();
+
+    res.json({
+      success: true,
+      postId: post.id,
+      postUrl: `https://reddit.com/r/${context.subredditName}/comments/${post.id}`,
+      message: 'Daily challenge post created successfully'
+    });
+  } catch (error) {
+    console.error(`Error creating daily post: ${error}`);
+    res.status(400).json({
+      success: false,
+      message: 'Failed to create daily post',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 router.post('/internal/scheduler/daily-reset', async (_req, res): Promise<void> => {
   const jobResult = await executeSchedulerJob(
     'daily-reset',
@@ -789,12 +834,23 @@ router.post('/internal/scheduler/daily-reset', async (_req, res): Promise<void> 
         timestamp: Date.now(),
       });
 
+      // Create a new daily challenge post automatically
+      let newPost = null;
+      try {
+        newPost = await createPost();
+        console.log(`[SCHEDULER] Created new daily post: ${newPost.id}`);
+      } catch (postError) {
+        console.error(`[SCHEDULER] Failed to create daily post: ${postError}`);
+        // Don't fail the entire job if post creation fails
+      }
+
       return {
         date: resetResult.gameState?.date,
         categoryOrder: resetResult.gameState?.categoryOrder,
         roundCount: resetResult.gameState?.imageSet.length,
         participantCount: 0, // Reset to 0 for new day
         contentReloaded: true, // Indicate content was refreshed
+        newPostId: newPost?.id || null, // Include post ID if created successfully
       };
     },
     {

@@ -2,11 +2,21 @@
 
 **Can you tell AI from reality?**
 
-AI or Not? is an engaging daily challenge game built on Reddit's Devvit platform where players test their ability to distinguish between real photographs and AI-generated images. Each day brings a fresh set of 6 image pairs across 5 active categories (Animals, Architecture, Nature, Food, Products) with a 6th category (Science) in development, challenging users to identify which image is the REAL photograph (not AI-generated).
+## 🎯 What is AI or Not?
 
-This interactive React-based game runs directly within Reddit posts, providing a seamless gaming experience with real-time leaderboards, achievement badges, social sharing features, simplified audio controls, and a revolutionary image magnification system. Players compete against a 10-second timer each round and against each other in a daily test of visual perception and AI detection skills, with up to 2 attempts per day to achieve their best score.
+**AI or Not?** is a daily AI detection challenge game that tests your ability to distinguish between real photographs and AI-generated images. Built natively for Reddit using the Devvit platform, this interactive game runs directly within Reddit posts and challenges players to identify which of two images is the REAL photograph (not AI-generated) across 6 rounds with 10-second timers.
 
-The game features a responsive mobile-first design optimized for Reddit's viewing experience, enhanced visual feedback with custom overlay indicators, simplified audio controls with one-click toggle functionality, comprehensive educational content system with midgame learning breaks, advanced timeout handling with extended learning opportunities, revolutionary 2.5x image magnification for detailed inspection, and smooth animated transitions throughout the user experience.
+### What the Game Does
+
+The game presents players with pairs of images - one real photograph and one AI-generated image - across different categories (Animals, Architecture, Nature, Food, Products, Science). Players must quickly identify which image is real while competing against a 10-second timer per round. The game features:
+
+- **6-Round Daily Challenge**: Each day brings fresh image pairs across 5 active categories with randomized difficulty
+- **Time-Based Scoring**: 10 points per correct answer + speed bonuses (5/3/1 points based on remaining time)
+- **Educational Integration**: Midgame learning break with AI detection tips and fascinating facts
+- **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings
+- **Multiple Attempts**: Up to 2 attempts per day with best score tracking
+- **Achievement System**: Earn badges from 🤖 AI Whisperer (perfect score) to 🎓 Human in Training
+- **Social Features**: Challenge friends with personalized sharing messages
 
 ## 🎯 What is AI or Not?
 
@@ -222,99 +232,68 @@ AI or Not? stands out as a pioneering AI detection game that combines entertainm
 ### 🎯 Complete Game Flow
 
 #### 📱 Pre-Game Setup (Splash Screen)
-The splash screen welcomes you with:
-- **Daily Challenge Display**: Shows the current date with the game title "AI or Not?" and tagline "Can you tell AI from reality?"
-- **Game Rules Overview**: Clear instructions explaining:
-  1. Pick the REAL photo from 6 pairs
-  2. 10 seconds per round
-  3. Faster = higher score!
-- **Audio Controls**: Optional audio toggle (🎵/🔇) in the top-right corner
-- **Start Button**: Large "Start Playing!" button to begin your daily challenge
+- **Daily Challenge Display**: Shows current date and game instructions
+- **Game Rules**: Pick the REAL photo from 6 pairs, 10 seconds per round, faster = higher score
+- **Audio Controls**: Optional toggle (🎵/🔇) in top-right corner
+- **Start Button**: Click "Start Playing!" to begin
 
 #### 🎮 Round-by-Round Gameplay (6 Rounds Total)
 
-**Each Round Structure:**
-- **Round Info**: Combined display showing "ROUND X OF 6 (Category)" in the top-left header
-- **Image Comparison**: Two images displayed - one real photograph, one AI-generated
-  - **Mobile Layout**: Images stacked vertically (max-width 400px, centered)
-  - **Desktop Layout**: Side-by-side comparison at 480px+ (max-width 600px, centered)
-  - **Visual Design**: 1:1 aspect ratio with 20px rounded corners
-- **10-Second Timer**: Color-coded countdown with progress bar:
-  - 🟢 **Green** (7-10 seconds): Plenty of time to analyze
-  - 🟡 **Yellow** (4-6 seconds): Time to make a decision  
-  - 🔴 **Red** (1-3 seconds): Choose quickly!
+**Each Round:**
+1. **View Two Images**: One real photograph, one AI-generated
+2. **10-Second Timer**: Color-coded countdown (green → yellow → red)
+3. **Analyze & Choose**: Look for AI artifacts and click the REAL image
+4. **Get Feedback**: See results with visual indicators and score
 
-**Making Your Selection:**
+**Key Features During Gameplay:**
+- **🔬 Image Magnification**: Hover (desktop) or touch-hold (mobile) for 2.5x zoom to examine details
+- **📱 Responsive Layout**: Vertical stack on mobile, side-by-side on desktop
+- **✅ Visual Feedback**: Color-coded borders and overlay indicators show results
+- **🔊 Audio Cues**: Success/failure sounds (if enabled)
 
-1. **🔍 Analyze Both Images**: Look for AI tells like:
-   - Unnatural lighting or impossible geometry
-   - Extra fingers or distorted hands
-   - Weird textures or repetitive patterns
-   - Text that looks blurry or nonsensical
-
-2. **🔬 Use Revolutionary Image Magnification**: 
-   - **Desktop**: Hover over images to see a 2.5x magnified circular view that follows your cursor
-   - **Mobile**: Touch-and-hold (400ms) to activate magnification, then drag to examine areas
-   - **High-Performance**: Canvas-based rendering with 60fps optimization and performance monitoring
-   - **Detail Inspection**: Perfect for examining AI artifacts and subtle inconsistencies with user-controlled experience
-
-3. **👆 Click to Choose**: Click on the image you believe is the REAL photograph
-
-4. **⏳ Loading State**: See a spinner and "Checking your answer..." message
-
-5. **✅ Visual Feedback**: Enhanced indicators show the results:
-   - **Overlay Indicators**: Circular overlays with icons (✕ for AI, ✓ for Human) and labels
-   - **Border Feedback**: Green borders for correct, red for incorrect (with glow effects)
-   - **Score Display**: See your points (e.g., "+13 points" or "No points")
-
-6. **🔊 Audio Feedback**: Success or failure sounds play (if audio enabled)
-
-7. **➡️ Auto-Advance**: Game moves to the next round after 2 seconds
-
-**⏰ Timeout Handling:**
-- **Extended Feedback**: 3-second countdown with "Time's Up!" message
-- **Learning Opportunity**: Shows correct answer with visual indicators
-- **Fair Scoring**: 0 points for timeout, counts as incorrect
+**⏰ If Time Runs Out:**
+- Shows "Time's Up!" with 3-second countdown
+- Displays correct answer for learning
+- Awards 0 points (counts as incorrect)
 
 #### 🎓 Educational Break (After Round 3)
-Halfway through, you'll get a learning break:
-- **💡 AI Detection Tips**: Practical advice (randomly selected from 50+ tips)
-- **🤖 AI Facts**: Fascinating insights about AI technology (50+ facts)
-- **📊 Progress Indicator**: Shows 3 of 6 rounds complete
-- **▶️ Continue Button**: "Continue Playing!" to resume rounds 4-6
+- **Learning Content**: AI detection tips and fascinating facts
+- **Progress Update**: Shows you're halfway through (3 of 6 rounds)
+- **Continue**: Click to resume with rounds 4-6
 
 #### 🏆 Scoring System
-- **Base Points**: 10 points for each correct identification
-- **Time Bonus**: Whole number bonuses based on speed:
-  - **7-10 seconds**: +5 bonus points
-  - **4-6 seconds**: +3 bonus points
-  - **1-3 seconds**: +1 bonus point
-  - **0 seconds**: +0 bonus points
+- **Base Points**: 10 points per correct answer
+- **Speed Bonus**: 5 points (7-10s), 3 points (4-6s), 1 point (1-3s), 0 points (0s)
 - **Maximum Score**: 90 points (6 correct × 15 points each)
-- **Multiple Attempts**: Up to 2 attempts per day with best score tracking
+- **Multiple Attempts**: Up to 2 attempts per day, best score tracked
 
-#### 🏅 Badge Achievement System
-Your performance determines your badge:
-- **🤖 AI Whisperer** (6/6 correct): Perfect score! Incredible accuracy
-- **🕵️ AI Detective** (5/6 correct): Outstanding detection skills!
-- **👁️ Good Samaritan** (4/6 correct): Excellent eye for detail!
-- **👤 Just Human** (3/6 correct): Getting the hang of it!
-- **🎓 Human in Training** (0-2/6 correct): Keep practicing!
+#### 🏅 Achievement Badges
+- **🤖 AI Whisperer** (6/6): Perfect score! Incredible accuracy
+- **🕵️ AI Detective** (5/6): Outstanding detection skills!
+- **👁️ Good Samaritan** (4/6): Excellent eye for detail!
+- **👤 Just Human** (3/6): Getting the hang of it!
+- **🎓 Human in Training** (0-2/6): Keep practicing!
 
-#### 🎉 Results & Social Features
-After completing all 6 rounds:
-- **📊 Final Results**: See your total score, badge, and leaderboard position
-- **📈 Improvement Tracking**: Compare with previous attempts
-- **👥 Social Sharing**: Challenge friends with personalized messages
-- **🏆 Leaderboards**: View daily, weekly, and all-time rankings
-- **🔄 Play Again**: Use your second daily attempt (if available)
+#### 🎉 Results Screen
+- **Final Score**: Total points, badge earned, leaderboard position
+- **Social Sharing**: Challenge friends with personalized messages
+- **Leaderboards**: View daily, weekly, and all-time rankings
+- **Play Again**: Use second daily attempt (if available)
 
 ### 💡 Pro Tips for Success
-- **🔍 Use Magnification**: Hover/touch-hold to examine fine details
-- **👀 Look for Hands**: AI often struggles with fingers and hand positioning
-- **💡 Check Lighting**: Look for inconsistent shadows and lighting
-- **📝 Read Text**: AI-generated text is often blurry or nonsensical
-- **⚡ Balance Speed vs Accuracy**: Quick decisions earn time bonuses
+
+#### 🔍 Detection Techniques
+- **Use Magnification**: Hover/touch-hold for 2.5x zoom to examine fine details
+- **Check Hands**: AI often creates extra fingers or unnatural hand positions
+- **Examine Lighting**: Look for inconsistent shadows or impossible light sources
+- **Read Text**: AI-generated text is usually blurry or nonsensical
+- **Study Textures**: AI struggles with complex patterns like fur, fabric, or skin
+
+#### ⚡ Strategy Tips
+- **Balance Speed vs Accuracy**: Time bonuses add up, but correctness is most important
+- **Trust Your Instincts**: The "uncanny valley" feeling often indicates AI
+- **Learn from Timeouts**: Extended feedback helps you improve for next time
+- **Practice Daily**: Regular play improves pattern recognition and speedccuracy**: Quick decisions earn time bonuses
 - **🎓 Learn from Timeouts**: Extended feedback helps you improve Good Samaritan** (4/6 correct): Excellent eye for detail!
 - **👤 Just Human** (3/6 correct): Getting the hang of it!
 - **🎓 Human in Training** (0-2/6 correct): Keep practicing!
