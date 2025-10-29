@@ -27,7 +27,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStartGame }) => {
         <div className="space-y-2">
           <div className="text-5xl mb-2">🤖</div>
           <h1 className="text-3xl font-bold text-gray-900 mb-1">
-            Spot the Bot
+            AI or Not?
           </h1>
           <p className="text-base text-gray-600">
             Can you tell AI from reality?

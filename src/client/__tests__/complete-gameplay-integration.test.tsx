@@ -229,7 +229,7 @@ describe('Complete 6-Round Gameplay Integration', () => {
     render(<App />);
 
     // 1. Start from splash screen
-    expect(screen.getByText(/spot the bot/i)).toBeInTheDocument();
+    expect(screen.getByText(/ai or not/i)).toBeInTheDocument();
     
     const playButton = screen.getByText(/play/i);
     fireEvent.click(playButton);

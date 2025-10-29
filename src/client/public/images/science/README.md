@@ -1,6 +1,6 @@
 # Science Category Images
 
-This directory contains image pairs for the Science category in Spot the Bot.
+This directory contains image pairs for the Science category in AI or Not?.
 
 ## Folder Structure
 

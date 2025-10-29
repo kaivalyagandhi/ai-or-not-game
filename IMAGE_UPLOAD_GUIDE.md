@@ -1,6 +1,6 @@
-# Image Upload Guide for Spot the Bot
+# Image Upload Guide for AI or Not?
 
-This guide explains how to upload and organize image pairs for the "Spot the Bot" game.
+This guide explains how to upload and organize image pairs for the "AI or Not?" game.
 
 ## Directory Structure
 

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Image Magnify Feature enhances the Spot the Bot gameplay experience by providing players with a magnification tool during each round. This feature allows players to hover over either image and see a magnified circular view that follows their cursor, showing a 3x magnified portion of the image area. The magnified circle appears only during hover interactions and uses visual styling consistent with the game's existing design language to maintain a cohesive user experience.
+The Image Magnify Feature enhances the AI or Not? gameplay experience by providing players with a magnification tool during each round. This feature allows players to hover over either image and see a magnified circular view that follows their cursor, showing a 3x magnified portion of the image area. The magnified circle appears only during hover interactions and uses visual styling consistent with the game's existing design language to maintain a cohesive user experience.
 
 ## Glossary
 

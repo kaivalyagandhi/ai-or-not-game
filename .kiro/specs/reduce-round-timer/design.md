@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design covers the implementation approach for reducing the game round timer from 15 seconds to 10 seconds across the Spot the Bot application. The change involves updating timer constants, validation logic, UI components, and user-facing text to ensure consistency throughout the system.
+This design covers the implementation approach for reducing the game round timer from 15 seconds to 10 seconds across the AI or Not? application. The change involves updating timer constants, validation logic, UI components, and user-facing text to ensure consistency throughout the system.
 
 ## Architecture
 

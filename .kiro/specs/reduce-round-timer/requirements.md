@@ -2,11 +2,11 @@
 
 ## Introduction
 
-This specification covers reducing the game round timer from 15 seconds to 10 seconds per round in the Spot the Bot game. This change will make the game more challenging and fast-paced while maintaining the existing 6-round structure.
+This specification covers reducing the game round timer from 15 seconds to 10 seconds per round in the AI or Not? game. This change will make the game more challenging and fast-paced while maintaining the existing 6-round structure.
 
 ## Glossary
 
-- **Game_System**: The Spot the Bot game application running on Reddit via Devvit
+- **Game_System**: The AI or Not? game application running on Reddit via Devvit
 - **Round_Timer**: The countdown timer that limits how long players have to make their selection in each round
 - **Client_Interface**: The React frontend that displays the game to users
 - **Server_Logic**: The backend validation and game logic that processes user submissions

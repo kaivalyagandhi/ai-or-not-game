@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Image Magnify Feature enhances the Spot the Bot game by providing players with a real-time magnification tool during gameplay. When players hover over game images, a circular magnified view appears that follows their cursor, displaying a 3x zoomed portion of the image area. This feature is implemented as a React component that integrates seamlessly with the existing GameRound component, using HTML5 Canvas for high-performance rendering and CSS for responsive styling. The magnification system maintains visual consistency with the game's design language while providing smooth, lag-free interaction across desktop and mobile devices.
+The Image Magnify Feature enhances the AI or Not? game by providing players with a real-time magnification tool during gameplay. When players hover over game images, a circular magnified view appears that follows their cursor, displaying a 3x zoomed portion of the image area. This feature is implemented as a React component that integrates seamlessly with the existing GameRound component, using HTML5 Canvas for high-performance rendering and CSS for responsive styling. The magnification system maintains visual consistency with the game's design language while providing smooth, lag-free interaction across desktop and mobile devices.
 
 ## Architecture
 

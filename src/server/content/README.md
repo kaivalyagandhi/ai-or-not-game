@@ -1,6 +1,6 @@
 # Educational Content Management
 
-This directory contains the content files for Spot the Bot's educational and inspirational features.
+This directory contains the content files for AI or Not?'s educational and inspirational features.
 
 ## File Structure
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design addresses critical bugs in the audio system and user interface of the Spot the Bot game. The improvements focus on simplifying audio controls, ensuring real-time state updates, enhancing sound effect audibility, reorganizing UI elements, and fixing timeout behavior to provide a better user experience.
+This design addresses critical bugs in the audio system and user interface of the AI or Not? game. The improvements focus on simplifying audio controls, ensuring real-time state updates, enhancing sound effect audibility, reorganizing UI elements, and fixing timeout behavior to provide a better user experience.
 
 ## Architecture
 
@@ -88,8 +88,8 @@ type AudioState = {
 };
 
 // localStorage keys
-const AUDIO_ENABLED_KEY = 'spotTheBot_audioEnabled';
-const AUDIO_VOLUME_KEY = 'spotTheBot_audioVolume'; // Keep for internal use
+const AUDIO_ENABLED_KEY = 'aiOrNot_audioEnabled';
+const AUDIO_VOLUME_KEY = 'aiOrNot_audioVolume'; // Keep for internal use
 ```
 
 ### Round Display Model

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Spot the Bot is a daily image identification game built on Reddit's Devvit platform. The game challenges players to distinguish between AI-generated and human-captured images across 6 rounds, with each round featuring a 15-second time limit. The system leverages Devvit's Redis capabilities for leaderboards and data persistence, realtime API for live participant counts, scheduler for daily content rotation, and includes educational content, audio feedback, and enhanced social sharing features. Players can attempt the game up to 2 times per day in production mode.
+AI or Not? is a daily image identification game built on Reddit's Devvit platform. The game challenges players to distinguish between AI-generated and human-captured images across 6 rounds, with each round featuring a 15-second time limit. The system leverages Devvit's Redis capabilities for leaderboards and data persistence, realtime API for live participant counts, scheduler for daily content rotation, and includes educational content, audio feedback, and enhanced social sharing features. Players can attempt the game up to 2 times per day in production mode.
 
 ## Architecture
 

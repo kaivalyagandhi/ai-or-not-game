@@ -28,7 +28,7 @@
 
 ### Functional Testing
 - [ ] Test development environment with `npm run dev`
-- [ ] Verify playtest URL works: `https://www.reddit.com/r/spot_the_bot_dev?playtest=spot-the-bot`
+- [ ] Verify playtest URL works: `https://www.reddit.com/r/ai_or_not_dev?playtest=ai-or-not`
 - [ ] Test complete game flow (6 rounds)
 - [ ] Verify leaderboard functionality
 - [ ] Test real-time participant counting
@@ -110,7 +110,7 @@ npm run lint
 ## Environment-Specific Notes
 
 ### Development Environment
-- Uses `r/spot_the_bot_dev` subreddit
+- Uses `r/ai_or_not_dev` subreddit
 - Hot reloading enabled for rapid iteration
 - Debug logging available
 

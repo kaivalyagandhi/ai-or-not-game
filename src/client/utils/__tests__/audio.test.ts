@@ -105,9 +105,9 @@ describe('Audio Utils - Local Storage Preferences', () => {
 
     saveAudioPreferences(config);
 
-    expect(mockLocalStorage.setItem).toHaveBeenCalledWith('spot-the-bot-audio-volume', '0.8');
-    expect(mockLocalStorage.setItem).toHaveBeenCalledWith('spot-the-bot-audio-muted', 'true');
-    expect(mockLocalStorage.setItem).toHaveBeenCalledWith('spot-the-bot-audio-enabled', 'false');
+    expect(mockLocalStorage.setItem).toHaveBeenCalledWith('ai-or-not-audio-volume', '0.8');
+    expect(mockLocalStorage.setItem).toHaveBeenCalledWith('ai-or-not-audio-muted', 'true');
+    expect(mockLocalStorage.setItem).toHaveBeenCalledWith('ai-or-not-audio-enabled', 'false');
   });
 
   it('should handle partial preference saving', () => {
@@ -115,8 +115,8 @@ describe('Audio Utils - Local Storage Preferences', () => {
 
     saveAudioPreferences(config);
 
-    expect(mockLocalStorage.setItem).toHaveBeenCalledWith('spot-the-bot-audio-volume', '0.3');
-    expect(mockLocalStorage.setItem).not.toHaveBeenCalledWith('spot-the-bot-audio-enabled', expect.anything());
+    expect(mockLocalStorage.setItem).toHaveBeenCalledWith('ai-or-not-audio-volume', '0.3');
+    expect(mockLocalStorage.setItem).not.toHaveBeenCalledWith('ai-or-not-audio-enabled', expect.anything());
   });
 
   it('should handle localStorage save errors gracefully', () => {

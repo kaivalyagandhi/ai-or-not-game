@@ -93,7 +93,7 @@ npm run test:watch
 
 ### Testing Your App
 1. Run `npm run dev`
-2. Open the playtest URL: `https://www.reddit.com/r/spot_the_bot_dev?playtest=spot-the-bot`
+2. Open the playtest URL: `https://www.reddit.com/r/ai_or_not_dev?playtest=ai-or-not`
 3. Click "Launch App" to test your game
 
 ### File Structure

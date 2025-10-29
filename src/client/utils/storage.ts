@@ -14,7 +14,7 @@ export interface StoredData<T = any> {
   ttl?: number;
 }
 
-const DEFAULT_PREFIX = 'spot-the-bot';
+const DEFAULT_PREFIX = 'ai-or-not';
 const DEFAULT_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 /**

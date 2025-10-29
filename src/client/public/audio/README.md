@@ -1,6 +1,6 @@
 # Audio Assets Directory
 
-This directory contains audio files for Spot the Bot game.
+This directory contains audio files for AI or Not? game.
 
 ## Required Files
 

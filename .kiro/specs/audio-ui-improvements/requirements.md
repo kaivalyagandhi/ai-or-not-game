@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This specification addresses critical bugs and improvements to the audio system and user interface in the Spot the Bot game. The changes focus on simplifying audio controls, ensuring real-time audio state updates, improving sound effect audibility, reorganizing UI labels, and fixing timeout behavior.
+This specification addresses critical bugs and improvements to the audio system and user interface in the AI or Not? game. The changes focus on simplifying audio controls, ensuring real-time audio state updates, improving sound effect audibility, reorganizing UI labels, and fixing timeout behavior.
 
 ## Glossary
 

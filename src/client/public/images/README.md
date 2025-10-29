@@ -1,6 +1,6 @@
 # Game Images Directory
 
-This directory contains all image pairs used in the "Spot the Bot" game.
+This directory contains all image pairs used in the "AI or Not?" game.
 
 ## Directory Structure
 

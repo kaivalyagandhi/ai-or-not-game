@@ -1,8 +1,8 @@
-# Audio Setup Guide for Spot the Bot
+# Audio Setup Guide for AI or Not?
 
 ## Overview
 
-Spot the Bot includes an audio system that provides background music and sound effects to enhance the gaming experience. This guide explains how to set up and manage audio files for the game.
+AI or Not? includes an audio system that provides background music and sound effects to enhance the gaming experience. This guide explains how to set up and manage audio files for the game.
 
 ## Audio File Requirements
 

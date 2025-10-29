@@ -9,7 +9,7 @@ export const createPost = async () => {
   return await reddit.submitCustomPost({
     splash: {
       // Splash Screen Configuration
-      appDisplayName: 'spot-the-bot',
+      appDisplayName: 'ai-or-not',
       backgroundUri: 'default-splash.png',
       buttonLabel: 'Tap to Start',
       description: 'An exciting interactive experience',
@@ -21,6 +21,6 @@ export const createPost = async () => {
       score: 0,
     },
     subredditName: subredditName,
-    title: 'spot-the-bot',
+    title: 'ai-or-not',
   });
 };

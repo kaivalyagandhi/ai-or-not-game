@@ -113,7 +113,7 @@ describe('ResultsScreen - Enhanced Sharing Functionality', () => {
 
     await waitFor(() => {
       expect(mockClipboard.writeText).toHaveBeenCalledWith(
-        expect.stringContaining('🤖 Spot the Bot - Daily Challenge Results 🤖')
+        expect.stringContaining('🤖 AI or Not? - Daily Challenge Results 🤖')
       );
       expect(mockClipboard.writeText).toHaveBeenCalledWith(
         expect.stringContaining('📊 Score: 85.50 points')
@@ -142,7 +142,7 @@ describe('ResultsScreen - Enhanced Sharing Functionality', () => {
 
     await waitFor(() => {
       expect(mockClipboard.writeText).toHaveBeenCalledWith(
-        expect.stringContaining('Hey friends! 👋 Just finished today\'s Spot the Bot challenge:')
+        expect.stringContaining('Hey friends! 👋 Just finished today\'s AI or Not? challenge:')
       );
       expect(mockClipboard.writeText).toHaveBeenCalledWith(
         expect.stringContaining('📊 Final Score: 85.50 points')
@@ -168,8 +168,8 @@ describe('ResultsScreen - Enhanced Sharing Functionality', () => {
 
     await waitFor(() => {
       expect(mockShare).toHaveBeenCalledWith({
-        title: 'Spot the Bot - My Results',
-        text: expect.stringContaining('🤖 Spot the Bot - Daily Challenge Results 🤖'),
+        title: 'AI or Not? - My Results',
+        text: expect.stringContaining('🤖 AI or Not? - Daily Challenge Results 🤖'),
       });
     });
   });

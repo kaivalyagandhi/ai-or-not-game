@@ -430,7 +430,7 @@ describe('Sharing Integration with Play Limits', () => {
       await waitFor(() => {
         // Should still generate share message without play limit context
         expect(mockClipboard.writeText).toHaveBeenCalledWith(
-          expect.stringContaining('🤖 Spot the Bot - Daily Challenge Results 🤖')
+          expect.stringContaining('🤖 AI or Not? - Daily Challenge Results 🤖')
         );
         expect(mockClipboard.writeText).toHaveBeenCalledWith(
           expect.stringContaining('📊 Score: 85.50 points')
@@ -460,7 +460,7 @@ describe('Sharing Integration with Play Limits', () => {
       await waitFor(() => {
         // Should still generate share message with fallback content
         expect(mockClipboard.writeText).toHaveBeenCalledWith(
-          expect.stringContaining('🤖 Spot the Bot - Daily Challenge Results 🤖')
+          expect.stringContaining('🤖 AI or Not? - Daily Challenge Results 🤖')
         );
       });
     });

@@ -1,6 +1,6 @@
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-  "name": "spot-the-bot-v8",
+  "name": "ai-or-not-v8",
   "post": {
     "dir": "dist/client",
     "entrypoints": {
@@ -22,7 +22,7 @@
     "items": [
       {
         "label": "Create a new post",
-        "description": "spot-the-bot",
+        "description": "ai-or-not",
         "location": "subreddit",
         "forUserType": "moderator",
         "endpoint": "/internal/menu/post-create"

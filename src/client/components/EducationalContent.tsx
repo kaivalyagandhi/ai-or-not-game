@@ -20,20 +20,20 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
         const response = await fetchRandomContentFresh();
         
         if (response.success) {
-          setTip(response.tip || 'Look for unnatural lighting or impossible geometry.');
-          setFact(response.fact || 'AI image generators learn from millions of real photos.');
+          setTip(response.tip || 'Look for \'the smudge.\' AI sometimes blurs or smudges details where objects meet, like a ring against a finger.');
+          setFact(response.fact || 'AI image generators don\'t \'see\' or \'think.\' They\'re just incredibly complex pattern-matching machines.');
         } else {
           setError(response.error || 'Failed to load content');
           // Set fallback content
-          setTip('Look for unnatural lighting or shadows that don\'t match the scene.');
-          setFact('AI image generators learn by studying millions of real photos.');
+          setTip('AI still gets hands wrong. Count the fingers. If it looks like a horror movie monster\'s hand, you\'ve found your tell.');
+          setFact('The term \'AI\' was first used at a college conference in 1956. It\'s older than your parents\' vinyl collection.');
         }
       } catch (err) {
         console.error('Error loading educational content:', err);
         setError('Failed to load educational content');
         // Set fallback content
-        setTip('Check hands and fingers carefully - AI often generates extra fingers.');
-        setFact('Modern AI can create images in seconds that would take human artists hours.');
+        setTip('Check for perfect symmetry. Reality is rarely perfect. If a face or building is flawlessly symmetrical, it\'s a red flag.');
+        setFact('An AI-generated artwork was sold at an auction for $432,500. It was basically a blurry portrait.');
       } finally {
         setLoading(false);
       }

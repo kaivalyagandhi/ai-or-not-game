@@ -119,7 +119,7 @@ describe('Game Workflow - Complete User Journey', () => {
     render(<App />);
 
     // 1. Should start on splash screen
-    expect(screen.getByText(/spot the bot/i)).toBeInTheDocument();
+    expect(screen.getByText(/ai or not/i)).toBeInTheDocument();
     expect(screen.getByText(/play/i)).toBeInTheDocument();
 
     // 2. Click play to start game
@@ -497,7 +497,7 @@ describe('Game Workflow - Accessibility', () => {
 
     // Check splash screen accessibility
     expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
-    expect(screen.getByText(/spot the bot/i)).toBeInTheDocument();
+    expect(screen.getByText(/ai or not/i)).toBeInTheDocument();
   });
 
   it('should support keyboard navigation', async () => {

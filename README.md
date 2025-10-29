@@ -1,19 +1,19 @@
-# 🤖 Spot the Bot
+# 🤖 AI or Not?
 
 **Can you tell AI from reality?**
 
-Spot the Bot is an engaging daily challenge game built on Reddit's Devvit platform where players test their ability to distinguish between real photographs and AI-generated images. Each day brings a fresh set of 6 image pairs across 5 active categories (Animals, Architecture, Nature, Food, Products) with a 6th category (Science) in development, challenging users to identify which image is the REAL photograph (not AI-generated).
+AI or Not? is an engaging daily challenge game built on Reddit's Devvit platform where players test their ability to distinguish between real photographs and AI-generated images. Each day brings a fresh set of 6 image pairs across 5 active categories (Animals, Architecture, Nature, Food, Products) with a 6th category (Science) in development, challenging users to identify which image is the REAL photograph (not AI-generated).
 
 This interactive React-based game runs directly within Reddit posts, providing a seamless gaming experience with real-time leaderboards, achievement badges, social sharing features, simplified audio controls, and a revolutionary image magnification system. Players compete against a 10-second timer each round and against each other in a daily test of visual perception and AI detection skills, with up to 2 attempts per day to achieve their best score.
 
 The game features a responsive mobile-first design optimized for Reddit's viewing experience, enhanced visual feedback with custom overlay indicators, simplified audio controls with one-click toggle functionality, comprehensive educational content system with midgame learning breaks, advanced timeout handling with extended learning opportunities, revolutionary 2.5x image magnification for detailed inspection, and smooth animated transitions throughout the user experience.
 
-## 🎯 What is Spot the Bot?
+## 🎯 What is AI or Not?
 
-**Spot the Bot** is a daily AI detection challenge game that tests your ability to distinguish between real photographs and AI-generated images. Built natively for Reddit using the Devvit platform, the game runs directly within Reddit posts and challenges players to identify which of two images is the REAL photograph (not AI-generated) across 6 rounds with 10-second timers.
+**AI or Not?** is a daily AI detection challenge game that tests your ability to distinguish between real photographs and AI-generated images. Built natively for Reddit using the Devvit platform, the game runs directly within Reddit posts and challenges players to identify which of two images is the REAL photograph (not AI-generated) across 6 rounds with 10-second timers.
 
 ### What the Game Does
-The game presents players with pairs of images - one real photograph and one AI-generated image - across six different categories (Animals, Architecture, Nature, Food, Products, Science). Players must quickly identify which image is real while competing against a 10-second timer. The game features:
+The game presents players with pairs of images - one real photograph and one AI-generated image - across different categories (Animals, Architecture, Nature, Food, Products, Science). Players must quickly identify which image is real while competing against a 10-second timer. The game features:
 
 - **Revolutionary Image Magnification**: Interactive 2.5x zoom system allowing detailed inspection of images with Canvas-based rendering, cursor tracking, and cross-device support for examining AI artifacts
 - **Educational Integration**: Midgame learning breaks with AI detection tips and fascinating facts about AI technology, randomly selected from comprehensive libraries (50+ tips, 50+ facts)
@@ -53,7 +53,7 @@ The game is complete and ready for players with all core systems implemented and
 
 ## 🎮 Game Overview
 
-Spot the Bot is a **daily visual challenge game** that tests your ability to distinguish between real photographs and AI-generated images. Built as a React web application that runs natively within Reddit posts using the Devvit platform, the game presents players with image comparisons where they must identify which image is the REAL photograph (not the AI-generated one).
+AI or Not? is a **daily visual challenge game** that tests your ability to distinguish between real photographs and AI-generated images. Built as a React web application that runs natively within Reddit posts using the Devvit platform, the game presents players with image comparisons where they must identify which image is the REAL photograph (not the AI-generated one).
 
 The game features a modern, streamlined interface with dynamic date display that automatically shows the current date in a clean format on both the splash screen and results screen. Players experience enhanced visual feedback throughout their journey, from the initial splash screen through the final results display, with custom overlay indicators, colored borders, smooth loading states, and simplified audio controls that provide immediate feedback on their choices.
 
@@ -71,7 +71,7 @@ The game features a modern, streamlined interface with dynamic date display that
 
 ## 🔍 Revolutionary Image Magnification System
 
-Spot the Bot introduces the first-ever interactive magnification system in an AI detection game, allowing players to examine images in unprecedented detail:
+AI or Not? introduces the first-ever interactive magnification system in an AI detection game, allowing players to examine images in unprecedented detail:
 
 ### How Magnification Works
 - **2.5x Magnification**: Hover over any image to see a circular magnified view at 2.5x zoom level
@@ -104,7 +104,7 @@ This magnification system transforms how players approach AI detection, enabling
 
 ## 🎮 Current Game Implementation
 
-Based on the latest code analysis, Spot the Bot is a fully functional AI detection game with a modern, polished interface. The game is built as a React application that runs natively within Reddit posts using the Devvit platform, providing a seamless gaming experience with cutting-edge features:
+Based on the latest code analysis, AI or Not? is a fully functional AI detection game with a modern, polished interface. The game is built as a React application that runs natively within Reddit posts using the Devvit platform, providing a seamless gaming experience with cutting-edge features:
 
 ### Complete Game Flow
 - **Splash Screen**: Welcome screen with game instructions, current date display, and "Start Playing" button that triggers audio context initialization
@@ -159,7 +159,7 @@ The game features sophisticated timeout handling:
 
 ## 🌟 What Makes This Game Innovative & Unique
 
-Spot the Bot stands out as a pioneering AI detection game that combines entertainment with practical digital literacy skills. Built natively for Reddit using cutting-edge web technologies, it introduces several industry-first features that set it apart from any other AI detection experience:
+AI or Not? stands out as a pioneering AI detection game that combines entertainment with practical digital literacy skills. Built natively for Reddit using cutting-edge web technologies, it introduces several industry-first features that set it apart from any other AI detection experience:
 
 ### 🎯 Revolutionary AI Detection Challenge
 - **Daily Fresh Content**: New image sets generated every day with completely randomized categories, AI placement, and difficulty progression across 5 active image categories (Animals, Architecture, Nature, Food, Products) with Science category in development
@@ -213,7 +213,7 @@ Spot the Bot stands out as a pioneering AI detection game that combines entertai
 ## 🎮 How to Play: Complete Step-by-Step Guide
 
 ### 🚀 Getting Started
-1. **Find the Game**: Look for Spot the Bot posts in participating subreddits or communities where the app is installed
+1. **Find the Game**: Look for AI or Not? posts in participating subreddits or communities where the app is installed
 2. **Launch the App**: Click the "Launch App" button in the Reddit post to open the game in full-screen webview mode
 3. **Welcome Screen**: You'll see today's date, game instructions explaining the 6-round format with 10-second timers, and scoring system details
 4. **Audio Setup**: Optional - use the audio toggle button (🎵/🔇) in the top-right corner to enable/disable background music and sound effects (audio starts immediately when enabled)
@@ -223,7 +223,7 @@ Spot the Bot stands out as a pioneering AI detection game that combines entertai
 
 #### 📱 Pre-Game Setup (Splash Screen)
 The splash screen welcomes you with:
-- **Daily Challenge Display**: Shows the current date with the game title "Spot the Bot" and tagline "Can you tell AI from reality?"
+- **Daily Challenge Display**: Shows the current date with the game title "AI or Not?" and tagline "Can you tell AI from reality?"
 - **Game Rules Overview**: Clear instructions explaining:
   1. Pick the REAL photo from 6 pairs
   2. 10 seconds per round
@@ -687,7 +687,7 @@ The game recently received major visual feedback improvements to create a more i
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd spot-the-bot-v6
+   cd ai-or-not-v6
    ```
 
 2. **Install dependencies**
@@ -710,7 +710,7 @@ The game recently received major visual feedback improvements to create a more i
    - Devvit playtest server
 
 5. **Open the game**
-   - Navigate to the provided playtest URL (typically `https://www.reddit.com/r/spot_the_bot_v6_dev?playtest=spot-the-bot-v6`)
+   - Navigate to the provided playtest URL (typically `https://www.reddit.com/r/ai_or_not_v6_dev?playtest=ai-or-not-v6`)
    - Click "Launch App" to test the game in full-screen mode
 
 ### Development Workflow

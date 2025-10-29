@@ -18,9 +18,9 @@ export const DEFAULT_AUDIO_CONFIG: AudioConfig = {
 
 // Local storage keys for audio preferences
 const STORAGE_KEYS = {
-  VOLUME: 'spot-the-bot-audio-volume',
-  MUTED: 'spot-the-bot-audio-muted',
-  ENABLED: 'spot-the-bot-audio-enabled',
+  VOLUME: 'ai-or-not-audio-volume',
+  MUTED: 'ai-or-not-audio-muted',
+  ENABLED: 'ai-or-not-audio-enabled',
 } as const;
 
 /**

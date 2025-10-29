@@ -2,7 +2,7 @@
 
 ## Gameplay Improvements Overview
 
-This implementation plan covers the enhancement of Spot the Bot with:
+This implementation plan covers the enhancement of AI or Not? with:
 
 - 6 rounds instead of 5 (15 seconds per round instead of 10)
 - Educational content after round 3 (tips and AI facts)

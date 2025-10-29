@@ -155,7 +155,7 @@ Want to see if you can beat me before I get my next try? 😏`;
 Think you can spot AI better than me? You get 2 attempts per day - give it a shot! 🎯`;
     }
     
-    return `Hey friends! 👋 Just finished today's Spot the Bot challenge:
+    return `Hey friends! 👋 Just finished today's AI or Not? challenge:
 
 🤖 Daily AI Detection Results:
 📊 Final Score: ${Math.round(session.totalScore)} points${attemptText}
@@ -167,7 +167,7 @@ ${friendChallenge}
 
 Some of these AI images are getting scary good - it's actually a fun challenge! 🤯
 
-#SpotTheBot #AIChallenge #FriendsChallenge`;
+#AIorNot #AIChallenge #FriendsChallenge`;
   };
 
   // Handle share button click
@@ -178,7 +178,7 @@ Some of these AI images are getting scary good - it's actually a fun challenge! 
       if (navigator.share) {
         // Use native sharing if available (mobile)
         await navigator.share({
-          title: 'Spot the Bot - Challenge Your Friends!',
+          title: 'AI or Not? - Challenge Your Friends!',
           text: shareText,
         });
       } else {

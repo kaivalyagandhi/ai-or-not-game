@@ -19,7 +19,7 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
 
     const [audioEnabled, setAudioEnabled] = useState(() => {
       try {
-        const saved = localStorage.getItem('spotTheBot_audioEnabled');
+        const saved = localStorage.getItem('aiOrNot_audioEnabled');
         return saved !== null ? saved === 'true' : true; // Default to enabled
       } catch {
         return true;
@@ -171,7 +171,7 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
 
         // Save to localStorage immediately
         try {
-          localStorage.setItem('spotTheBot_audioEnabled', enabled.toString());
+          localStorage.setItem('aiOrNot_audioEnabled', enabled.toString());
         } catch (error) {
           console.warn('Failed to save audio state to localStorage:', error);
         }

@@ -14,7 +14,7 @@
 
     - Modify `handleMuteToggle` to `handleAudioToggle` with synchronous state updates
     - Ensure all audio elements (background music, sound effects) update immediately
-    - Update localStorage persistence to use `spotTheBot_audioEnabled` key
+    - Update localStorage persistence to use `aiOrNot_audioEnabled` key
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
   - [x] 2.2 Implement session-start background music playback
