@@ -2,7 +2,7 @@
 
 **Can you tell AI from reality?**
 
-Spot the Bot is an engaging daily challenge game built on Reddit's Devvit platform where players test their ability to distinguish between real photographs and AI-generated images. Each day brings a fresh set of 6 image pairs across 6 different categories (Animals, Architecture, Nature, Food, Products, Science), challenging users to identify which image is the REAL photograph (not AI-generated).
+Spot the Bot is an engaging daily challenge game built on Reddit's Devvit platform where players test their ability to distinguish between real photographs and AI-generated images. Each day brings a fresh set of 6 image pairs across 5 active categories (Animals, Architecture, Nature, Food, Products) with a 6th category (Science) in development, challenging users to identify which image is the REAL photograph (not AI-generated).
 
 This interactive React-based game runs directly within Reddit posts, providing a seamless gaming experience with real-time leaderboards, achievement badges, social sharing features, simplified audio controls, and a revolutionary image magnification system. Players compete against a 10-second timer each round and against each other in a daily test of visual perception and AI detection skills, with up to 2 attempts per day to achieve their best score.
 
@@ -23,7 +23,7 @@ The game presents players with pairs of images - one real photograph and one AI-
 - **Social Features**: Enhanced sharing capabilities to challenge friends with personalized messages and improvement tracking
 
 **Key Features:**
-- **Daily Fresh Content**: New image pairs generated every day across 6 categories (Animals, Architecture, Nature, Food, Products, Science)
+- **Daily Fresh Content**: New image pairs generated every day across 5 active categories (Animals, Architecture, Nature, Food, Products) with Science category in development
 - **Educational Integration**: Midgame learning breaks with AI detection tips and fascinating facts about AI image generation, randomly selected from comprehensive libraries (50+ tips, 50+ facts)
 - **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings, plus up to 2 attempts per day with best score tracking
 - **Enhanced Audio Experience**: Background music and sound effects with simple one-click toggle controls (🎵/🔇), enhanced sound effects at 1.8x volume for clarity, balanced background music at 0.15x volume, and smart audio context management
@@ -39,7 +39,7 @@ The game presents players with pairs of images - one real photograph and one AI-
 
 The game is complete and ready for players with all core systems implemented and recently enhanced with performance optimizations:
 - **6-round gameplay** with 10-second timers and tier-based whole-number scoring system
-- **6 active image categories** (Animals, Architecture, Nature, Food, Products, Science)
+- **5 active image categories** (Animals, Architecture, Nature, Food, Products) with Science category in development
 - **Advanced timeout handling** with server-side processing, 3-second animated countdown, and extended learning feedback
 - **Optimized audio system** with one-click toggle controls (🎵/🔇), enhanced sound effects at 1.8x volume (recently reduced for better balance), balanced background music at 0.15x volume (recently reduced from 0.3x) for clarity, smart audio context management, and immediate session-start background music
 - **Educational content system** with fresh AI detection tips and facts randomly loaded from comprehensive libraries (50+ tips, 50+ facts)
@@ -59,7 +59,7 @@ The game features a modern, streamlined interface with dynamic date display that
 
 ### Core Game Mechanics
 - **6 rounds per game** with exactly 10 seconds per round and immediate visual feedback
-- **6 active image categories**: Animals, Architecture, Nature, Food, Products, and Science
+- **5 active image categories**: Animals, Architecture, Nature, Food, Products (with Science category in development)
 - **Reddit-optimized responsive design**: Images displayed in a responsive grid that adapts from vertical stack on mobile to horizontal side-by-side at 480px breakpoint for optimal Reddit feed viewing
 - **Tier-based scoring system**: 10 points per correct answer + time bonuses (5 points for 7-10 seconds, 3 points for 4-6 seconds, 1 point for 1-3 seconds, 0 points for 0 seconds)
 - **Multiple attempts per day**: Players can attempt the challenge up to 2 times per day with best score tracking and improvement notifications (unlimited in development mode)
@@ -162,7 +162,7 @@ The game features sophisticated timeout handling:
 Spot the Bot stands out as a pioneering AI detection game that combines entertainment with practical digital literacy skills. Built natively for Reddit using cutting-edge web technologies, it introduces several industry-first features that set it apart from any other AI detection experience:
 
 ### 🎯 Revolutionary AI Detection Challenge
-- **Daily Fresh Content**: New image sets generated every day with completely randomized categories, AI placement, and difficulty progression across 6 diverse image categories (Animals, Architecture, Nature, Food, Products, Science)
+- **Daily Fresh Content**: New image sets generated every day with completely randomized categories, AI placement, and difficulty progression across 5 active image categories (Animals, Architecture, Nature, Food, Products) with Science category in development
 - **Intelligent Scoring System**: Tier-based scoring rewards both accuracy (10 points per correct answer) and speed (5/3/1/0 bonus points based on remaining time), creating strategic tension between careful analysis and quick decisions under 10-second time pressure
 - **Educational Integration**: Midgame learning break after round 3 provides AI detection tips and fascinating facts about AI image generation with fresh content randomly selected from comprehensive libraries (50+ tips, 50+ facts)
 - **Real-World Training**: Uses authentic AI-generated images from modern models, providing genuine training for spotting deepfakes and synthetic media in the wild
@@ -341,7 +341,7 @@ After completing your challenge, you'll see:
 - **Graceful Degradation**: Game works perfectly even if audio files are unavailable with comprehensive error handling and fallback mechanisms
 
 ### Daily Challenge Features
-- **Fresh Content Daily**: New image pairs generated every day across all 6 categories
+- **Fresh Content Daily**: New image pairs generated every day across all 5 active categories (with Science category in development)
 - **Multiple Attempts**: Up to 2 attempts per day with best score tracking
 - **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings
 - **Social Sharing**: Challenge friends with personalized messages including your scores and improvement
