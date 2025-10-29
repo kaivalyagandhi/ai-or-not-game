@@ -76,9 +76,9 @@ Spot the Bot introduces the first-ever interactive magnification system in an AI
 ### How Magnification Works
 - **2.5x Magnification**: Hover over any image to see a circular magnified view at 2.5x zoom level
 - **Cursor Following**: The magnified circle smoothly follows your mouse cursor in real-time at 60fps with enhanced performance monitoring
-- **Responsive Sizing**: Magnification circle automatically adjusts size based on screen size (70px mobile, 80px desktop)
+- **Responsive Sizing**: Magnification circle automatically adjusts size based on screen size (60px mobile, 80px desktop)
 - **Viewport Awareness**: Smart positioning keeps the magnified circle fully visible even near screen edges with safe margins
-- **Performance Optimized**: Smooth rendering with automatic performance monitoring, exponential moving average FPS calculation, and intelligent feature disabling on low-performance devices
+- **Performance Optimized**: Smooth rendering with automatic performance monitoring and intelligent resource management
 
 ### Cross-Device Support
 - **Desktop**: Smooth mouse hover activation with instant magnification
@@ -89,10 +89,10 @@ Spot the Bot introduces the first-ever interactive magnification system in an AI
 ### Technical Innovation
 - **Canvas Rendering**: High-performance HTML5 Canvas with circular clipping masks and high-quality image smoothing
 - **Real-Time Processing**: Live image processing with throttled updates (16ms intervals) for optimal 60fps performance
-- **Advanced Performance Monitoring**: Exponential moving average FPS calculation over 3-second intervals with very conservative thresholds (5fps minimum) to prevent false positives while maintaining smooth operation
+- **Advanced Performance Monitoring**: Exponential moving average FPS calculation with intelligent performance thresholds for debugging insights
 - **Memory Management**: Efficient cleanup and resource management prevents memory leaks with automatic canvas context cleanup
 - **Browser Compatibility**: Works across all modern browsers with graceful fallbacks and comprehensive error handling
-- **User-Controlled Feature**: Magnification remains available to all users regardless of device performance, with performance monitoring providing debugging insights without restricting user choice
+- **User-Controlled Experience**: Performance monitoring tracks metrics for debugging but respects user choice - magnification remains available regardless of device performance
 
 ### Strategic Advantages
 - **Detail Detection**: Examine fine textures, skin imperfections, and material properties at pixel level
@@ -255,8 +255,8 @@ The splash screen welcomes you with:
 2. **🔬 Use Revolutionary Image Magnification**: 
    - **Desktop**: Hover over images to see a 2.5x magnified circular view that follows your cursor
    - **Mobile**: Touch-and-hold (400ms) to activate magnification, then drag to examine areas
-   - **High-Performance**: Canvas-based rendering with 60fps optimization and advanced performance monitoring
-   - **Detail Inspection**: Perfect for examining AI artifacts and subtle inconsistencies with intelligent performance management
+   - **High-Performance**: Canvas-based rendering with 60fps optimization and performance monitoring
+   - **Detail Inspection**: Perfect for examining AI artifacts and subtle inconsistencies with user-controlled experience
 
 3. **👆 Click to Choose**: Click on the image you believe is the REAL photograph
 
@@ -378,14 +378,14 @@ After completing your challenge, you'll see:
 
 #### Detection Techniques
 - **Detail Inspection**: Use the magnification feature to examine fine details like hair, fur, fabric textures, and skin imperfections
-- **Magnified Analysis**: Hover over suspicious areas to get a 3x magnified view with high-quality Canvas rendering - look for unnatural patterns, impossible geometry, or artifacts that become visible at higher magnification
+- **Magnified Analysis**: Hover over suspicious areas to get a 2.5x magnified view with high-quality Canvas rendering - look for unnatural patterns, impossible geometry, or artifacts that become visible at higher magnification
 - **Lighting Consistency**: Look for unnatural lighting, impossible shadows, or inconsistent light sources across the imagessible shadows, or inconsistent light sources
 - **Geometric Logic**: Check for impossible architecture, floating objects, or perspective errors
 - **Human Elements**: Pay special attention to faces, hands, and human interactions - AI often struggles here
 
 #### Strategic Gameplay
 - **Trust Your Instincts**: The "uncanny valley" feeling is often a reliable AI indicator
-- **Use Magnification Strategically**: Don't spend too much time magnifying - use it to quickly check suspicious areas like hands, eyes, or complex textures with the smooth cursor-following magnification system
+- **Use Magnification Strategically**: Don't spend too much time magnifying - use it to quickly check suspicious areas like hands, eyes, or complex textures with the smooth cursor-following 2.5x magnification system
 - **Balance Speed vs. Accuracy**: Time bonuses can add up to 30 points total (5 points × 6 rounds), but accuracy is still most important (60 points total for perfect answers)
 - **Category-Specific Patterns**: Each category has different AI tells:
   - **Animals**: Unnatural fur patterns, impossible anatomy, weird eyes (magnify to see individual fur strands)
@@ -418,7 +418,7 @@ After completing your challenge, you'll see:
 
 #### User Experience & Design
 - **Enhanced Visual Feedback**: Custom overlay indicators with colored circles, icons, and labels, plus colored borders with glow effects
-- **Interactive Image Magnification**: Fully implemented 2.5x magnification system with Canvas rendering, cursor tracking, and cross-device support
+- **Revolutionary Image Magnification**: Fully implemented 2.5x magnification system with Canvas rendering, cursor tracking, and cross-device support
 - **Responsive Design**: Mobile-first approach with adaptive layouts for all screen sizes (480px breakpoint)
 - **Error Resilience**: Comprehensive error boundaries, retry logic, and offline support
 - **Loading States**: Smooth transitions and progress indicators throughout the experience
@@ -453,7 +453,7 @@ The game is **fully functional and production-ready** with all core systems impl
 
 #### Recent Updates ⏱️
 - **Revolutionary Image Magnification System**: Implemented first-ever interactive 2.5x magnification with Canvas rendering, cursor tracking, and cross-device support for detailed AI artifact inspection
-- **User-Controlled Performance**: Enhanced magnification system with performance monitoring that respects user choice - the system tracks performance metrics for debugging but never auto-disables the feature, allowing users to decide whether they want magnification enabled
+- **User-Controlled Performance**: Enhanced magnification system with performance monitoring that respects user choice - the system tracks performance metrics for debugging but allows users to decide whether they want magnification enabled
 - **Enhanced Visual Feedback System**: Improved round feedback display with loading states during answer submission and prominent score display in the header area
 - **Educational Content Streamlining**: Simplified midgame learning break with cleaner, more focused presentation and removed redundant instructional text
 - **UI Organization Improvements**: Combined round number and category information into a single, cleaner label format (e.g., "Round 1 of 6 (Category: Animals)") positioned on the left side using formatRoundLabel utility
@@ -476,7 +476,7 @@ The game is **fully functional and production-ready** with all core systems impl
 ## 🎨 Recent Updates & Enhancements
 
 ### 🔥 Latest Update: Revolutionary Image Magnification System & Performance Optimization
-The game recently received a groundbreaking image magnification system and significant performance optimizations. **Most Recent Change**: Enhanced performance monitoring for the magnification system with user-controlled experience - the system no longer auto-disables magnification based on performance metrics, allowing users to decide whether they want to use the feature. Performance monitoring still tracks metrics for debugging purposes but prioritizes user choice over automatic feature disabling.
+The game recently received a groundbreaking image magnification system and significant performance optimizations. **Most Recent Change**: Enhanced performance monitoring for the magnification system with user-controlled experience - the system tracks performance metrics for debugging purposes but respects user choice, allowing players to use magnification regardless of device performance characteristics.
 
 **Latest Audio System Improvements:**
 - **Simplified Audio Controls**: Replaced complex dropdown controls with simple one-click toggle button (🎵/🔇) positioned in top-right corner
