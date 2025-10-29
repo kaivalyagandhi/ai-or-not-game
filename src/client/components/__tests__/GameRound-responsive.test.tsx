@@ -71,7 +71,7 @@ describe('GameRound - Responsive UI Layout', () => {
     // Default to desktop view
     mockMatchMedia.mockReturnValue({
       matches: true,
-      media: '(min-width: 768px)',
+      media: '(min-width: 480px)',
       onchange: null,
       addListener: vi.fn(),
       removeListener: vi.fn(),
@@ -90,7 +90,7 @@ describe('GameRound - Responsive UI Layout', () => {
       // Mock mobile viewport
       mockMatchMedia.mockReturnValue({
         matches: false,
-        media: '(min-width: 768px)',
+        media: '(min-width: 480px)',
         onchange: null,
         addListener: vi.fn(),
         removeListener: vi.fn(),
@@ -153,7 +153,7 @@ describe('GameRound - Responsive UI Layout', () => {
 
       const imageContainer = container.querySelector('.image-container');
       const computedStyle = window.getComputedStyle(imageContainer!);
-      expect(computedStyle.gap).toBe('1.5rem');
+      expect(computedStyle.gap).toBe('1rem');
     });
 
     it('should use smaller overlay indicators on mobile', async () => {
@@ -192,7 +192,7 @@ describe('GameRound - Responsive UI Layout', () => {
       // Mock desktop viewport
       mockMatchMedia.mockReturnValue({
         matches: true,
-        media: '(min-width: 768px)',
+        media: '(min-width: 480px)',
         onchange: null,
         addListener: vi.fn(),
         removeListener: vi.fn(),
@@ -257,7 +257,7 @@ describe('GameRound - Responsive UI Layout', () => {
 
       const imageContainer = container.querySelector('.image-container');
       const computedStyle = window.getComputedStyle(imageContainer!);
-      expect(computedStyle.gap).toBe('2rem');
+      expect(computedStyle.gap).toBe('1.5rem');
     });
 
     it('should center image pair within available screen space on desktop', () => {
@@ -271,7 +271,7 @@ describe('GameRound - Responsive UI Layout', () => {
 
       const imageContainer = container.querySelector('.image-container');
       const computedStyle = window.getComputedStyle(imageContainer!);
-      expect(computedStyle.maxWidth).toBe('800px');
+      expect(computedStyle.maxWidth).toBe('600px');
       expect(computedStyle.margin).toBe('0 auto');
     });
   });
@@ -294,7 +294,7 @@ describe('GameRound - Responsive UI Layout', () => {
 
       let imageContainer = container.querySelector('.image-container');
       let computedStyle = window.getComputedStyle(imageContainer!);
-      expect(computedStyle.gap).toBe('1.5rem'); // Mobile gap
+      expect(computedStyle.gap).toBe('1rem'); // Mobile gap
 
       // Switch to desktop
       mockMatchMedia.mockReturnValue({
@@ -312,7 +312,7 @@ describe('GameRound - Responsive UI Layout', () => {
 
       imageContainer = container.querySelector('.image-container');
       computedStyle = window.getComputedStyle(imageContainer!);
-      expect(computedStyle.gap).toBe('2rem'); // Desktop gap
+      expect(computedStyle.gap).toBe('1.5rem'); // Desktop gap
     });
 
     it('should maintain aspect ratio across all screen sizes', () => {

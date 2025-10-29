@@ -4,15 +4,19 @@
 .image-container {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: 1rem;
   max-width: 100%;
+  /* Mobile: Constrain image size to be more reasonable */
+  max-width: 400px;
+  margin: 0 auto;
 }
 
-/* Desktop layout - horizontal side-by-side */
-@media (min-width: 768px) {
+/* Reddit feed optimized breakpoint - smaller than typical desktop */
+@media (min-width: 480px) {
   .image-container {
     grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
+    max-width: 600px;
   }
 }
 
@@ -141,21 +145,27 @@
 .mobile-vertical {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: 1rem;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .desktop-horizontal {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  gap: 1.5rem;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-/* Ensure consistent styling across screen sizes */
-@media (max-width: 767px) {
+/* Mobile styling - smaller images, consistent overlay sizing */
+@media (max-width: 479px) {
   .image-container {
-    padding: 0 0.5rem;
+    padding: 0 1rem;
+    gap: 1rem;
   }
   
+  /* Keep overlay indicators consistent size across all screens */
   .overlay-indicator {
     width: 70px;
     height: 70px;
@@ -165,7 +175,7 @@
   .human-indicator {
     width: 70px;
     height: 70px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
   
   .overlay-icon {
@@ -173,14 +183,36 @@
   }
   
   .overlay-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
   }
 }
 
-@media (min-width: 768px) {
+/* Reddit feed and larger screens */
+@media (min-width: 480px) {
   .image-container {
-    max-width: 800px;
+    max-width: 600px;
     margin: 0 auto;
+  }
+  
+  /* Standard overlay size for larger screens */
+  .overlay-indicator {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .ai-indicator,
+  .human-indicator {
+    width: 80px;
+    height: 80px;
+    font-size: 0.875rem;
+  }
+  
+  .overlay-icon {
+    font-size: 1.5rem;
+  }
+  
+  .overlay-label {
+    font-size: 0.75rem;
   }
 }
 

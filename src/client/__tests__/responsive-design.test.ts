@@ -33,11 +33,11 @@ describe('Responsive Design - CSS Utility Classes', () => {
         max-width: 100%;
       }
       
-      @media (min-width: 768px) {
+      @media (min-width: 480px) {
         .image-container {
           grid-template-columns: 1fr 1fr;
-          gap: 2rem;
-          max-width: 800px;
+          gap: 1.5rem;
+          max-width: 600px;
           margin: 0 auto;
         }
       }
@@ -97,7 +97,7 @@ describe('Responsive Design - CSS Utility Classes', () => {
         background-color: #46E870;
       }
       
-      @media (max-width: 767px) {
+      @media (max-width: 479px) {
         .ai-indicator,
         .human-indicator {
           width: 70px;
@@ -134,18 +134,18 @@ describe('Responsive Design - CSS Utility Classes', () => {
       const container = createMockElement('image-container');
       
       // Simulate media query match
-      const mediaQuery = window.matchMedia('(min-width: 768px)');
+      const mediaQuery = window.matchMedia('(min-width: 480px)');
       if (mediaQuery.matches) {
         container.style.gridTemplateColumns = '1fr 1fr';
-        container.style.gap = '2rem';
-        container.style.maxWidth = '800px';
+        container.style.gap = '1.5rem';
+        container.style.maxWidth = '600px';
         container.style.margin = '0 auto';
       }
 
       const styles = window.getComputedStyle(container);
       expect(styles.gridTemplateColumns).toBe('1fr 1fr');
-      expect(styles.gap).toBe('2rem');
-      expect(styles.maxWidth).toBe('800px');
+      expect(styles.gap).toBe('1.5rem');
+      expect(styles.maxWidth).toBe('600px');
       expect(styles.margin).toBe('0 auto');
     });
   });
@@ -257,7 +257,7 @@ describe('Responsive Design - CSS Utility Classes', () => {
       const aiIndicator = createMockElement('ai-indicator');
       
       // Simulate mobile media query
-      const mediaQuery = window.matchMedia('(max-width: 767px)');
+      const mediaQuery = window.matchMedia('(max-width: 479px)');
       if (mediaQuery.matches) {
         aiIndicator.style.width = '70px';
         aiIndicator.style.height = '70px';
@@ -287,9 +287,9 @@ describe('Responsive Design - Breakpoint Behavior', () => {
     });
   };
 
-  describe('Mobile Breakpoint (< 768px)', () => {
+  describe('Mobile Breakpoint (< 480px)', () => {
     beforeEach(() => {
-      mockMatchMedia('(max-width: 767px)', true);
+      mockMatchMedia('(max-width: 479px)', true);
       Object.defineProperty(window, 'innerWidth', {
         value: 375,
         configurable: true,
@@ -301,33 +301,33 @@ describe('Responsive Design - Breakpoint Behavior', () => {
       container.className = 'image-container';
       
       // Mobile styles should be applied
-      expect(window.matchMedia('(max-width: 767px)').matches).toBe(true);
+      expect(window.matchMedia('(max-width: 479px)').matches).toBe(true);
       expect(window.innerWidth).toBe(375);
     });
 
     it('should use vertical layout', () => {
-      const mediaQuery = window.matchMedia('(min-width: 768px)');
+      const mediaQuery = window.matchMedia('(min-width: 480px)');
       expect(mediaQuery.matches).toBe(false);
     });
   });
 
-  describe('Desktop Breakpoint (>= 768px)', () => {
+  describe('Desktop Breakpoint (>= 480px)', () => {
     beforeEach(() => {
-      mockMatchMedia('(min-width: 768px)', true);
+      mockMatchMedia('(min-width: 480px)', true);
       Object.defineProperty(window, 'innerWidth', {
-        value: 1024,
+        value: 600,
         configurable: true,
       });
     });
 
     it('should apply desktop-specific styles', () => {
-      const mediaQuery = window.matchMedia('(min-width: 768px)');
+      const mediaQuery = window.matchMedia('(min-width: 480px)');
       expect(mediaQuery.matches).toBe(true);
-      expect(window.innerWidth).toBe(1024);
+      expect(window.innerWidth).toBe(600);
     });
 
     it('should use horizontal layout', () => {
-      const mediaQuery = window.matchMedia('(min-width: 768px)');
+      const mediaQuery = window.matchMedia('(min-width: 480px)');
       expect(mediaQuery.matches).toBe(true);
     });
   });
@@ -335,26 +335,26 @@ describe('Responsive Design - Breakpoint Behavior', () => {
   describe('Breakpoint Transitions', () => {
     it('should handle viewport size changes', () => {
       // Start mobile
-      mockMatchMedia('(max-width: 767px)', true);
+      mockMatchMedia('(max-width: 479px)', true);
       Object.defineProperty(window, 'innerWidth', { value: 375 });
       
-      let mediaQuery = window.matchMedia('(max-width: 767px)');
+      let mediaQuery = window.matchMedia('(max-width: 479px)');
       expect(mediaQuery.matches).toBe(true);
       
       // Switch to desktop
-      mockMatchMedia('(min-width: 768px)', true);
-      Object.defineProperty(window, 'innerWidth', { value: 1024 });
+      mockMatchMedia('(min-width: 480px)', true);
+      Object.defineProperty(window, 'innerWidth', { value: 600 });
       
-      mediaQuery = window.matchMedia('(min-width: 768px)');
+      mediaQuery = window.matchMedia('(min-width: 480px)');
       expect(mediaQuery.matches).toBe(true);
     });
 
     it('should handle edge case at exact breakpoint', () => {
-      // Test at exactly 768px
-      mockMatchMedia('(min-width: 768px)', true);
-      Object.defineProperty(window, 'innerWidth', { value: 768 });
+      // Test at exactly 480px
+      mockMatchMedia('(min-width: 480px)', true);
+      Object.defineProperty(window, 'innerWidth', { value: 480 });
       
-      const mediaQuery = window.matchMedia('(min-width: 768px)');
+      const mediaQuery = window.matchMedia('(min-width: 480px)');
       expect(mediaQuery.matches).toBe(true);
     });
   });
@@ -445,20 +445,20 @@ describe('Responsive Design - Cross-Device Compatibility', () => {
       });
 
       it('should determine correct layout type', () => {
-        const isMobile = device.width < 768;
-        const isDesktop = device.width >= 768;
+        const isMobile = device.width < 480;
+        const isDesktop = device.width >= 480;
         
         expect(isMobile || isDesktop).toBe(true);
         expect(isMobile && isDesktop).toBe(false);
       });
 
       it('should have appropriate container sizing', () => {
-        if (device.width >= 768) {
+        if (device.width >= 480) {
           // Desktop: should have max-width constraint
-          expect(device.width).toBeGreaterThanOrEqual(768);
+          expect(device.width).toBeGreaterThanOrEqual(480);
         } else {
           // Mobile: should use full width
-          expect(device.width).toBeLessThan(768);
+          expect(device.width).toBeLessThan(480);
         }
       });
 

@@ -323,20 +323,34 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl w-full">
-        {/* Header with round info and timer */}
-        <div className="text-center mb-6">
-          <div className="flex items-center justify-start mb-4">
-            <div className="text-sm text-gray-500">
-              {formatRoundLabel(round.roundNumber, 6, round.category)}
-            </div>
+      {/* Fixed header with round info aligned with audio toggle */}
+      <div className="fixed top-4 left-4 z-40">
+        <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
+          <div className="text-base font-medium text-gray-700">
+            {formatRoundLabel(round.roundNumber, 6, round.category)}
           </div>
+        </div>
+      </div>
+
+      <div className="max-w-4xl w-full">
+        {/* Header with timer */}
+        <div className="text-center mb-6">
+          {/* Add top padding to account for fixed header */}
+          <div className="pt-16"></div>
           
           {/* Timer */}
           <div className="mb-4">
-            <div className={`text-4xl font-bold ${getTimerColor()}`}>
-              {timeRemaining}
-            </div>
+            {showFeedback && isTimeout && timeoutCountdown !== null ? (
+              // Show countdown in place of timer
+              <div className="text-4xl font-bold text-gray-700">
+                {timeoutCountdown}
+              </div>
+            ) : (
+              // Show normal timer
+              <div className={`text-4xl font-bold ${getTimerColor()}`}>
+                {timeRemaining}
+              </div>
+            )}
             <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
               <div
                 className={`h-2 rounded-full transition-all duration-1000 ${getProgressColor()}`}
@@ -345,12 +359,29 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
             </div>
           </div>
 
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Which image is REAL?
+          <h2 className={`text-xl font-semibold mb-2 ${showFeedback && isTimeout ? "text-red-600" : "text-gray-900"}`}>
+            {isSubmitting && !showFeedback ? (
+              // Show loading spinner during submission
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+              </div>
+            ) : showFeedback && !isTimeout && feedbackData ? (
+              // Show points feedback after submission
+              feedbackData.roundScore !== undefined && feedbackData.roundScore > 0 ? (
+                <span style={{ color: '#46E870' }}>
+                  +{Math.round(feedbackData.roundScore)} points
+                </span>
+              ) : (
+                <span style={{ color: '#F23C3C' }}>
+                  No points
+                </span>
+              )
+            ) : showFeedback && isTimeout ? (
+              "Time's Up!"
+            ) : (
+              "Which image is REAL?"
+            )}
           </h2>
-          <p className="text-gray-600">
-            Click on the photo taken by a human (not AI-generated)
-          </p>
         </div>
 
         {/* Image Selection - Responsive Layout */}
@@ -472,38 +503,9 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
           </div>
         </div>
 
-        {/* Timeout Message */}
-        {showFeedback && isTimeout && (
-          <div className="text-center mt-6">
-            <div className="flex items-center justify-center gap-4">
-              <div className="text-lg font-semibold text-red-600">
-                Time's Up!
-              </div>
-              {timeoutCountdown !== null && (
-                <div className="text-2xl font-bold text-gray-700 animate-pulse">
-                  {timeoutCountdown}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
-        {/* Points Display - Only show if not timeout and has points */}
-        {showFeedback && feedbackData && feedbackData.roundScore !== undefined && feedbackData.roundScore > 0 && !isTimeout && (
-          <div className="text-center mt-6">
-            <div className="text-lg font-semibold text-gray-700">
-              +{Math.round(feedbackData.roundScore)} points
-            </div>
-          </div>
-        )}
 
-        {/* Loading state during submission */}
-        {isSubmitting && !showFeedback && (
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-            <div className="text-gray-600 mt-2">Checking your answer...</div>
-          </div>
-        )}
+
       </div>
     </div>
   );
