@@ -15,6 +15,7 @@
   },
   "realtime": true,
   "redis": true,
+  "reddit": ["read", "submit"],
   "media": {
     "dir": "assets"
   },

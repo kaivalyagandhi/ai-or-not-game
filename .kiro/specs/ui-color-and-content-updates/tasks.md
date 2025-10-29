@@ -88,8 +88,8 @@
   - Remove emoji from the disabled state text
   - _Requirements: 4.5_
 
-- [ ] 6. Implement AI tip posting feature
-- [ ] 6.1 Create AI tip form component
+- [x] 6. Implement AI tip posting feature
+- [x] 6.1 Create AI tip form component
 
   - Build modal form component for editing AI tip comments
   - Pre-populate with challenge results message and AI tip
@@ -97,14 +97,14 @@
   - Include submit and cancel buttons with loading states
   - _Requirements: 5.1, 5.2, 5.3_
 
-- [ ] 6.2 Implement comment formatting logic
+- [x] 6.2 Implement comment formatting logic
 
   - Create function to combine challenge message with AI tip
   - Format comment as specified: "[challenge_results_message]\nHere's my AI detection tip to help you: [ai_tip_text]"
   - Handle edge cases for missing or empty AI tips
   - _Requirements: 5.4_
 
-- [ ] 6.3 Add server-side comment posting endpoint
+- [x] 6.3 Add server-side comment posting endpoint
 
   - Create POST /api/comments/post-ai-tip endpoint
   - Integrate with Devvit Reddit API for comment submission
@@ -112,7 +112,7 @@
   - Return success/failure status with comment ID
   - _Requirements: 5.5_
 
-- [ ] 6.4 Connect form to server endpoint
+- [x] 6.4 Connect form to server endpoint
 
   - Implement form submission logic in ResultsScreen component
   - Handle loading states and error feedback
@@ -120,8 +120,8 @@
   - Close form modal after successful submission
   - _Requirements: 5.1, 5.5_
 
-- [ ] 7. Update Devvit configuration for Reddit API access
-- [ ] 7.1 Add required Reddit API permissions
+- [x] 7. Update Devvit configuration for Reddit API access
+- [x] 7.1 Add required Reddit API permissions
 
   - Update devvit.json to include reddit.read and reddit.submit permissions
   - Ensure proper scopes for comment posting functionality

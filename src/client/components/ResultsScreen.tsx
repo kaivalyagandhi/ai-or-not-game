@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { GameSession, BadgeType, LeaderboardResponse, RealtimeMessage, PlayAttemptsResponse } from '../../shared/types/api';
+import { GameSession, BadgeType, LeaderboardResponse, RealtimeMessage, PlayAttemptsResponse, PostAITipResponse } from '../../shared/types/api';
 import { connectRealtime } from '@devvit/web/client';
 import { fetchCurrentContentCached } from '../utils/content';
 import { useAudio } from '../hooks/useAudio';
+import { AITipForm } from './AITipForm';
+import { formatAITipComment } from '../utils/aiTipFormatting';
 
 interface ResultsScreenProps {
   session: GameSession;
@@ -27,6 +29,12 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
     bestScore: number;
   } | null>(null);
   const connectionRef = useRef<any>(null);
+  
+  // AI Tip Form state
+  const [showAITipForm, setShowAITipForm] = useState(false);
+  const [submittingTip, setSubmittingTip] = useState(false);
+  const [aiTip, setAiTip] = useState<string>('');
+  const [tipSubmissionSuccess, setTipSubmissionSuccess] = useState(false);
   
   // Animation states
   const [showHeader, setShowHeader] = useState(false);
@@ -82,7 +90,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
     }
   };
 
-  // Fetch user's leaderboard position, inspirational content, and play attempts
+  // Fetch user's leaderboard position, inspirational content, play attempts, and AI tip
   const fetchLeaderboardPosition = async () => {
     try {
       const [leaderboardResponse, contentResponse, playAttemptsResponse] = await Promise.all([
@@ -98,11 +106,22 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
         setTotalParticipants(leaderboardData.totalParticipants || null);
       }
       
-      if (contentResponse.success && contentResponse.inspiration) {
-        setInspirationalContent(contentResponse.inspiration);
+      if (contentResponse.success) {
+        if (contentResponse.inspiration) {
+          setInspirationalContent(contentResponse.inspiration);
+        } else {
+          // Fallback inspirational content
+          setInspirationalContent('Every expert was once a beginner. Keep practicing!');
+        }
+        
+        // Set AI tip from the current content
+        if (contentResponse.tip) {
+          setAiTip(contentResponse.tip);
+        }
       } else {
-        // Fallback inspirational content
-        setInspirationalContent('Every expert was once a beginner. Keep practicing!');
+        // Set fallback content
+        setInspirationalContent('Practice makes perfect - each game makes you better!');
+        setAiTip('Look for details that seem too perfect or slightly off - AI often struggles with small imperfections that make images feel real.');
       }
 
       const playAttemptsData: PlayAttemptsResponse = await playAttemptsResponse.json();
@@ -117,6 +136,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
       console.error('Error fetching data:', error);
       // Set fallback content
       setInspirationalContent('Practice makes perfect - each game makes you better!');
+      setAiTip('Look for details that seem too perfect or slightly off - AI often struggles with small imperfections that make images feel real.');
     } finally {
       setLoading(false);
     }
@@ -162,6 +182,52 @@ Want to see if you can beat me before I get my next try?`;
         console.error('Clipboard error:', clipboardError);
       }
     }
+  };
+
+  // Handle AI tip form submission
+  const handleAITipSubmit = async (comment: string) => {
+    setSubmittingTip(true);
+    
+    try {
+      const response = await fetch('/api/comments/post-ai-tip', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ comment }),
+      });
+      
+      const result: PostAITipResponse = await response.json();
+      
+      if (result.success) {
+        setTipSubmissionSuccess(true);
+        setShowAITipForm(false);
+        setShowToast(true);
+        setTimeout(() => {
+          setShowToast(false);
+          setTipSubmissionSuccess(false);
+        }, 3000);
+      } else {
+        console.error('Failed to post AI tip:', result.error);
+        // Show error feedback to user
+        alert('Failed to post your AI tip. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error posting AI tip:', error);
+      alert('Failed to post your AI tip. Please try again.');
+    } finally {
+      setSubmittingTip(false);
+    }
+  };
+
+  // Handle AI tip form cancel
+  const handleAITipCancel = () => {
+    setShowAITipForm(false);
+  };
+
+  // Handle Post AI tip button click
+  const handlePostAITip = () => {
+    setShowAITipForm(true);
   };
 
   // Set up realtime connection for live rank updates
@@ -356,7 +422,7 @@ Want to see if you can beat me before I get my next try?`;
           <div className="flex flex-col justify-between h-full space-y-3">
             {/* Post AI tip Button */}
             <button
-              onClick={() => {/* TODO: Implement AI tip functionality */}}
+              onClick={handlePostAITip}
               className="w-full bg-secondary-500 hover:bg-secondary-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm btn-text"
             >
               <span>💡</span>
@@ -393,12 +459,23 @@ Want to see if you can beat me before I get my next try?`;
 
       </div>
 
+      {/* AI Tip Form Modal */}
+      {showAITipForm && (
+        <AITipForm
+          challengeMessage={generateShareMessage()}
+          aiTip={aiTip}
+          onSubmit={handleAITipSubmit}
+          onCancel={handleAITipCancel}
+          isSubmitting={submittingTip}
+        />
+      )}
+
       {/* Toast Notification */}
       {showToast && (
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-success-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
           <div className="flex items-center gap-2">
             <span>✅</span>
-            Results copied to clipboard!
+            {tipSubmissionSuccess ? 'AI tip posted successfully!' : 'Results copied to clipboard!'}
           </div>
         </div>
       )}

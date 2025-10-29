@@ -8,3 +8,4 @@ export { EducationalContent } from './EducationalContent';
 export { AudioSystem } from './AudioSystem';
 export { MagnifyOverlay } from './MagnifyOverlay';
 export { MagnifyContainer } from './MagnifyContainer';
+export { AITipForm } from './AITipForm';

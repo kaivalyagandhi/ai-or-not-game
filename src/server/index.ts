@@ -1069,6 +1069,69 @@ router.post('/api/game/results', async (req, res): Promise<void> => {
   }
 });
 
+// AI Tip Comment Posting Endpoint
+router.post('/api/comments/post-ai-tip', async (req, res): Promise<void> => {
+  try {
+    const { comment } = req.body;
+    
+    // Validate input
+    if (!comment || typeof comment !== 'string' || comment.trim() === '') {
+      res.status(400).json({
+        success: false,
+        error: 'Comment text is required',
+      });
+      return;
+    }
+    
+    // Get current user from Reddit context
+    const username = await getCurrentUsername();
+    if (!username) {
+      res.status(401).json({
+        success: false,
+        error: 'User authentication required',
+      });
+      return;
+    }
+    
+    // Get the current post ID from context
+    const { postId } = context;
+    if (!postId) {
+      res.status(400).json({
+        success: false,
+        error: 'Post context not available',
+      });
+      return;
+    }
+    
+    try {
+      // Submit comment using Devvit Reddit API
+      const commentResult = await reddit.submitComment({
+        id: postId,
+        text: comment.trim(),
+      });
+      
+      console.log(`AI tip comment posted by ${username}:`, commentResult.id);
+      
+      res.json({
+        success: true,
+        commentId: commentResult.id,
+      });
+    } catch (redditError) {
+      console.error('Reddit API error posting comment:', redditError);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to post comment to Reddit',
+      });
+    }
+  } catch (error) {
+    console.error('Error in /api/comments/post-ai-tip:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
 // Test endpoint for manual daily reset (development only)
 router.post('/api/test/daily-reset', async (_req, res): Promise<void> => {
   const jobResult = await executeSchedulerJob(

@@ -291,6 +291,17 @@ export interface GameResultsResponse {
   error?: string;
 }
 
+// AI Tip Comment API Types
+export interface PostAITipRequest {
+  comment: string;
+}
+
+export interface PostAITipResponse {
+  success: boolean;
+  commentId?: string;
+  error?: string;
+}
+
 // Legacy response types for backward compatibility
 export interface InitResponse {
   type: 'init';
