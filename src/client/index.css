@@ -231,6 +231,30 @@
   border-radius: 16px; /* Slightly smaller radius for inner image to match 20px outer radius */
 }
 
+/* Magnify Container Styles */
+.magnify-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Magnify Overlay Styles */
+.magnify-overlay {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.magnify-overlay.visible {
+  opacity: 1;
+}
+
+.magnify-overlay.hidden {
+  opacity: 0;
+}
+
 /* Results Screen Responsive Layout - Matching GameRound breakpoint */
 .results-horizontal-layout {
   display: grid;

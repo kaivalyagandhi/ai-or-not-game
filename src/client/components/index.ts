@@ -6,3 +6,5 @@ export { ErrorBoundary } from './ErrorBoundary';
 export { LoadingScreen } from './LoadingScreen';
 export { EducationalContent } from './EducationalContent';
 export { AudioSystem } from './AudioSystem';
+export { MagnifyOverlay } from './MagnifyOverlay';
+export { MagnifyContainer } from './MagnifyContainer';

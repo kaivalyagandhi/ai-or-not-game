@@ -5,6 +5,7 @@ import { useErrorHandler } from '../hooks/useErrorHandler';
 import { useAudio } from '../hooks/useAudio';
 import { triggerConfetti, cleanupConfetti } from '../utils/confetti';
 import { formatRoundLabel } from '../utils/ui';
+import { MagnifyContainer } from './MagnifyContainer';
 
 interface GameRoundProps {
   round: GameRoundType;
@@ -30,6 +31,12 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
     enableOfflineDetection: true,
     enableAutoRetry: false, // Don't auto-retry during gameplay
   });
+
+  // Magnification is only active during gameplay, not during feedback or when answer is selected
+  const isMagnifyActive = !showFeedback && selectedAnswer === null && !isSubmitting;
+  
+  // Get border color that matches the game's pre-selection border (gray-300)
+  const magnifyBorderColor = '#d1d5db';
 
   // Reset component state when round changes
   useEffect(() => {
@@ -284,7 +291,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
 
   // Handle image selection
   const handleImageSelect = (answer: 'A' | 'B') => {
-    if (selectedAnswer || showFeedback) return;
+    if (selectedAnswer || showFeedback || isSubmitting) return;
     
     submitAnswer(answer, timeRemaining);
   };
@@ -388,118 +395,130 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
         <div className="image-container">
           {/* Image A */}
           <div className="image-wrapper">
-            <button
-              onClick={() => handleImageSelect('A')}
-              disabled={selectedAnswer !== null || showFeedback}
-              className={`game-image-button ${
-                showFeedback
-                  ? isTimeout
-                    ? feedbackData?.correctAnswer === 'A'
+            <MagnifyContainer
+              imageUrl={round.imageA.url}
+              isActive={isMagnifyActive}
+              borderColor={magnifyBorderColor}
+            >
+              <button
+                onClick={() => handleImageSelect('A')}
+                disabled={selectedAnswer !== null || showFeedback || isSubmitting}
+                className={`game-image-button ${
+                  showFeedback
+                    ? isTimeout
+                      ? feedbackData?.correctAnswer === 'A'
+                        ? 'correct-feedback'
+                        : 'incorrect-feedback'
+                      : selectedAnswer === 'A'
+                      ? feedbackData?.isCorrect
+                        ? 'selected correct-feedback'
+                        : 'selected incorrect-feedback'
+                      : feedbackData?.correctAnswer === 'A'
                       ? 'correct-feedback'
                       : 'incorrect-feedback'
                     : selectedAnswer === 'A'
-                    ? feedbackData?.isCorrect
-                      ? 'selected correct-feedback'
-                      : 'selected incorrect-feedback'
-                    : feedbackData?.correctAnswer === 'A'
-                    ? 'correct-feedback'
-                    : 'incorrect-feedback'
-                  : selectedAnswer === 'A'
-                  ? 'selected'
-                  : 'default'
-              } ${selectedAnswer || showFeedback ? 'disabled' : ''}`}
-            >
-              <img
-                src={round.imageA.url}
-                alt={`Option A - ${round.imageA.metadata.description}`}
-                onError={(e) => {
-                  console.error('Failed to load image A:', round.imageA.url);
-                  console.error('Image A error event:', e);
-                }}
-                onLoad={(e) => {
-                  console.log('Successfully loaded image A:', round.imageA.url);
-                  const img = e.target as HTMLImageElement;
-                  console.log('Image A dimensions:', img.naturalWidth, 'x', img.naturalHeight);
-                  console.log('Image A display size:', img.width, 'x', img.height);
-                }}
-                className="game-image"
-              />
-              
-              {/* Custom Overlay Indicators - Show on selected image or correct answer on timeout */}
-              {showFeedback && (selectedAnswer === 'A' || (isTimeout && feedbackData?.correctAnswer === 'A')) && (
-                <div className="overlay-indicator">
-                  {feedbackData?.aiImagePosition === 'A' ? (
-                    <div className="ai-indicator">
-                      <div className="overlay-icon">✕</div>
-                      <div className="overlay-label">AI</div>
-                    </div>
-                  ) : (
-                    <div className="human-indicator">
-                      <div className="overlay-icon">✓</div>
-                      <div className="overlay-label">Human</div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </button>
+                    ? 'selected'
+                    : 'default'
+                } ${selectedAnswer || showFeedback ? 'disabled' : ''}`}
+              >
+                <img
+                  src={round.imageA.url}
+                  alt={`Option A - ${round.imageA.metadata.description}`}
+                  onError={(e) => {
+                    console.error('Failed to load image A:', round.imageA.url);
+                    console.error('Image A error event:', e);
+                  }}
+                  onLoad={(e) => {
+                    console.log('Successfully loaded image A:', round.imageA.url);
+                    const img = e.target as HTMLImageElement;
+                    console.log('Image A dimensions:', img.naturalWidth, 'x', img.naturalHeight);
+                    console.log('Image A display size:', img.width, 'x', img.height);
+                  }}
+                  className="game-image"
+                />
+                
+                {/* Custom Overlay Indicators - Show on selected image or correct answer on timeout */}
+                {showFeedback && (selectedAnswer === 'A' || (isTimeout && feedbackData?.correctAnswer === 'A')) && (
+                  <div className="overlay-indicator">
+                    {feedbackData?.aiImagePosition === 'A' ? (
+                      <div className="ai-indicator">
+                        <div className="overlay-icon">✕</div>
+                        <div className="overlay-label">AI</div>
+                      </div>
+                    ) : (
+                      <div className="human-indicator">
+                        <div className="overlay-icon">✓</div>
+                        <div className="overlay-label">Human</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </button>
+            </MagnifyContainer>
           </div>
 
           {/* Image B */}
           <div className="image-wrapper">
-            <button
-              onClick={() => handleImageSelect('B')}
-              disabled={selectedAnswer !== null || showFeedback}
-              className={`game-image-button ${
-                showFeedback
-                  ? isTimeout
-                    ? feedbackData?.correctAnswer === 'B'
+            <MagnifyContainer
+              imageUrl={round.imageB.url}
+              isActive={isMagnifyActive}
+              borderColor={magnifyBorderColor}
+            >
+              <button
+                onClick={() => handleImageSelect('B')}
+                disabled={selectedAnswer !== null || showFeedback || isSubmitting}
+                className={`game-image-button ${
+                  showFeedback
+                    ? isTimeout
+                      ? feedbackData?.correctAnswer === 'B'
+                        ? 'correct-feedback'
+                        : 'incorrect-feedback'
+                      : selectedAnswer === 'B'
+                      ? feedbackData?.isCorrect
+                        ? 'selected correct-feedback'
+                        : 'selected incorrect-feedback'
+                      : feedbackData?.correctAnswer === 'B'
                       ? 'correct-feedback'
                       : 'incorrect-feedback'
                     : selectedAnswer === 'B'
-                    ? feedbackData?.isCorrect
-                      ? 'selected correct-feedback'
-                      : 'selected incorrect-feedback'
-                    : feedbackData?.correctAnswer === 'B'
-                    ? 'correct-feedback'
-                    : 'incorrect-feedback'
-                  : selectedAnswer === 'B'
-                  ? 'selected'
-                  : 'default'
-              } ${selectedAnswer || showFeedback ? 'disabled' : ''}`}
-            >
-              <img
-                src={round.imageB.url}
-                alt={`Option B - ${round.imageB.metadata.description}`}
-                onError={(e) => {
-                  console.error('Failed to load image B:', round.imageB.url);
-                  console.error('Image B error event:', e);
-                }}
-                onLoad={(e) => {
-                  console.log('Successfully loaded image B:', round.imageB.url);
-                  const img = e.target as HTMLImageElement;
-                  console.log('Image B dimensions:', img.naturalWidth, 'x', img.naturalHeight);
-                  console.log('Image B display size:', img.width, 'x', img.height);
-                }}
-                className="game-image"
-              />
-              
-              {/* Custom Overlay Indicators - Show on selected image or correct answer on timeout */}
-              {showFeedback && (selectedAnswer === 'B' || (isTimeout && feedbackData?.correctAnswer === 'B')) && (
-                <div className="overlay-indicator">
-                  {feedbackData?.aiImagePosition === 'B' ? (
-                    <div className="ai-indicator">
-                      <div className="overlay-icon">✕</div>
-                      <div className="overlay-label">AI</div>
-                    </div>
-                  ) : (
-                    <div className="human-indicator">
-                      <div className="overlay-icon">✓</div>
-                      <div className="overlay-label">Human</div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </button>
+                    ? 'selected'
+                    : 'default'
+                } ${selectedAnswer || showFeedback ? 'disabled' : ''}`}
+              >
+                <img
+                  src={round.imageB.url}
+                  alt={`Option B - ${round.imageB.metadata.description}`}
+                  onError={(e) => {
+                    console.error('Failed to load image B:', round.imageB.url);
+                    console.error('Image B error event:', e);
+                  }}
+                  onLoad={(e) => {
+                    console.log('Successfully loaded image B:', round.imageB.url);
+                    const img = e.target as HTMLImageElement;
+                    console.log('Image B dimensions:', img.naturalWidth, 'x', img.naturalHeight);
+                    console.log('Image B display size:', img.width, 'x', img.height);
+                  }}
+                  className="game-image"
+                />
+                
+                {/* Custom Overlay Indicators - Show on selected image or correct answer on timeout */}
+                {showFeedback && (selectedAnswer === 'B' || (isTimeout && feedbackData?.correctAnswer === 'B')) && (
+                  <div className="overlay-indicator">
+                    {feedbackData?.aiImagePosition === 'B' ? (
+                      <div className="ai-indicator">
+                        <div className="overlay-icon">✕</div>
+                        <div className="overlay-label">AI</div>
+                      </div>
+                    ) : (
+                      <div className="human-indicator">
+                        <div className="overlay-icon">✓</div>
+                        <div className="overlay-label">Human</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </button>
+            </MagnifyContainer>
           </div>
         </div>
 
