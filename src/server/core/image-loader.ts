@@ -119,7 +119,7 @@ export function discoverImagePairs(
   // Since we can't read the file system in a serverless environment,
   // we'll create pairs based on the known uploaded images
   // This should be replaced with a manifest file or database in production
-  
+
   // Create pairs based on known uploaded images
   const knownPairs = getKnownImagePairs(category, config);
   pairs.push(...knownPairs);
@@ -140,23 +140,32 @@ export function discoverImagePairs(
 
 /**
  * Gets known image pairs based on uploaded files
- * 
+ *
  * This function maps to the actual uploaded images in the public folder.
  * In production, this should be replaced with a manifest file or database.
  */
-function getKnownImagePairs(
-  category: ImageCategory,
-  config: ImageLoaderConfig
-): ImagePair[] {
+function getKnownImagePairs(category: ImageCategory, config: ImageLoaderConfig): ImagePair[] {
   const pairs: ImagePair[] = [];
-  
+
   // Define known image pairs based on what's actually uploaded
   const knownPairs = getKnownPairsForCategory(category);
-  
+
   for (const pairInfo of knownPairs) {
-    const humanImage = createImageAsset(category, pairInfo.pairNumber, false, pairInfo.humanFilename, config);
-    const aiImage = createImageAsset(category, pairInfo.pairNumber, true, pairInfo.aiFilename, config);
-    
+    const humanImage = createImageAsset(
+      category,
+      pairInfo.pairNumber,
+      false,
+      pairInfo.humanFilename,
+      config
+    );
+    const aiImage = createImageAsset(
+      category,
+      pairInfo.pairNumber,
+      true,
+      pairInfo.aiFilename,
+      config
+    );
+
     pairs.push({
       pairNumber: pairInfo.pairNumber,
       category,
@@ -164,7 +173,7 @@ function getKnownImagePairs(
       aiImage,
     });
   }
-  
+
   return pairs;
 }
 
@@ -182,37 +191,97 @@ function getKnownPairsForCategory(category: ImageCategory): Array<{
         { pairNumber: 1, humanFilename: 'pair1-human.jpg', aiFilename: 'pair1-ai.jpg' },
         { pairNumber: 2, humanFilename: 'pair2-human.jpg', aiFilename: 'pair2-ai.png' },
         { pairNumber: 3, humanFilename: 'pair3-human.jpg', aiFilename: 'pair3-ai.png' },
+        { pairNumber: 4, humanFilename: 'pair4-human.png', aiFilename: 'pair4-ai.png' },
+        { pairNumber: 5, humanFilename: 'pair5-human.png', aiFilename: 'pair5-ai.png' },
+        { pairNumber: 6, humanFilename: 'pair6-human.png', aiFilename: 'pair6-ai.png' },
+        { pairNumber: 7, humanFilename: 'pair7-human.png', aiFilename: 'pair7-ai.png' },
+        { pairNumber: 8, humanFilename: 'pair8-human.png', aiFilename: 'pair8-ai.png' },
+        { pairNumber: 9, humanFilename: 'pair9-human.png', aiFilename: 'pair9-ai.png' },
+        { pairNumber: 10, humanFilename: 'pair10-human.png', aiFilename: 'pair10-ai.png' },
+        { pairNumber: 11, humanFilename: 'pair11-human.png', aiFilename: 'pair11-ai.png' },
+        { pairNumber: 12, humanFilename: 'pair12-human.png', aiFilename: 'pair12-ai.png' },
+        { pairNumber: 13, humanFilename: 'pair13-human.png', aiFilename: 'pair13-ai.png' },
+        { pairNumber: 14, humanFilename: 'pair14-human.png', aiFilename: 'pair14-ai.png' },
+        { pairNumber: 15, humanFilename: 'pair15-human.png', aiFilename: 'pair15-ai.png' },
+        { pairNumber: 16, humanFilename: 'pair16-human.png', aiFilename: 'pair16-ai.png' },
       ];
-    
+
     case ImageCategory.ARCHITECTURE:
       return [
         { pairNumber: 1, humanFilename: 'pair1-human.jpg', aiFilename: 'pair1-ai.jpg' },
         { pairNumber: 2, humanFilename: 'pair2-human.jpg', aiFilename: 'pair2-ai.png' },
+        { pairNumber: 3, humanFilename: 'pair3-human.png', aiFilename: 'pair3-ai.png' },
       ];
-    
+
     case ImageCategory.FOOD:
       return [
         { pairNumber: 1, humanFilename: 'pair1-human.jpg', aiFilename: 'pair1-ai.jpg' },
         { pairNumber: 2, humanFilename: 'pair2-human.jpg', aiFilename: 'pair2-ai.jpg' },
+        { pairNumber: 3, humanFilename: 'pair3-human.png', aiFilename: 'pair3-ai.png' },
+        { pairNumber: 4, humanFilename: 'pair4-human.png', aiFilename: 'pair4-ai.png' },
+        { pairNumber: 5, humanFilename: 'pair5-human.png', aiFilename: 'pair5-ai.png' },
+        { pairNumber: 6, humanFilename: 'pair6-human.png', aiFilename: 'pair6-ai.png' },
+        { pairNumber: 7, humanFilename: 'pair7-human.png', aiFilename: 'pair7-ai.png' },
+        { pairNumber: 8, humanFilename: 'pair8-human.png', aiFilename: 'pair8-ai.png' },
+        { pairNumber: 9, humanFilename: 'pair9-human.png', aiFilename: 'pair9-ai.png' },
+        { pairNumber: 10, humanFilename: 'pair10-human.png', aiFilename: 'pair10-ai.png' },
+        { pairNumber: 11, humanFilename: 'pair11-human.png', aiFilename: 'pair11-ai.png' },
+        { pairNumber: 12, humanFilename: 'pair12-human.png', aiFilename: 'pair12-ai.png' },
+        { pairNumber: 13, humanFilename: 'pair13-human.png', aiFilename: 'pair13-ai.png' },
+        { pairNumber: 14, humanFilename: 'pair14-human.png', aiFilename: 'pair14-ai.png' },
+        { pairNumber: 15, humanFilename: 'pair15-human.png', aiFilename: 'pair15-ai.png' },
+        { pairNumber: 16, humanFilename: 'pair16-human.png', aiFilename: 'pair16-ai.png' },
+        { pairNumber: 17, humanFilename: 'pair17-human.png', aiFilename: 'pair17-ai.png' },
+        { pairNumber: 18, humanFilename: 'pair18-human.png', aiFilename: 'pair18-ai.png' },
+        { pairNumber: 19, humanFilename: 'pair19-human.png', aiFilename: 'pair19-ai.png' },
+        { pairNumber: 20, humanFilename: 'pair20-human.png', aiFilename: 'pair20-ai.png' },
+        { pairNumber: 21, humanFilename: 'pair21-human.png', aiFilename: 'pair21-ai.png' },
+        { pairNumber: 22, humanFilename: 'pair22-human.png', aiFilename: 'pair22-ai.png' },
+        { pairNumber: 23, humanFilename: 'pair23-human.png', aiFilename: 'pair23-ai.png' },
       ];
-    
+
     case ImageCategory.NATURE:
       return [
         { pairNumber: 1, humanFilename: 'pair1-human.jpg', aiFilename: 'pair1-ai.png' },
         { pairNumber: 2, humanFilename: 'pair2-human.jpg', aiFilename: 'pair2-ai.jpg' },
+        { pairNumber: 3, humanFilename: 'pair3-human.png', aiFilename: 'pair3-ai.png' },
+        { pairNumber: 4, humanFilename: 'pair4-human.png', aiFilename: 'pair4-ai.png' },
       ];
-    
+
     case ImageCategory.PRODUCTS:
       return [
         { pairNumber: 1, humanFilename: 'pair1-human.jpg', aiFilename: 'pair1-ai.jpg' },
         { pairNumber: 2, humanFilename: 'pair2-human.jpg', aiFilename: 'pair2-ai.png' },
+        { pairNumber: 3, humanFilename: 'pair3-human.png', aiFilename: 'pair3-ai.png' },
+        { pairNumber: 4, humanFilename: 'pair4-human.png', aiFilename: 'pair4-ai.png' },
+        { pairNumber: 5, humanFilename: 'pair5-human.png', aiFilename: 'pair5-ai.png' },
+        { pairNumber: 6, humanFilename: 'pair6-human.png', aiFilename: 'pair6-ai.png' },
+        { pairNumber: 7, humanFilename: 'pair7-human.png', aiFilename: 'pair7-ai.png' },
       ];
-    
+
     case ImageCategory.SCIENCE:
       return [
         { pairNumber: 1, humanFilename: 'pair1-human.jpeg', aiFilename: 'pair1-ai.jpeg' },
+        { pairNumber: 2, humanFilename: 'pair2-human.png', aiFilename: 'pair2-ai.png' },
+        { pairNumber: 3, humanFilename: 'pair3-human.png', aiFilename: 'pair3-ai.png' },
+        { pairNumber: 4, humanFilename: 'pair4-human.png', aiFilename: 'pair4-ai.png' },
+        { pairNumber: 5, humanFilename: 'pair5-human.jpg', aiFilename: 'pair5-ai.jpg' },
+        { pairNumber: 6, humanFilename: 'pair6-human.png', aiFilename: 'pair6-ai.png' },
+        { pairNumber: 7, humanFilename: 'pair7-human.png', aiFilename: 'pair7-ai.png' },
+        { pairNumber: 8, humanFilename: 'pair8-human.png', aiFilename: 'pair8-ai.png' },
+        { pairNumber: 9, humanFilename: 'pair9-human.png', aiFilename: 'pair9-ai.png' },
+        { pairNumber: 10, humanFilename: 'pair10-human.png', aiFilename: 'pair10-ai.png' },
+        { pairNumber: 11, humanFilename: 'pair11-human.png', aiFilename: 'pair11-ai.png' },
+        { pairNumber: 12, humanFilename: 'pair12-human.jpg', aiFilename: 'pair12-ai.png' },
+        { pairNumber: 13, humanFilename: 'pair13-human.png', aiFilename: 'pair13-ai.png' },
+        { pairNumber: 14, humanFilename: 'pair14-human.png', aiFilename: 'pair14-ai.png' },
+        { pairNumber: 15, humanFilename: 'pair15-human.png', aiFilename: 'pair15-ai.png' },
+        { pairNumber: 16, humanFilename: 'pair16-human.jpg', aiFilename: 'pair16-ai.png' },
+        { pairNumber: 17, humanFilename: 'pair17-human.png', aiFilename: 'pair17-ai.png' },
+        { pairNumber: 18, humanFilename: 'pair18-human.png', aiFilename: 'pair18-ai.png' },
+        { pairNumber: 19, humanFilename: 'pair19-human.png', aiFilename: 'pair19-ai.png' },
       ];
-    
+
     default:
       return [];
   }
