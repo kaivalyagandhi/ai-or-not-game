@@ -1,6 +1,6 @@
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-  "name": "ai-or-not-v8",
+  "name": "ai-or-not-v0",
   "post": {
     "dir": "dist/client",
     "entrypoints": {
@@ -31,5 +31,8 @@
   },
   "triggers": {
     "onAppInstall": "/internal/on-app-install"
+  },
+  "dev": {
+    "subreddit": "ai_or_not_v0_dev"
   }
 }
