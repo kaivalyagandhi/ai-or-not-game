@@ -43,14 +43,13 @@ export const MagnifyOverlay: React.FC<MagnifyOverlayProps> = ({
   const sourceImageRef = useRef<HTMLImageElement | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
-  const [isFeatureDisabled, setIsFeatureDisabled] = useState(false);
   const animationFrameRef = useRef<number | null>(null);
   const performanceMonitorRef = useRef<PerformanceMonitor>(createPerformanceMonitor());
   const imageCleanupRef = useRef<(() => void) | null>(null);
 
   // Load source image for magnification with retry logic and error handling
   useEffect(() => {
-    if (!imageUrl || isFeatureDisabled) return;
+    if (!imageUrl) return;
 
     // Clean up previous image loading
     if (imageCleanupRef.current) {
@@ -60,17 +59,14 @@ export const MagnifyOverlay: React.FC<MagnifyOverlayProps> = ({
     const handleSuccess = (image: HTMLImageElement) => {
       sourceImageRef.current = image;
       
-      // Check if image is too large and should disable magnification
+      // Log image size for debugging but don't disable magnification
       const imagePixels = image.naturalWidth * image.naturalHeight;
-      const isExtremelyLarge = imagePixels > 50000000; // >50MP (very high threshold)
       
-      if (isExtremelyLarge) {
-        console.info('Magnification disabled for extremely large image:', {
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('Magnification enabled for image:', {
           dimensions: `${image.naturalWidth}x${image.naturalHeight}`,
           pixels: imagePixels
         });
-        setIsFeatureDisabled(true);
-        return;
       }
       
       setImageLoaded(true);
@@ -101,43 +97,32 @@ export const MagnifyOverlay: React.FC<MagnifyOverlayProps> = ({
         imageCleanupRef.current = null;
       }
     };
-  }, [imageUrl, isFeatureDisabled, onError]);
+  }, [imageUrl, onError]);
 
   // Render magnified view on canvas with performance monitoring
   const renderMagnifiedView = useCallback(() => {
     const canvas = canvasRef.current;
     const sourceImage = sourceImageRef.current;
     
-    if (!canvas || !sourceImage || !cursorPosition || !containerRef.current || !imageLoaded || isFeatureDisabled) {
+    if (!canvas || !sourceImage || !cursorPosition || !containerRef.current || !imageLoaded) {
       return;
     }
 
     // Check canvas availability and handle errors
-    if (!handleCanvasError(canvas, () => setIsFeatureDisabled(true))) {
+    if (!handleCanvasError(canvas, () => console.warn('Canvas error detected, but continuing with magnification'))) {
       return;
     }
 
     const ctx = canvas.getContext('2d');
     if (!ctx) {
-      setIsFeatureDisabled(true);
+      console.warn('Canvas 2D context not available, but continuing');
       return;
     }
 
     try {
-      // Update performance metrics with image size context (disabled in development)
-      if (process.env.NODE_ENV !== 'development') {
-        const imageSize = sourceImage ? { width: sourceImage.naturalWidth, height: sourceImage.naturalHeight } : undefined;
-        performanceMonitorRef.current = updatePerformanceMetrics(performanceMonitorRef.current, imageSize);
-      }
-      
-      // Check if feature should be disabled due to poor performance (skip in development)
-      if (process.env.NODE_ENV !== 'development' && performanceMonitorRef.current.shouldDisableFeature) {
-        setIsFeatureDisabled(true);
-        if (onPerformanceIssue) {
-          onPerformanceIssue(performanceMonitorRef.current);
-        }
-        return;
-      }
+      // Update performance metrics for debugging only (never disable feature)
+      const imageSize = sourceImage ? { width: sourceImage.naturalWidth, height: sourceImage.naturalHeight } : undefined;
+      performanceMonitorRef.current = updatePerformanceMetrics(performanceMonitorRef.current, imageSize);
 
       // Calculate image size metrics first
       const imagePixels = sourceImage.naturalWidth * sourceImage.naturalHeight;
@@ -220,9 +205,7 @@ export const MagnifyOverlay: React.FC<MagnifyOverlayProps> = ({
     } catch (error) {
       console.error('Error rendering magnified view:', error);
       
-      // Disable feature on repeated canvas errors
-      setIsFeatureDisabled(true);
-      
+      // Log error but don't disable feature - let users decide
       if (onError) {
         onError(error instanceof Error ? error : new Error('Canvas rendering failed'));
       }
@@ -231,7 +214,6 @@ export const MagnifyOverlay: React.FC<MagnifyOverlayProps> = ({
     cursorPosition,
     containerRef,
     imageLoaded,
-    isFeatureDisabled,
     magnificationFactor,
     circleRadius,
     borderColor,
@@ -241,7 +223,7 @@ export const MagnifyOverlay: React.FC<MagnifyOverlayProps> = ({
 
   // Handle rendering with animation frame for smooth performance
   useEffect(() => {
-    if (isVisible && imageLoaded && cursorPosition && adjustedPosition && !isFeatureDisabled) {
+    if (isVisible && imageLoaded && cursorPosition && adjustedPosition) {
       // Cancel any pending animation frame
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -257,7 +239,7 @@ export const MagnifyOverlay: React.FC<MagnifyOverlayProps> = ({
         animationFrameRef.current = null;
       }
     };
-  }, [isVisible, imageLoaded, cursorPosition, adjustedPosition, isFeatureDisabled, renderMagnifiedView]);
+  }, [isVisible, imageLoaded, cursorPosition, adjustedPosition, renderMagnifiedView]);
 
   // Comprehensive cleanup on unmount
   useEffect(() => {
@@ -282,8 +264,8 @@ export const MagnifyOverlay: React.FC<MagnifyOverlayProps> = ({
     };
   }, []);
 
-  // Don't render if image failed to load, not visible, or feature is disabled
-  if (!isVisible || imageError || !imageLoaded || !adjustedPosition || isFeatureDisabled) {
+  // Don't render if image failed to load, not visible, or no position
+  if (!isVisible || imageError || !imageLoaded || !adjustedPosition) {
     return null;
   }
 

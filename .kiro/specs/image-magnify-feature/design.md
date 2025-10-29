@@ -41,18 +41,18 @@ graph TB
     MagnifyOverlay --> HoverDetection
     HoverDetection --> MouseEvents
     HoverDetection --> TouchEvents
-    
+
     MouseEvents --> CursorTracking
     TouchEvents --> CursorTracking
     CursorTracking --> PositionCalc
     PositionCalc --> ViewportCheck
-    
+
     ViewportCheck --> MagnifyCanvas
     MagnifyCanvas --> ImageSource
     ImageSource --> CanvasContext
     CanvasContext --> MagnifiedRender
     MagnifiedRender --> CircleMask
-    
+
     MagnifyCanvas --> BorderStyling
     BorderStyling --> ImageElement
 ```
@@ -86,7 +86,7 @@ const MagnifyContainer: React.FC<MagnifyContainerProps> = ({
   imageUrl,
   isActive,
   borderColor,
-  onImageClick
+  onImageClick,
 }) => {
   // Component implementation
 };
@@ -110,7 +110,7 @@ const MagnifyOverlay: React.FC<MagnifyOverlayProps> = ({
   cursorPosition,
   isVisible,
   borderColor,
-  magnificationFactor = 3
+  magnificationFactor = 3,
 }) => {
   // Canvas-based magnification rendering
 };
@@ -151,17 +151,17 @@ The existing GameRound component will be enhanced to include magnification:
 const GameRound: React.FC<GameRoundProps> = ({ round, onAnswer, timeRemaining }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<'A' | 'B' | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
-  
+
   // Magnification is only active during gameplay, not during feedback
   const isMagnifyActive = !showFeedback && selectedAnswer === null;
-  
+
   // Get border color from game theme (matches pre-selection state)
   const borderColor = getBorderColor(); // Returns default border color
-  
+
   return (
     <div className="game-round">
       <Timer timeRemaining={timeRemaining} />
-      
+
       <div className="images-container">
         <MagnifyContainer
           imageUrl={round.imageA.url}
@@ -172,7 +172,7 @@ const GameRound: React.FC<GameRoundProps> = ({ round, onAnswer, timeRemaining })
           <img src={round.imageA.url} alt="Option A" />
           {showFeedback && <FeedbackOverlay />}
         </MagnifyContainer>
-        
+
         <MagnifyContainer
           imageUrl={round.imageB.url}
           isActive={isMagnifyActive}
@@ -232,11 +232,13 @@ interface ViewportConstraints {
 ### Performance Degradation
 
 **Canvas Rendering Issues**:
+
 - **Fallback Strategy**: Disable magnification if canvas operations fail
 - **Performance Monitoring**: Track rendering frame rates and disable if below 30fps
 - **Memory Management**: Properly dispose of canvas contexts and image data
 
 **Image Loading Failures**:
+
 - **Graceful Degradation**: Hide magnification if source image fails to load
 - **Retry Logic**: Attempt to reload image data once before disabling feature
 - **User Feedback**: No error messages - feature simply remains inactive
@@ -244,11 +246,13 @@ interface ViewportConstraints {
 ### Device Compatibility
 
 **Touch Device Handling**:
+
 - **Touch and Hold**: Implement touch and hold gesture for mobile magnification
 - **Touch Move**: Track touch movement for cursor following on mobile
 - **Gesture Conflicts**: Prevent conflicts with native touch gestures (zoom, scroll)
 
 **Browser Compatibility**:
+
 - **Canvas Support**: Feature detection for HTML5 Canvas support
 - **Performance Limits**: Automatic disabling on low-performance devices
 - **Fallback Behavior**: Game remains fully functional without magnification
@@ -256,11 +260,13 @@ interface ViewportConstraints {
 ### Edge Cases
 
 **Rapid Cursor Movement**:
+
 - **Debouncing**: Limit update frequency to maintain performance
 - **Smooth Interpolation**: Use requestAnimationFrame for smooth cursor following
 - **Memory Leaks**: Proper cleanup of event listeners and canvas contexts
 
 **Viewport Boundaries**:
+
 - **Edge Detection**: Keep magnified circle fully visible within viewport
 - **Position Adjustment**: Automatically adjust circle position near edges
 - **Responsive Behavior**: Handle orientation changes and window resizing
@@ -272,18 +278,21 @@ interface ViewportConstraints {
 #### Component Testing
 
 **MagnifyContainer Component**:
+
 - Test hover state activation and deactivation
 - Verify click events pass through correctly
 - Test border color application
 - Verify active/inactive state handling
 
 **MagnifyOverlay Component**:
+
 - Test canvas rendering with different image sources
 - Verify 3x magnification accuracy
 - Test circular clipping mask application
 - Verify border styling consistency
 
 **useMagnify Hook**:
+
 - Test cursor position tracking accuracy
 - Verify event handler registration and cleanup
 - Test state transitions (hover enter/leave)
@@ -292,12 +301,14 @@ interface ViewportConstraints {
 #### Rendering Tests
 
 **Canvas Operations**:
+
 - Test image drawing at 3x magnification
 - Verify circular clipping mask accuracy
 - Test performance with different image sizes
 - Verify memory cleanup after rendering
 
 **Position Calculations**:
+
 - Test cursor position relative to image container
 - Verify viewport boundary detection
 - Test position adjustment near edges
@@ -308,12 +319,14 @@ interface ViewportConstraints {
 #### GameRound Integration
 
 **Component Integration**:
+
 - Test magnification with existing GameRound component
 - Verify click detection works with magnification overlay
 - Test timer functionality with magnification active
 - Verify feedback display disables magnification
 
 **State Management**:
+
 - Test magnification state during round transitions
 - Verify proper cleanup between rounds
 - Test interaction with game state changes
@@ -322,12 +335,14 @@ interface ViewportConstraints {
 #### Cross-Device Testing
 
 **Desktop Browsers**:
+
 - Test mouse hover interactions
 - Verify cursor following accuracy
 - Test performance across different browsers
 - Verify visual consistency
 
 **Mobile Devices**:
+
 - Test touch and hold gesture activation
 - Verify touch move cursor following
 - Test performance on various mobile devices
@@ -338,12 +353,14 @@ interface ViewportConstraints {
 #### Rendering Performance
 
 **Frame Rate Testing**:
+
 - Monitor canvas rendering frame rates
 - Test with various image sizes and qualities
 - Verify 60fps target maintenance
 - Test performance degradation thresholds
 
 **Memory Usage**:
+
 - Monitor memory consumption during magnification
 - Test for memory leaks with extended use
 - Verify proper cleanup of canvas contexts
@@ -352,12 +369,14 @@ interface ViewportConstraints {
 #### User Experience Testing
 
 **Responsiveness**:
+
 - Test cursor following lag (target <16ms)
 - Verify smooth fade in/out animations
 - Test rapid cursor movement handling
 - Verify no impact on click responsiveness
 
 **Visual Quality**:
+
 - Test magnification quality at 3x zoom
 - Verify border styling consistency
 - Test circular mask edge smoothness
@@ -368,6 +387,7 @@ interface ViewportConstraints {
 #### Screen Reader Support
 
 **Alternative Access**:
+
 - Provide keyboard shortcuts for magnification activation
 - Ensure screen readers can describe magnification state
 - Test with various assistive technologies
@@ -376,6 +396,7 @@ interface ViewportConstraints {
 #### Motor Accessibility
 
 **Alternative Interactions**:
+
 - Support keyboard-based magnification control
 - Provide adjustable hover timing for motor difficulties
 - Test with various input devices
@@ -384,6 +405,7 @@ interface ViewportConstraints {
 #### Visual Accessibility
 
 **High Contrast Support**:
+
 - Test magnification with high contrast themes
 - Verify border visibility in various color schemes
 - Test with color blind simulation
@@ -422,8 +444,14 @@ const renderMagnifiedView = (
   // Draw magnified portion
   ctx.drawImage(
     sourceImage,
-    sourceX, sourceY, sourceSize * 2, sourceSize * 2, // source rectangle
-    0, 0, circleRadius * 2, circleRadius * 2 // destination rectangle
+    sourceX,
+    sourceY,
+    sourceSize * 2,
+    sourceSize * 2, // source rectangle
+    0,
+    0,
+    circleRadius * 2,
+    circleRadius * 2 // destination rectangle
   );
 };
 ```
@@ -457,12 +485,12 @@ const renderMagnifiedView = (
 const getResponsiveCircleRadius = (containerWidth: number): number => {
   // Base radius as percentage of container width
   const baseRadius = Math.min(containerWidth * 0.15, 80); // Max 80px, min 15% of width
-  
+
   // Adjust for mobile devices
   if (window.innerWidth < 768) {
     return Math.max(baseRadius * 1.2, 60); // Larger on mobile, min 60px
   }
-  
+
   return Math.max(baseRadius, 50); // Min 50px on desktop
 };
 ```
@@ -475,16 +503,16 @@ const handleTouchInteraction = (
   containerRef: React.RefObject<HTMLDivElement>
 ) => {
   event.preventDefault(); // Prevent native gestures
-  
+
   const touch = event.touches[0];
   if (!touch || !containerRef.current) return;
-  
+
   const rect = containerRef.current.getBoundingClientRect();
   const position = {
     x: touch.clientX - rect.left,
-    y: touch.clientY - rect.top
+    y: touch.clientY - rect.top,
   };
-  
+
   return position;
 };
 ```
@@ -499,14 +527,17 @@ const useThrottledMagnify = (
   delay: number = 16 // ~60fps
 ) => {
   const lastUpdate = useRef(0);
-  
-  return useCallback((position: { x: number; y: number }) => {
-    const now = Date.now();
-    if (now - lastUpdate.current >= delay) {
-      updateFunction(position);
-      lastUpdate.current = now;
-    }
-  }, [updateFunction, delay]);
+
+  return useCallback(
+    (position: { x: number; y: number }) => {
+      const now = Date.now();
+      if (now - lastUpdate.current >= delay) {
+        updateFunction(position);
+        lastUpdate.current = now;
+      }
+    },
+    [updateFunction, delay]
+  );
 };
 ```
 

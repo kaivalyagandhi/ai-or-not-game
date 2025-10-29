@@ -63,23 +63,14 @@ export const useMagnify = (
   // Calculate if magnification should be visible
   const isVisible = isActive && isHovering && cursorPosition !== null && !isFeatureDisabled;
   
-  // Throttled position update function with enhanced performance monitoring
+  // Throttled position update function with optional performance monitoring
   const updatePosition = useCallback(
     throttle((position: CursorPosition) => {
       if (isFeatureDisabled) return;
       
       try {
-        // Update performance metrics (disabled in development to avoid false positives)
-        if (process.env.NODE_ENV !== 'development') {
-          performanceMonitorRef.current = updatePerformanceMetrics(performanceMonitorRef.current);
-        }
-        
-        // Check if feature should be disabled due to poor performance
-        if (performanceMonitorRef.current.shouldDisableFeature) {
-          console.info('Magnification feature disabled due to performance constraints');
-          setIsFeatureDisabled(true);
-          return;
-        }
+        // Update performance metrics for debugging only (never disable feature)
+        performanceMonitorRef.current = updatePerformanceMetrics(performanceMonitorRef.current);
         
         setCursorPosition(position);
         
@@ -98,10 +89,10 @@ export const useMagnify = (
       } catch (error) {
         console.error('Error updating magnification position:', error);
         
-        // Increment error count and disable feature if too many errors
+        // Only disable on critical errors, not performance issues
         errorCountRef.current++;
         if (errorCountRef.current >= maxErrorsBeforeDisable) {
-          console.warn('Magnification feature disabled due to repeated errors');
+          console.warn('Magnification feature disabled due to repeated critical errors');
           setIsFeatureDisabled(true);
         }
       }
@@ -284,7 +275,7 @@ export const useMagnify = (
         
       } catch (error) {
         console.error('Error handling orientation change:', error);
-        setIsFeatureDisabled(true);
+        // Don't disable feature for orientation change errors
       }
     };
     

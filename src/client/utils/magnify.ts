@@ -372,69 +372,19 @@ export const updatePerformanceMetrics = (
     // Update tab visibility status
     monitor.isTabActive = !document.hidden;
     
-    // Determine performance status - adjust thresholds based on image size
-    let fpsThreshold = 15;
-    let memoryThreshold = 0.9;
+    // Always mark performance as good - let users decide if they want magnification
+    monitor.isPerformanceGood = true;
     
-    if (imageSize) {
-      const imagePixels = imageSize.width * imageSize.height;
-      // For very large images (>2MP), be more lenient
-      if (imagePixels > 2000000) {
-        fpsThreshold = 8;
-        memoryThreshold = 0.95;
-      }
-      // For extremely large images (>10MP), be very lenient
-      if (imagePixels > 10000000) {
-        fpsThreshold = 5;
-        memoryThreshold = 0.98;
-      }
-    }
+    // Never auto-disable the feature - users should have control
+    monitor.shouldDisableFeature = false;
     
-    monitor.isPerformanceGood = monitor.averageFps >= fpsThreshold && monitor.memoryUsage < memoryThreshold;
-    
-    // Only disable feature if performance is catastrophically poor
-    // Skip performance-based disabling in development to avoid false positives
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    
-    if (isDevelopment) {
-      // In development, only disable for memory issues, not FPS
-      // Dev tools and React strict mode can cause misleading FPS readings
-      if (monitor.memoryUsage > 0.99) {
-        monitor.shouldDisableFeature = true;
-        console.info('Magnification auto-disabled due to memory constraints:', {
-          memoryUsage: (monitor.memoryUsage * 100).toFixed(1) + '%',
-          imageSize: imageSize ? `${imageSize.width}x${imageSize.height}` : 'unknown'
-        });
-      }
-      return monitor;
-    }
-    
-    // Production: Use very conservative thresholds
-    let criticalFpsThreshold = 1; // Extremely low threshold for production
-    let criticalMemoryThreshold = 0.99; // Nearly out of memory
-    
-    // Adjust thresholds based on image size
-    if (imageSize) {
-      const imagePixels = imageSize.width * imageSize.height;
-      if (imagePixels > 10000000) {
-        // For very large images, disable performance monitoring entirely
-        // These images are expected to cause performance issues
-        return monitor;
-      }
-    }
-    
-    // Only check FPS if tab is active (browsers throttle inactive tabs)
-    const shouldDisableDueToFps = monitor.isTabActive && monitor.averageFps < criticalFpsThreshold;
-    const shouldDisableDueToMemory = monitor.memoryUsage > criticalMemoryThreshold;
-    
-    if (shouldDisableDueToFps || shouldDisableDueToMemory) {
-      monitor.shouldDisableFeature = true;
-      console.info('Magnification auto-disabled for performance protection:', {
+    // Optional: Log performance metrics for debugging without disabling
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('Magnification performance metrics:', {
         fps: monitor.averageFps.toFixed(1),
         memoryUsage: (monitor.memoryUsage * 100).toFixed(1) + '%',
         tabActive: monitor.isTabActive,
-        imageSize: imageSize ? `${imageSize.width}x${imageSize.height}` : 'unknown',
-        reason: shouldDisableDueToFps ? 'low-fps' : 'high-memory'
+        imageSize: imageSize ? `${imageSize.width}x${imageSize.height}` : 'unknown'
       });
     }
   }

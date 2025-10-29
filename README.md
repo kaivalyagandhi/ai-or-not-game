@@ -6,7 +6,7 @@ Spot the Bot is an engaging daily challenge game built on Reddit's Devvit platfo
 
 This interactive React-based game runs directly within Reddit posts, providing a seamless gaming experience with real-time leaderboards, achievement badges, social sharing features, simplified audio controls, and a revolutionary image magnification system. Players compete against a 10-second timer each round and against each other in a daily test of visual perception and AI detection skills, with up to 2 attempts per day to achieve their best score.
 
-The game features a responsive mobile-first design optimized for Reddit's viewing experience, enhanced visual feedback with custom overlay indicators, simplified audio controls with one-click toggle functionality, comprehensive educational content system with midgame learning breaks, advanced timeout handling with extended learning opportunities, revolutionary image magnification for detailed inspection, and smooth animated transitions throughout the user experience.
+The game features a responsive mobile-first design optimized for Reddit's viewing experience, enhanced visual feedback with custom overlay indicators, simplified audio controls with one-click toggle functionality, comprehensive educational content system with midgame learning breaks, advanced timeout handling with extended learning opportunities, revolutionary 2.5x image magnification for detailed inspection, and smooth animated transitions throughout the user experience.
 
 ## 🎯 What is Spot the Bot?
 
@@ -15,7 +15,7 @@ The game features a responsive mobile-first design optimized for Reddit's viewin
 ### What the Game Does
 The game presents players with pairs of images - one real photograph and one AI-generated image - across six different categories (Animals, Architecture, Nature, Food, Products, Science). Players must quickly identify which image is real while competing against a 10-second timer. The game features:
 
-- **Interactive Magnification**: Revolutionary 2.5x zoom system allowing detailed inspection of images with Canvas-based rendering and intelligent performance monitoring
+- **Revolutionary Image Magnification**: Interactive 2.5x zoom system allowing detailed inspection of images with Canvas-based rendering, cursor tracking, and cross-device support for examining AI artifacts
 - **Educational Integration**: Midgame learning breaks with AI detection tips and fascinating facts about AI technology, randomly selected from comprehensive libraries (50+ tips, 50+ facts)
 - **Real-Time Competition**: Live leaderboards and participant tracking with multiple daily attempts (up to 2 per day)
 - **Enhanced Audio Experience**: Background music and sound effects with simplified one-click controls and balanced audio levels
@@ -92,7 +92,7 @@ Spot the Bot introduces the first-ever interactive magnification system in an AI
 - **Advanced Performance Monitoring**: Exponential moving average FPS calculation over 3-second intervals with very conservative thresholds (5fps minimum) to prevent false positives while maintaining smooth operation
 - **Memory Management**: Efficient cleanup and resource management prevents memory leaks with automatic canvas context cleanup
 - **Browser Compatibility**: Works across all modern browsers with graceful fallbacks and comprehensive error handling
-- **Intelligent Degradation**: Automatically disables magnification on catastrophically poor performance (below 5fps) while maintaining game functionality
+- **User-Controlled Feature**: Magnification remains available to all users regardless of device performance, with performance monitoring providing debugging insights without restricting user choice
 
 ### Strategic Advantages
 - **Detail Detection**: Examine fine textures, skin imperfections, and material properties at pixel level
@@ -100,7 +100,7 @@ Spot the Bot introduces the first-ever interactive magnification system in an AI
 - **Texture Analysis**: Analyze fabric weaves, fur patterns, and surface details with precision
 - **Edge Inspection**: Check for unnatural edges, blending, or impossible geometry
 
-This magnification system transforms how players approach AI detection, enabling detailed forensic analysis while maintaining the fast-paced, competitive nature of the game. The recent performance optimizations ensure smooth operation across all devices while providing intelligent fallbacks for lower-end hardware.
+This magnification system transforms how players approach AI detection, enabling detailed forensic analysis while maintaining the fast-paced, competitive nature of the game. The system prioritizes user choice, allowing players to use magnification regardless of their device's performance characteristics.
 
 ## 🎮 Current Game Implementation
 
@@ -172,7 +172,7 @@ Spot the Bot stands out as a pioneering AI detection game that combines entertai
 - **High-Performance Rendering**: Canvas-based rendering with 60fps optimization, circular clipping masks, and advanced performance monitoring with exponential moving average FPS calculation
 - **Cross-Device Support**: Desktop users get smooth mouse hover magnification, while mobile users can use touch-and-hold gestures (400ms activation) for detailed inspection
 - **Smart Positioning**: Magnified circle automatically adjusts position near screen edges to remain fully visible across all screen sizes with viewport boundary detection
-- **Intelligent Performance Management**: Automatic performance monitoring with very conservative thresholds (5fps minimum) and graceful degradation on low-performance devices
+- **User-Controlled Experience**: Performance monitoring tracks metrics for debugging purposes but respects user choice - magnification remains available regardless of device performance, letting users decide their preferred experience
 - **Strategic Advantage**: Enables detailed forensic analysis of AI artifacts, textures, and fine details invisible at normal zoom
 
 ### 📱 First Reddit-Native Gaming Experience
@@ -453,7 +453,7 @@ The game is **fully functional and production-ready** with all core systems impl
 
 #### Recent Updates ⏱️
 - **Revolutionary Image Magnification System**: Implemented first-ever interactive 2.5x magnification with Canvas rendering, cursor tracking, and cross-device support for detailed AI artifact inspection
-- **Advanced Performance Monitoring**: Enhanced magnification system with exponential moving average FPS calculation over 3-second intervals and very conservative performance thresholds (5fps minimum) to prevent false positives, with performance monitoring disabled in development mode to avoid interference from React strict mode and dev tools
+- **User-Controlled Performance**: Enhanced magnification system with performance monitoring that respects user choice - the system tracks performance metrics for debugging but never auto-disables the feature, allowing users to decide whether they want magnification enabled
 - **Enhanced Visual Feedback System**: Improved round feedback display with loading states during answer submission and prominent score display in the header area
 - **Educational Content Streamlining**: Simplified midgame learning break with cleaner, more focused presentation and removed redundant instructional text
 - **UI Organization Improvements**: Combined round number and category information into a single, cleaner label format (e.g., "Round 1 of 6 (Category: Animals)") positioned on the left side using formatRoundLabel utility
@@ -476,7 +476,7 @@ The game is **fully functional and production-ready** with all core systems impl
 ## 🎨 Recent Updates & Enhancements
 
 ### 🔥 Latest Update: Revolutionary Image Magnification System & Performance Optimization
-The game recently received a groundbreaking image magnification system and significant performance optimizations. **Most Recent Change**: Enhanced performance monitoring for the magnification system with exponential moving average FPS calculation over 3-second intervals and very conservative performance thresholds (5fps minimum) to prevent false positives while maintaining smooth 60fps rendering. Performance monitoring is now disabled in development mode to prevent false positives during development with React strict mode and dev tools.
+The game recently received a groundbreaking image magnification system and significant performance optimizations. **Most Recent Change**: Enhanced performance monitoring for the magnification system with user-controlled experience - the system no longer auto-disables magnification based on performance metrics, allowing users to decide whether they want to use the feature. Performance monitoring still tracks metrics for debugging purposes but prioritizes user choice over automatic feature disabling.
 
 **Latest Audio System Improvements:**
 - **Simplified Audio Controls**: Replaced complex dropdown controls with simple one-click toggle button (🎵/🔇) positioned in top-right corner
