@@ -17,6 +17,13 @@
     "realtime": true,
     "redis": true
   },
+  "http": {
+    "domains": [
+      "api.openai.com",
+      "wikipedia.org",
+      "api.weather.gov"
+    ]
+  },
   "media": {
     "dir": "assets"
   },

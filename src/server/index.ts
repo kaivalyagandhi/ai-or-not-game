@@ -700,6 +700,32 @@ router.post('/api/participants/join', async (_req, res): Promise<void> => {
   }
 });
 
+// Example external API endpoint
+router.get('/api/external/weather', async (_req, res): Promise<void> => {
+  try {
+    // Example using globally allowed domain
+    const response = await fetch('https://api.weather.gov/stations', {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'AIorNotGame/1.0 (contact@example.com)',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Weather API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('External API error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch external data',
+    });
+  }
+});
+
 // Educational Content API Endpoints
 router.get('/api/content/educational', async (_req, res): Promise<void> => {
   try {
@@ -841,10 +867,15 @@ router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
 
 router.post('/internal/menu/post-create', async (_req, res): Promise<void> => {
   try {
+    console.log('🚨🚨🚨 MENU POST CREATION TRIGGERED 🚨🚨🚨');
     console.log('📝 Menu triggered post creation');
+    console.log('🔧 SCHEDULER STATUS CHECK: Cron 0 12 * * * (Daily at noon UTC)');
+    console.log('⏰ Next scheduler execution: Tomorrow at 12:00 PM UTC');
+    console.log('📍 Scheduler endpoint: /internal/scheduler/daily-reset');
+    console.log('🎯 If you see logs tomorrow at noon UTC with "SCHEDULER TRIGGERED", it works!');
     
     // 🔍 SCHEDULER DEBUGGING - Log comprehensive scheduler state
-    console.log('🕐 ===== SCHEDULER DEBUG INFO =====');
+    console.log('🕐 ===== SCHEDULER DEBUG INFO START =====');
     console.log('📅 Current time:', new Date().toISOString());
     console.log('📅 Current UTC time:', new Date().toUTCString());
     console.log('📅 Current hour UTC:', new Date().getUTCHours());
