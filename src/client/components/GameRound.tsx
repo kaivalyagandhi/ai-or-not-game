@@ -318,14 +318,14 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
   const getTimerColor = () => {
     if (timeRemaining > 6) return 'text-green-600'; // Normal green for high time
     if (timeRemaining > 3) return 'text-secondary-600'; // Secondary color for medium time
-    return 'text-error-600'; // Maroon red for low time
+    return 'text-error-600'; // Red for low time
   };
 
   // Get progress bar color
   const getProgressColor = () => {
     if (timeRemaining > 6) return 'bg-green-500'; // Normal green for high time
     if (timeRemaining > 3) return 'bg-secondary-500'; // Secondary color (#ffb800) for medium time
-    return 'bg-error-500'; // Maroon red for low time
+    return 'bg-error-500'; // Red for low time
   };
 
   return (
@@ -366,7 +366,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
             </div>
           </div>
 
-          <h2 className={`text-xl font-semibold mb-2 ${showFeedback && isTimeout ? "text-red-600" : "text-gray-900"}`}>
+          <h2 className={`text-xl font-semibold mb-2 ${showFeedback && isTimeout ? "text-error-500" : "text-gray-900"}`}>
             {isSubmitting && !showFeedback ? (
               // Show loading spinner during submission
               <div className="flex items-center justify-center">
@@ -379,7 +379,7 @@ export const GameRound: React.FC<GameRoundProps> = ({ round, sessionId, onRoundC
                   +{Math.round(feedbackData.roundScore)} points
                 </span>
               ) : (
-                <span style={{ color: '#8b0000' }}>
+                <span style={{ color: '#dc2626' }}>
                   No points
                 </span>
               )

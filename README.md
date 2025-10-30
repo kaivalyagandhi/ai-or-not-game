@@ -110,7 +110,8 @@ After completing your challenge:
   ```
 - **AI Tip Sharing**: Post your detection insights as comments with the format:
   ```
-  [Your challenge results]Here's my AI detection tip to help you: [Your tip]
+  [Your challenge results]
+  Here's my AI detection tip to help you: [Your tip]
   ```
 - **Improvement Tracking**: See if you improved from your previous attempt with best score context and achievement notifications
 
@@ -205,6 +206,7 @@ The game is complete and ready for players with all core systems implemented and
 - **Comprehensive error handling** with offline support, retry logic with exponential backoff, and graceful degradation
 - **Modern UI design** with DynaPuff font, combined round/category labels, cleaner date display, and Reddit-optimized responsive layout at 480px breakpoint
 - **Enhanced social sharing** with detailed message templates including correct guesses, badge earned, and daily rank
+- **AI Tip Sharing Feature** with comment posting functionality allowing players to share detection insights with the community
 
 ## 🎮 Game Overview
 
@@ -219,7 +221,7 @@ The game features a modern, streamlined interface with dynamic date display that
 - **Tier-based scoring system**: 10 points per correct answer + time bonuses (5 points for 7-10 seconds, 3 points for 4-6 seconds, 1 point for 1-3 seconds, 0 points for 0 seconds)
 - **Multiple attempts per day**: Players can attempt the challenge up to 2 times per day with best score tracking and improvement notifications
 - **Educational break**: After round 3, players receive fresh AI detection tips and facts randomly selected from comprehensive content libraries
-- **Enhanced visual feedback**: Custom overlay indicators with colored circles, icons (✕ for AI, ✓ for Human), and labels show image sources, plus colored borders (#6b8e23 green, #8b0000 red) with glow effects
+- **Enhanced visual feedback**: Custom overlay indicators with colored circles, icons (✕ for AI, ✓ for Human), and labels show image sources, plus colored borders (#6b8e23 green, #dc2626 red) with glow effects
 - **Simplified audio system**: Background music starts immediately when enabled, sound effects at 1.8x volume, one-click toggle controls (🎵/🔇) with real-time state changes
 - **Advanced timeout handling**: Server-side timeout processing with improved countdown display, extended learning feedback showing correct answers, and proper game state management
 - **Progressive difficulty**: Mixed categories and randomized AI placement keep players guessing across diverse image types
@@ -312,7 +314,7 @@ The game features sophisticated timeout handling:
 
 ### Enhanced Visual Feedback System
 - **Custom Overlay Indicators**: Selected images show circular overlays with white icons (✕ for AI, ✓ for Human) and clear labels ("AI" or "Human")
-- **Enhanced Border Styling**: Color-coded borders (green #6b8e23 for correct, red #8b0000 for incorrect) with glow effects
+- **Enhanced Border Styling**: Color-coded borders (green #6b8e23 for correct, red #dc2626 for incorrect) with glow effects
 - **Mobile-First Responsive Layout**: Images adapt from single column on mobile to side-by-side on desktop with consistent 1:1 aspect ratio
 - **Smart Visual States**: Clear progression from default → selection → feedback states with smooth transitions and 20px rounded corners
 

@@ -51,7 +51,8 @@ export const AITipForm: React.FC<AITipFormProps> = ({
               id="comment"
               value={editableComment}
               onChange={(e) => setEditableComment(e.target.value)}
-              className="w-full h-40 p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary-500 focus:border-transparent font-montserrat"
+              className="w-full h-40 p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              style={{ fontFamily: '"Montserrat", sans-serif' }}
               placeholder="Share your AI detection tip..."
               disabled={isSubmitting}
               required

@@ -125,7 +125,7 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
         <div className="text-center">
           <button
             onClick={onContinue}
-            className="bg-secondary-500 hover:bg-secondary-600 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg btn-text"
+            className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg btn-text"
           >
             Continue Playing!
           </button>

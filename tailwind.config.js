@@ -40,8 +40,8 @@ export default {
           600: '#556b1d',
         },
         'error': {
-          500: '#8b0000', // Maroon-like red
-          600: '#660000',
+          500: '#dc2626', // Red
+          600: '#b91c1c',
         }
       }
     },

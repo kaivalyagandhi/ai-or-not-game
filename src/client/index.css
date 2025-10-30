@@ -65,8 +65,8 @@
   --color-success-500: #6b8e23;
   --color-success-600: #556b1d;
   
-  --color-error-500: #8b0000;
-  --color-error-600: #660000;
+  --color-error-500: #dc2626;
+  --color-error-600: #b91c1c;
 }
 
 /* Primary color utilities */
@@ -105,6 +105,7 @@
 .bg-error-500 { background-color: var(--color-error-500); }
 .bg-error-600 { background-color: var(--color-error-600); }
 
+.text-error-500 { color: var(--color-error-500); }
 .text-error-600 { color: var(--color-error-600); }
 
 /* Secondary color text utilities */
@@ -207,9 +208,9 @@
 }
 
 .game-image-button.incorrect-feedback {
-  border-color: #8b0000; /* Maroon-like red */
+  border-color: #dc2626; /* Red */
   border-width: 6px;
-  box-shadow: 0 0 20px rgba(139, 0, 0, 0.3);
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
 }
 
 /* Selected image gets enhanced styling */
@@ -224,7 +225,7 @@
 }
 
 .game-image-button.incorrect-feedback:not(.selected) {
-  box-shadow: 0 0 15px rgba(139, 0, 0, 0.2);
+  box-shadow: 0 0 15px rgba(220, 38, 38, 0.2);
 }
 
 .game-image-button.disabled {
@@ -265,7 +266,7 @@
 }
 
 .ai-indicator {
-  background-color: #8b0000; /* Maroon-like red */
+  background-color: #dc2626; /* Red */
 }
 
 .human-indicator {
