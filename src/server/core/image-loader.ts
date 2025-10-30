@@ -211,6 +211,12 @@ function getKnownPairsForCategory(category: ImageCategory): Array<{
         { pairNumber: 1, humanFilename: 'pair1-human.jpg', aiFilename: 'pair1-ai.jpg' },
         { pairNumber: 2, humanFilename: 'pair2-human.jpg', aiFilename: 'pair2-ai.png' },
         { pairNumber: 3, humanFilename: 'pair3-human.png', aiFilename: 'pair3-ai.png' },
+        { pairNumber: 4, humanFilename: 'pair4-human.png', aiFilename: 'pair4-ai.png' },
+        { pairNumber: 5, humanFilename: 'pair5-human.png', aiFilename: 'pair5-ai.png' },
+        { pairNumber: 6, humanFilename: 'pair6-human.png', aiFilename: 'pair6-ai.png' },
+        { pairNumber: 7, humanFilename: 'pair7-human.png', aiFilename: 'pair7-ai.png' },
+        { pairNumber: 8, humanFilename: 'pair8-human.png', aiFilename: 'pair8-ai.png' },
+        { pairNumber: 9, humanFilename: 'pair9-human.png', aiFilename: 'pair9-ai.png' },
       ];
 
     case ImageCategory.FOOD:

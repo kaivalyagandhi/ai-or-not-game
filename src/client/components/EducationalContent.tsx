@@ -61,7 +61,7 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
         {/* Header */}
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-primary-500">
-            Midgame Learning Break
+            AI Fact Check
           </h2>
         </div>
 
@@ -79,13 +79,13 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
 
         {/* Content Cards */}
         <div className="space-y-4 mb-6">
-          {/* Detection Tip */}
+          {/* AI Check */}
           <div className="border border-gray-200 rounded-lg p-4">
             <div className="flex items-start">
               <div className="text-xl mr-3 mt-1">💡</div>
               <div>
                 <h3 className="text-base font-semibold text-secondary-500 mb-2">
-                  AI Image Detection Tip
+                  AI Check
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm educational-body">
                   {tip}

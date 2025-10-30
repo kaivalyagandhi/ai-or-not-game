@@ -1,6 +1,6 @@
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-  "name": "ai-or-not-v0",
+  "name": "ai-or-not",
   "post": {
     "dir": "dist/client",
     "entrypoints": {
@@ -40,8 +40,5 @@
         "cron": "0 0 * * *"
       }
     }
-  },
-  "dev": {
-    "subreddit": "ai_or_not_v0_dev"
   }
 }
