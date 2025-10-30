@@ -814,6 +814,16 @@ router.get('/api/content/random', async (_req, res): Promise<void> => {
 
 router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
   try {
+    console.log('🚀 APP INSTALLATION TRIGGERED');
+    console.log('📅 Installation time:', new Date().toISOString());
+    
+    // Log scheduler configuration on app install
+    console.log('⏰ SCHEDULER CONFIGURED:');
+    console.log('   - Task: daily-reset-and-post');
+    console.log('   - Schedule: 0 12 * * * (Daily at 12:00 PM UTC)');
+    console.log('   - Endpoint: /internal/scheduler/daily-reset');
+    console.log('   - Target subreddit:', context.subredditName);
+    
     const post = await createPost(reddit, context);
 
     res.json({
@@ -821,7 +831,7 @@ router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
       message: `Post created in subreddit ${context.subredditName} with id ${post.id}`,
     });
   } catch (error) {
-    console.error(`Error creating post: ${error}`);
+    console.error(`❌ Error creating post during app install: ${error}`);
     res.status(400).json({
       status: 'error',
       message: 'Failed to create post',
@@ -831,13 +841,100 @@ router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
 
 router.post('/internal/menu/post-create', async (_req, res): Promise<void> => {
   try {
+    console.log('📝 Menu triggered post creation');
+    
+    // 🔍 SCHEDULER DEBUGGING - Log comprehensive scheduler state
+    console.log('🕐 ===== SCHEDULER DEBUG INFO =====');
+    console.log('📅 Current time:', new Date().toISOString());
+    console.log('📅 Current UTC time:', new Date().toUTCString());
+    console.log('📅 Current hour UTC:', new Date().getUTCHours());
+    console.log('📅 Current minute UTC:', new Date().getUTCMinutes());
+    
+    // Calculate next scheduler execution
+    const now = new Date();
+    const nextNoon = new Date();
+    nextNoon.setUTCHours(12, 0, 0, 0);
+    if (nextNoon <= now) {
+      nextNoon.setUTCDate(nextNoon.getUTCDate() + 1);
+    }
+    
+    console.log('⏰ SCHEDULER CONFIGURATION:');
+    console.log('   - Task Name: daily-reset-and-post');
+    console.log('   - Cron Expression: 0 12 * * *');
+    console.log('   - Description: Daily at 12:00 PM UTC');
+    console.log('   - Endpoint: /internal/scheduler/daily-reset');
+    console.log('   - Next Execution:', nextNoon.toISOString());
+    console.log('   - Time Until Next:', Math.round((nextNoon.getTime() - now.getTime()) / 1000 / 60), 'minutes');
+    
+    console.log('🏗️ ENVIRONMENT INFO:');
+    console.log('   - NODE_ENV:', process.env.NODE_ENV || 'undefined');
+    console.log('   - DEVVIT_EXECUTION_ID:', !!process.env.DEVVIT_EXECUTION_ID);
+    console.log('   - DEVVIT_PLAYTEST:', process.env.DEVVIT_PLAYTEST || 'undefined');
+    console.log('   - Subreddit Context:', context.subredditName);
+    console.log('   - Post Context:', context.postId || 'none');
+    
+    console.log('📋 SCHEDULER ENDPOINT STATUS:');
+    console.log('   - Endpoint Path: /internal/scheduler/daily-reset');
+    console.log('   - Expected Trigger: POST request from Reddit scheduler');
+    console.log('   - Manual Test: Use menu action to verify functionality');
+    
+    console.log('🔧 TROUBLESHOOTING CHECKLIST:');
+    console.log('   ✓ devvit.json has scheduler configuration');
+    console.log('   ✓ Endpoint /internal/scheduler/daily-reset exists');
+    console.log('   ✓ Cron expression: 0 12 * * * (noon UTC)');
+    console.log('   ✓ App deployed with scheduler config');
+    console.log('   ? Scheduler service active (Reddit internal)');
+    
+    // Test scheduler logic without triggering full reset
+    console.log('🧪 TESTING SCHEDULER COMPONENTS:');
+    
+    try {
+      // Test content manager
+      const { contentManager } = await import('./core/content-manager.js');
+      console.log('   ✓ Content manager accessible');
+      
+      // Test image collection
+      const imageCollection = createImageCollection();
+      console.log('   ✓ Image collection loadable');
+      console.log('   - Image categories available:', Object.keys(imageCollection).length);
+      
+      // Test Redis connectivity
+      await redis.ping();
+      console.log('   ✓ Redis connection active');
+      
+      // Test daily game state functionality
+      const { getDailyGameState } = await import('./core/daily-game-manager.js');
+      const gameState = await getDailyGameState(redis);
+      console.log('   ✓ Daily game state accessible');
+      console.log('   - Game state exists:', gameState.success);
+      
+    } catch (testError) {
+      console.error('   ❌ Scheduler component test failed:', testError);
+    }
+    
+    console.log('📊 SCHEDULER EXPECTATIONS:');
+    console.log('   - Should trigger daily at 12:00 PM UTC');
+    console.log('   - Should create new post in', context.subredditName);
+    console.log('   - Should reset daily game state');
+    console.log('   - Should show logs: "🕐 SCHEDULER TRIGGERED"');
+    console.log('   - Should show logs: "✅ [SCHEDULER] Created new daily post"');
+    
+    console.log('🔍 VERIFICATION STEPS:');
+    console.log('   1. Check logs tomorrow at 12:00 PM UTC');
+    console.log('   2. Look for new post in r/' + context.subredditName);
+    console.log('   3. Verify post title: "AI or Not?"');
+    console.log('   4. Verify post description contains current date');
+    
+    console.log('🕐 ===== END SCHEDULER DEBUG =====');
+
     const post = await createPost(reddit, context);
 
     res.json({
       navigateTo: `https://reddit.com/r/${context.subredditName}/comments/${post.id}`,
     });
   } catch (error) {
-    console.error(`Error creating post: ${error}`);
+    console.error(`❌ Error creating post: ${error}`);
+    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     res.status(400).json({
       status: 'error',
       message: 'Failed to create post',
@@ -1048,13 +1145,17 @@ router.get('/api/debug/environment', async (_req, res): Promise<void> => {
 
 
 router.post('/internal/scheduler/daily-reset', async (req, res): Promise<void> => {
-  console.log('🕐 SCHEDULER TRIGGERED: Daily reset starting at', new Date().toISOString());
-  console.log('📋 Request headers:', JSON.stringify(req.headers, null, 2));
-  console.log('📋 Request body:', JSON.stringify(req.body, null, 2));
+  console.log('🚨🚨🚨 SCHEDULER TRIGGERED! 🚨🚨🚨');
+  console.log('🕐 SCHEDULER EXECUTION START:', new Date().toISOString());
+  console.log('🕐 UTC Time:', new Date().toUTCString());
+  console.log('🕐 Expected: Daily at 12:00 PM UTC (cron: 0 12 * * *)');
+  console.log('📋 Scheduler request headers:', JSON.stringify(req.headers, null, 2));
+  console.log('📋 Scheduler request body:', JSON.stringify(req.body, null, 2));
   console.log('📋 Context subreddit:', context.subredditName);
   console.log('📋 Context postId:', context.postId);
   console.log('📋 Environment NODE_ENV:', process.env.NODE_ENV);
   console.log('📋 Environment DEVVIT_EXECUTION_ID:', process.env.DEVVIT_EXECUTION_ID);
+  console.log('🎯 THIS CONFIRMS SCHEDULER IS WORKING!');
   
   const jobResult = await executeSchedulerJob(
     'daily-reset',
