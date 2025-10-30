@@ -24,6 +24,7 @@ import {
   getUserPlayStats,
   canUserPlay,
   incrementUserAttempts,
+  getEnvironmentInfo,
 } from './core/play-limit-manager.js';
 import { getAllBadgeDisplayInfo, calculateBadgeProgress } from './core/badge-manager.js';
 import { 
@@ -32,7 +33,7 @@ import {
   getLeaderboardParticipantCount,
   LeaderboardType 
 } from './core/leaderboard-manager.js';
-import { BadgeType, ImageCategory } from '../shared/types/api.js';
+import { BadgeType } from '../shared/types/api.js';
 
 const app = express();
 
@@ -782,7 +783,7 @@ router.get('/api/content/random', async (_req, res): Promise<void> => {
 
 router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
   try {
-    const post = await createPost();
+    const post = await createPost(reddit, context);
 
     res.json({
       status: 'success',
@@ -799,7 +800,7 @@ router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
 
 router.post('/internal/menu/post-create', async (_req, res): Promise<void> => {
   try {
-    const post = await createPost();
+    const post = await createPost(reddit, context);
 
     res.json({
       navigateTo: `https://reddit.com/r/${context.subredditName}/comments/${post.id}`,
@@ -840,7 +841,7 @@ router.post('/api/create-post', async (req, res): Promise<void> => {
 router.post('/api/create-daily-post', async (_req, res): Promise<void> => {
   try {
     // Create post with dynamic date
-    const post = await createPost();
+    const post = await createPost(reddit, context);
 
     res.json({
       success: true,
@@ -884,8 +885,8 @@ router.post('/api/debug/migrate-leaderboard', async (_req, res): Promise<void> =
           // Copy each entry to new key
           for (const entry of oldEntries) {
             const score = await redis.zScore(oldPattern, entry.member);
-            if (score !== null) {
-              await redis.zAdd(newAllTimeKey, { member: entry.member, score });
+            if (score !== null && score !== undefined) {
+              await redis.zAdd(newAllTimeKey, { member: entry.member, score: score });
               migratedCount++;
             }
           }
@@ -921,12 +922,10 @@ router.post('/api/debug/migrate-leaderboard', async (_req, res): Promise<void> =
 // Debug endpoint to check environment detection and external API access
 router.get('/api/debug/environment', async (_req, res): Promise<void> => {
   try {
-    const nodeEnv = process.env.NODE_ENV;
-    const isDevvitPlaytest = process.env.DEVVIT_PLAYTEST === 'true';
-    const hasRedditContext = !!process.env.REDDIT_CONTEXT || !!process.env.DEVVIT_EXECUTION_ID;
+    // Get comprehensive environment info
+    const envInfo = getEnvironmentInfo();
     
-    // Import the function to test it
-    const { canUserPlay } = await import('./core/play-limit-manager.js');
+    // Test play limit functionality
     const testUserId = 'debug-user-123';
     const playResult = await canUserPlay(testUserId);
     
@@ -948,17 +947,11 @@ router.get('/api/debug/environment', async (_req, res): Promise<void> => {
     }
     
     res.json({
-      environment: {
-        NODE_ENV: nodeEnv,
-        DEVVIT_PLAYTEST: process.env.DEVVIT_PLAYTEST,
-        REDDIT_CONTEXT: !!process.env.REDDIT_CONTEXT,
-        DEVVIT_EXECUTION_ID: !!process.env.DEVVIT_EXECUTION_ID,
-        hasRedditContext,
-        isDevvitPlaytest
-      },
+      environment: envInfo,
       playLimitTest: playResult,
       externalApiTest,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      message: `Running in ${envInfo.mode} mode with ${envInfo.maxAttempts} daily attempts (detected via ${envInfo.detectionMethod})`
     });
   } catch (error) {
     res.status(500).json({

@@ -35,14 +35,50 @@ export const PLAY_LIMIT_ERROR_CODES = {
 const PRODUCTION_MAX_ATTEMPTS = 2;
 const DEVELOPMENT_MAX_ATTEMPTS = 999; // Effectively unlimited for testing
 
+// Configuration override - set this to force a specific mode
+const FORCE_PRODUCTION_MODE = true; // Set to true to always use production limits
+
 /**
  * Check if we're in development mode
+ * Multiple detection methods for different hosting environments
  */
 function isDevelopmentMode(): boolean {
-  // FORCE PRODUCTION MODE - No more complex detection
-  console.log('🚨 FORCING PRODUCTION MODE - Play limits: 2 attempts per day');
-  console.error('🚨 FORCING PRODUCTION MODE - Play limits: 2 attempts per day'); // Use error to make it more visible
-  return false; // Always return false = always production mode
+  // Configuration override - if set, always use this setting
+  if (FORCE_PRODUCTION_MODE) {
+    console.log('🔒 FORCED PRODUCTION MODE - Play limits: 2 attempts per day');
+    return false;
+  }
+
+  // Method 1: Check NODE_ENV (traditional)
+  if (process.env.NODE_ENV === 'production') {
+    console.log('🏭 Production mode detected via NODE_ENV');
+    return false;
+  }
+
+  // Method 2: Check for Devvit playtest environment
+  if (process.env.DEVVIT_PLAYTEST === 'true') {
+    console.log('🧪 Development mode detected via DEVVIT_PLAYTEST');
+    return true;
+  }
+
+  // Method 3: Check for Reddit execution context (production indicator)
+  if (process.env.REDDIT_CONTEXT || process.env.DEVVIT_EXECUTION_ID) {
+    console.log('🏭 Production mode detected via Reddit execution context');
+    return false;
+  }
+
+  // Method 4: Check hostname/domain patterns
+  const hostname = process.env.HOSTNAME || '';
+  if (hostname.includes('reddit.com') || hostname.includes('devvit')) {
+    console.log('🏭 Production mode detected via hostname:', hostname);
+    return false;
+  }
+
+  // Method 5: Default to PRODUCTION for safety
+  // This ensures production limits are enforced when in doubt
+  console.log('🚨 DEFAULTING TO PRODUCTION MODE - Play limits: 2 attempts per day');
+  console.error('🚨 Environment detection unclear - using production mode for safety');
+  return false; // Default to production mode
 }
 
 /**
@@ -54,6 +90,44 @@ function getMaxAttempts(): number {
     `Max attempts determined: ${maxAttempts} (${isDevelopmentMode() ? 'Development' : 'Production'} mode)`
   );
   return maxAttempts;
+}
+
+/**
+ * Get current environment configuration for debugging
+ */
+export function getEnvironmentInfo(): {
+  mode: 'development' | 'production';
+  maxAttempts: number;
+  detectionMethod: string;
+  environmentVars: Record<string, string | undefined>;
+} {
+  const isDev = isDevelopmentMode();
+  const maxAttempts = getMaxAttempts();
+
+  let detectionMethod = 'default-production';
+
+  if (FORCE_PRODUCTION_MODE) {
+    detectionMethod = 'forced-production';
+  } else if (process.env.NODE_ENV === 'production') {
+    detectionMethod = 'NODE_ENV';
+  } else if (process.env.DEVVIT_PLAYTEST === 'true') {
+    detectionMethod = 'DEVVIT_PLAYTEST';
+  } else if (process.env.REDDIT_CONTEXT || process.env.DEVVIT_EXECUTION_ID) {
+    detectionMethod = 'reddit-context';
+  }
+
+  return {
+    mode: isDev ? 'development' : 'production',
+    maxAttempts,
+    detectionMethod,
+    environmentVars: {
+      NODE_ENV: process.env.NODE_ENV,
+      DEVVIT_PLAYTEST: process.env.DEVVIT_PLAYTEST,
+      REDDIT_CONTEXT: process.env.REDDIT_CONTEXT ? 'present' : undefined,
+      DEVVIT_EXECUTION_ID: process.env.DEVVIT_EXECUTION_ID ? 'present' : undefined,
+      HOSTNAME: process.env.HOSTNAME,
+    },
+  };
 }
 
 /**

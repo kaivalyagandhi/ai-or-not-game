@@ -13,15 +13,10 @@
     "dir": "dist/server",
     "entry": "index.cjs"
   },
-  "http": {
-    "domains": []
+  "permissions": {
+    "realtime": true,
+    "redis": true
   },
-  "realtime": true,
-  "redis": true,
-  "reddit": [
-    "read",
-    "submit"
-  ],
   "media": {
     "dir": "assets"
   },

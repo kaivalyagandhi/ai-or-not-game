@@ -1,12 +1,17 @@
-import { Context, RedditAPIClient } from '@devvit/web/server';
+import { Context, RedditClient } from '@devvit/web/server';
 
 export const createPost = async (
-  redditClient: RedditAPIClient, 
-  contextObj: Context, 
+  redditClient?: RedditClient, 
+  contextObj?: Context, 
   customTitle?: string, 
   customDescription?: string
 ) => {
-  const { subredditName } = contextObj;
+  // Use provided clients or import from context
+  const { reddit, context } = await import('@devvit/web/server');
+  const client = redditClient || reddit;
+  const ctx = contextObj || context;
+  
+  const { subredditName } = ctx;
   if (!subredditName) {
     throw new Error('subredditName is required');
   }
@@ -22,7 +27,7 @@ export const createPost = async (
   const title = customTitle || 'AI or Not?';
   const description = customDescription || `Daily Challenge - ${date}`;
 
-  return await redditClient.submitCustomPost({
+  return await client.submitCustomPost({
     splash: {
       // Splash Screen Configuration
       appDisplayName: 'AI or Not?',
