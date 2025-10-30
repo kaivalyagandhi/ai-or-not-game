@@ -19,7 +19,7 @@ export const AITipForm: React.FC<AITipFormProps> = ({
 
   // Pre-populate the form with the formatted comment
   useEffect(() => {
-    const formattedComment = `${challengeMessage}\nHere's my AI detection tip to help you: ${aiTip}`;
+    const formattedComment = `${challengeMessage}\n${aiTip}`;
     setEditableComment(formattedComment);
   }, [challengeMessage, aiTip]);
 
@@ -51,7 +51,7 @@ export const AITipForm: React.FC<AITipFormProps> = ({
               id="comment"
               value={editableComment}
               onChange={(e) => setEditableComment(e.target.value)}
-              className="w-full h-40 p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full h-40 p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary-500 focus:border-transparent font-montserrat"
               placeholder="Share your AI detection tip..."
               disabled={isSubmitting}
               required

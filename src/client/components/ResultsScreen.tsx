@@ -155,6 +155,22 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
 Want to see if you can beat me before I get my next try?`;
   };
 
+  // Generate AI tip message in the specific multi-line format requested
+  const generateAITipMessage = () => {
+    const badgeInfo = getBadgeInfo(session.badge);
+    const dailyRank = leaderboardPosition ? `#${leaderboardPosition}` : '#?';
+    const totalPlayers = totalParticipants ? ` of ${totalParticipants}` : '';
+    
+    return `I just finished today's AI or Not? challenge:
+✅ Correct Guesses: ${session.correctCount}/6 images
+🏆 Badge Earned: ${badgeInfo.emoji} ${badgeInfo.title}
+📈 Daily Rank: ${dailyRank}${totalPlayers} players
+
+Want to see if you can beat me before I get my next try?
+
+Here's my AI detection tip to help you:`;
+  };
+
   // Handle share button click
   const handleShare = async () => {
     const shareText = generateShareMessage();
@@ -462,7 +478,7 @@ Want to see if you can beat me before I get my next try?`;
       {/* AI Tip Form Modal */}
       {showAITipForm && (
         <AITipForm
-          challengeMessage={generateShareMessage()}
+          challengeMessage={generateAITipMessage()}
           aiTip={aiTip}
           onSubmit={handleAITipSubmit}
           onCancel={handleAITipCancel}

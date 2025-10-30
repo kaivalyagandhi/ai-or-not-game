@@ -16,7 +16,7 @@ The game presents players with pairs of images - one real photograph and one AI-
 1. **Welcome Screen**: Shows your weekly ranking, daily play count, and live participant statistics with the stylized "AI or Not?" title in DynaPuff font and animated "Start Playing!" button with wave animation
 2. **6-Round Challenge**: Each round presents two images with 10-second timer and revolutionary interactive magnification system
 3. **Educational Break**: After round 3, learn AI detection tips and fascinating facts randomly selected from comprehensive content libraries
-4. **Results & Sharing**: View your score, badge, daily rank, and challenge friends with detailed sharing messages
+4. **Results & Sharing**: View your score, badge, daily rank, challenge friends with detailed sharing messages, and post AI detection tips as comments
 5. **Leaderboards**: Compare your performance on daily, weekly, and all-time rankings
 
 The game features:
@@ -29,7 +29,7 @@ The game features:
 - **Multiple Attempts**: Up to 2 attempts per day with best score tracking and improvement notifications
 - **Achievement System**: Earn badges from 🤖 AI Whisperer (6/6 correct) to 🎓 Human in Training (0-2/6 correct)
 - **Enhanced Audio Experience**: Background music and sound effects with simplified one-click controls (🎵/🔇) and balanced audio levels
-- **Social Features**: Challenge friends with detailed sharing messages including score, badge, and daily rank
+- **Social Features**: Challenge friends with detailed sharing messages and post AI detection tips as comments to help the community
 - **Reddit-Native Experience**: Seamless integration with Reddit accounts, no external apps or logins required
 - **Mobile-Optimized Design**: Responsive layout with vertical image stacking on mobile, transitioning to side-by-side at 480px breakpoint for optimal Reddit feed viewing
 - **Animated UI Elements**: Wave animation on the "Start Playing!" button with enhanced 1.4x scale and staggered reveal animations on results screen
@@ -95,7 +95,11 @@ The game features:
 After completing your challenge:
 - **Challenge Complete Header**: Modern results display with dynamic date formatting and staggered reveal animations
 - **Final Score Display**: Total points, badge earned, and daily leaderboard position with smooth animations
-- **Rankings Box**: Shows your daily rank and total daily participants with integrated "View Leaderboard" button
+- **Rankings Box**: Shows your daily rank and total daily participants with integrated "Leaderboard" button
+- **Action Buttons**: Three vertically-aligned buttons for enhanced interaction:
+  - **💡 Post AI tip**: Share your AI detection insights as a comment to help other players
+  - **👥 Challenge Friends**: Share detailed results with the community using the template format
+  - **🎮 Play Again / Play Again Tomorrow!**: Use your second daily attempt or return tomorrow
 - **Social Sharing**: Challenge friends with detailed messages using the new template format:
   ```
   I just finished today's AI or Not? challenge:
@@ -104,7 +108,10 @@ After completing your challenge:
   📈 Daily Rank: #42 of 1,247 players
   Want to see if you can beat me before I get my next try?
   ```
-- **Play Again Option**: Use your second daily attempt if available (shows remaining attempts)
+- **AI Tip Sharing**: Post your detection insights as comments with the format:
+  ```
+  [Your challenge results]Here's my AI detection tip to help you: [Your tip]
+  ```
 - **Improvement Tracking**: See if you improved from your previous attempt with best score context and achievement notifications
 
 ### 💡 Pro Tips for Success
@@ -156,7 +163,7 @@ AI or Not? stands out as a pioneering AI detection game that combines entertainm
 ### 📱 First Reddit-Native Gaming Experience
 - **Revolutionary Platform Integration**: The first comprehensive AI detection game built natively for Reddit using Devvit platform
 - **Zero-Friction Authentication**: Automatic user authentication through Reddit accounts - no separate login required
-- **Community-Centric Design**: Purpose-built for Reddit's social environment with integrated sharing and real-time competition
+- **Community-Centric Design**: Purpose-built for Reddit's social environment with integrated sharing, real-time competition, and community AI tip sharing
 - **Custom Typography**: Features the DynaPuff font for a distinctive, playful visual identity with button text styling
 - **Enhanced Animated UI Elements**: Improved wave animation effects on buttons and staggered reveal animations for enhanced user experience
 
@@ -164,6 +171,7 @@ AI or Not? stands out as a pioneering AI detection game that combines entertainm
 - **Authentic AI Content**: Uses genuine AI-generated images from modern models, providing practical training for spotting deepfakes and synthetic media
 - **Educational Value**: Midgame learning breaks with comprehensive AI detection tips and fascinating facts about AI image generation randomly selected from extensive libraries
 - **Progressive Difficulty**: Mixed categories and randomized AI placement keep players guessing across diverse image types (Animals, Architecture, Nature, Food, Products, Science)
+- **Community Learning**: Players can share their AI detection tips as comments, creating a collaborative learning environment
 
 ### 🎵 Simplified Audio Experience
 - **One-Click Controls**: Simple toggle button (🎵/🔇) positioned in top-right corner for instant audio enable/disable
@@ -175,6 +183,7 @@ AI or Not? stands out as a pioneering AI detection game that combines entertainm
 ### 🏆 Advanced Social & Competition Features
 - **Multi-Tier Leaderboards**: Daily, weekly, and all-time rankings with live updates via Devvit Realtime API
 - **Enhanced Social Sharing**: Friend challenge sharing with detailed messages including correct guesses, badge earned, and daily rank
+- **Community AI Tips**: Post your AI detection tips as comments to help other players learn and improve
 - **Multiple Daily Attempts**: Up to 2 attempts per day with best score tracking and improvement notifications
 - **Real-Time Participant Tracking**: Live participant counts and community engagement indicators showing active player base
 
