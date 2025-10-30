@@ -157,6 +157,7 @@ export const App = () => {
               return (
                 <EducationalContent
                   onContinue={continueFromEducational}
+                  sessionId={session?.sessionId}
                 />
               );
             

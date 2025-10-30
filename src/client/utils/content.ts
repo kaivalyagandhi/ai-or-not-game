@@ -219,6 +219,48 @@ export async function fetchRandomContentFresh(): Promise<CurrentContentResponse>
 }
 
 /**
+ * Fetch session-specific content (unique per session ID)
+ */
+export async function fetchSessionContent(sessionId: string): Promise<CurrentContentResponse> {
+  try {
+    const response = await fetch(`/api/content/session/${sessionId}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching session content:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch session content',
+    };
+  }
+}
+
+/**
+ * Cached version of fetchSessionContent (cached per session)
+ */
+export async function fetchSessionContentCached(sessionId: string): Promise<CurrentContentResponse> {
+  const cacheKey = `session-content-${sessionId}`;
+  const cached = contentCache.get(cacheKey);
+  
+  if (cached) {
+    return cached;
+  }
+  
+  const content = await loadContentWithRetry(() => fetchSessionContent(sessionId));
+  
+  if (content.success) {
+    // Cache session content for the duration of the session
+    contentCache.set(cacheKey, content, 30 * 60 * 1000); // 30 minutes
+  }
+  
+  return content;
+}
+
+/**
  * Clear content cache (useful when day changes)
  */
 export function clearContentCache(): void {

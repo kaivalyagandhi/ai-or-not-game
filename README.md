@@ -513,7 +513,7 @@ AI or Not? is a complete and polished AI detection game running in production wi
 - **Enhanced Splash Screen**: Welcome screen featuring the stylized "AI or Not?" title in DynaPuff font, weekly rankings, daily play count, live participant statistics, current date display, and animated "Start Playing!" button with enhanced wave animation
 - **6-Round Gameplay**: Each round presents two images (one real, one AI-generated) with 10-second timer and combined round/category labels positioned in the top-left
 - **Revolutionary Magnification**: Players can hover (desktop) or touch-and-hold 400ms (mobile) to see 2.5x magnified circular views with Canvas rendering and performance monitoring
-- **Educational Break**: After round 3, players receive fresh AI detection tips and facts randomly selected from comprehensive content libraries
+- **Educational Break**: After round 3, players receive fresh AI detection tips and facts with session-specific content loading for unique educational experiences per game
 - **Results Screen**: Modern results display with "Challenge Complete!" header, dynamic date formatting, final scoring with badge achievement, daily leaderboard position, and smooth staggered animations
 - **Leaderboard View**: Comprehensive leaderboard with daily, weekly, and all-time rankings
 
@@ -737,7 +737,13 @@ By contributing to this project, you agree that your contributions will be licen
 ## 🎨 Recent Updates & Enhancements
 
 ### 🔥 Latest Update: Educational Content Enhancement
-The game recently received comprehensive enhancements including AI tip sharing functionality and typography improvements. **Most Recent Change**: Updated the educational break component header from "Midgame Learning Break" to "AI Fact Check" for clearer, more focused branding that better reflects the content's purpose of fact-checking AI detection knowledge.
+The game recently received comprehensive enhancements including AI tip sharing functionality and typography improvements. **Most Recent Change**: Enhanced the educational content system with session-specific content loading - the EducationalContent component now supports optional sessionId parameter for unique content per game session, improving content variety and preventing repetition across multiple plays.
+
+**Latest Educational Content Improvements:**
+- **Session-Specific Content**: Enhanced EducationalContent component with optional sessionId parameter for unique content per game session
+- **Improved Content Variety**: Session-based content loading prevents repetition and ensures fresh educational experiences across multiple plays
+- **Dual Content Loading**: Supports both session-specific cached content (`fetchSessionContentCached`) and random fresh content (`fetchRandomContentFresh`)
+- **Enhanced Learning Experience**: Players receive varied educational content with session-specific caching for better content distribution
 
 **Latest AI Tip Form Improvements:**
 - **Enhanced Typography**: AI tip form now uses Montserrat font for improved readability in the comment text area
@@ -794,11 +800,12 @@ The game recently received comprehensive enhancements including AI tip sharing f
 - **Consistent Aspect Ratios**: All images maintain 1:1 aspect ratio with 20px rounded corners across all screen sizes
 
 **Fresh Educational Content System:**
-- **Dynamic Content Loading**: Fresh educational content loaded for each game session using `fetchRandomContentFresh()` function
+- **Session-Specific Content**: Enhanced educational content system with optional sessionId parameter for unique content per game session
+- **Dynamic Content Loading**: Fresh educational content loaded for each game session using `fetchSessionContentCached()` for session-specific content or `fetchRandomContentFresh()` for general content
 - **Comprehensive Content Library**: 50+ AI detection tips and 50+ fascinating AI facts stored in server-managed JSON files
-- **No Content Repetition**: Each educational break provides fresh, randomly selected tips and facts from comprehensive libraries
+- **No Content Repetition**: Each educational break provides fresh, randomly selected tips and facts from comprehensive libraries with session-based caching
 - **Streamlined Presentation**: Clean, focused educational break design with progress indicator and clear visual hierarchy
-- **Enhanced Learning Experience**: Players receive varied educational content across multiple game sessions with fallback content for reliability
+- **Enhanced Learning Experience**: Players receive varied educational content across multiple game sessions with fallback content for reliability and session-specific variety
 
 **Scoring System Modernization:**
 - **Simplified Calculations**: Moved from complex decimal-based scoring to clean whole numbers for better user experience

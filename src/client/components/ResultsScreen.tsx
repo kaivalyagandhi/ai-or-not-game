@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameSession, BadgeType, LeaderboardResponse, RealtimeMessage, PlayAttemptsResponse, PostAITipResponse } from '../../shared/types/api';
 import { connectRealtime } from '@devvit/web/client';
-import { fetchCurrentContentCached } from '../utils/content';
+import { fetchCurrentContentCached, fetchSessionContentCached } from '../utils/content';
 import { useAudio } from '../hooks/useAudio';
 import { AITipForm } from './AITipForm';
 import { formatAITipComment } from '../utils/aiTipFormatting';
@@ -95,7 +95,8 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
     try {
       const [leaderboardResponse, contentResponse, playAttemptsResponse] = await Promise.all([
         fetch(`/api/leaderboard/user-rank/daily`),
-        fetchCurrentContentCached(),
+        // Use session-specific content if sessionId is available, otherwise use daily content
+        session?.sessionId ? fetchSessionContentCached(session.sessionId) : fetchCurrentContentCached(),
         fetch(`/api/game/play-attempts`)
       ]);
       

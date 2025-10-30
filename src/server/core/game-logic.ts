@@ -13,6 +13,7 @@ import {
   GameInitResponse,
   StartGameResponse,
   SubmitAnswerResponse,
+  ImageCategory,
 } from '../../shared/types/api.js';
 import {
   createGameSession,
@@ -29,6 +30,11 @@ import {
   initializeDailyGameState,
 } from './daily-game-manager.js';
 import { createImageCollection } from './image-loader.js';
+import {
+  generateDailyGameRounds,
+  generateRandomCategoryOrder,
+  GameRoundGenerationOptions,
+} from './daily-game-manager.js';
 import { addScoreToLeaderboards } from './leaderboard-manager.js';
 import { determineBadge } from './badge-manager.js';
 import {
@@ -316,8 +322,9 @@ export async function startGame(userId: string): Promise<StartGameResponse> {
     // Create new game session
     const session = await createGameSession(userId);
 
-    // Populate session with daily game rounds
-    session.rounds = [...gameState.imageSet]; // Copy the rounds
+    // Generate unique content for this session instead of using daily state
+    const uniqueRounds = await generateUniqueSessionRounds(userId, session.sessionId);
+    session.rounds = uniqueRounds;
 
     // Update session in Redis
     await updateGameSession(session);
@@ -573,11 +580,11 @@ export function calculateRoundScore(isCorrect: boolean, timeRemaining: number): 
   }
 
   const correctnessPoints = 10; // Base points for correct answer
-  
+
   // Tier-based time bonus (convert milliseconds to seconds)
   const secondsRemaining = Math.floor(timeRemaining / 1000);
   let timeBonus = 0;
-  
+
   if (secondsRemaining >= 7) {
     timeBonus = 5;
   } else if (secondsRemaining >= 4) {
@@ -586,7 +593,7 @@ export function calculateRoundScore(isCorrect: boolean, timeRemaining: number): 
     timeBonus = 1;
   }
   // 0 seconds remaining = 0 bonus points
-  
+
   return correctnessPoints + timeBonus;
 }
 
@@ -932,4 +939,95 @@ export async function getCurrentUsername(): Promise<string> {
     console.error('Error getting current username:', error);
     return 'anonymous';
   }
+}
+
+/**
+ * Generate unique rounds for a specific session
+ * This ensures each play attempt has different images and content
+ */
+async function generateUniqueSessionRounds(
+  userId: string,
+  sessionId: string
+): Promise<GameRound[]> {
+  try {
+    console.log(`Generating unique rounds for user ${userId}, session ${sessionId}`);
+
+    // Create image collection
+    const imageCollection = createImageCollection();
+
+    // Create a unique seed based on user ID and session ID
+    const sessionSeed = `${userId}-${sessionId}-${Date.now()}`;
+    const seedHash = hashString(sessionSeed);
+
+    // Use the seed to create a deterministic but unique random order
+    const randomGen = createSeededRandom(seedHash);
+
+    // Generate unique category order for this session
+    const categoryOrder = generateRandomCategoryOrderWithSeed(randomGen);
+
+    console.log(`Generated unique category order for session ${sessionId}:`, categoryOrder);
+
+    // Generate rounds with the unique category order
+    const rounds = generateDailyGameRounds(imageCollection, {
+      categoryOrder,
+      randomizeAIPlacement: true,
+      ensureBalance: true,
+    });
+
+    console.log(`Generated ${rounds.length} unique rounds for session ${sessionId}`);
+    return rounds;
+  } catch (error) {
+    console.error('Error generating unique session rounds:', error);
+
+    // Fallback to daily game state if unique generation fails
+    console.log('Falling back to daily game state for session rounds');
+    const dailyGameResult = await getDailyGameState(redis);
+    if (dailyGameResult.success && dailyGameResult.gameState) {
+      return [...dailyGameResult.gameState.imageSet];
+    }
+
+    throw new Error('Failed to generate session rounds and no daily state available');
+  }
+}
+
+/**
+ * Simple hash function for strings
+ */
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+}
+
+/**
+ * Create a seeded random number generator
+ */
+function createSeededRandom(seed: number) {
+  let state = seed;
+  return function () {
+    state = (state * 1664525 + 1013904223) % Math.pow(2, 32);
+    return state / Math.pow(2, 32);
+  };
+}
+
+/**
+ * Generate random category order with a seeded random function
+ */
+function generateRandomCategoryOrderWithSeed(randomFn: () => number): ImageCategory[] {
+  // Import ImageCategory from the already imported types
+  const categories = [...Object.values(ImageCategory)];
+
+  // Fisher-Yates shuffle with seeded random
+  for (let i = categories.length - 1; i > 0; i--) {
+    const j = Math.floor(randomFn() * (i + 1));
+    const temp = categories[i]!;
+    categories[i] = categories[j]!;
+    categories[j] = temp;
+  }
+
+  return categories;
 }

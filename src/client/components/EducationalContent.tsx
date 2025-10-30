@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { fetchRandomContentFresh } from '../utils/content';
+import { fetchSessionContentCached, fetchRandomContentFresh } from '../utils/content';
 
 interface EducationalContentProps {
   onContinue: () => void;
+  sessionId?: string; // Optional session ID for unique content
 }
 
-export const EducationalContent: React.FC<EducationalContentProps> = ({ onContinue }) => {
+export const EducationalContent: React.FC<EducationalContentProps> = ({ onContinue, sessionId }) => {
   const [tip, setTip] = useState<string>('');
   const [fact, setFact] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -17,7 +18,10 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
         setLoading(true);
         setError(null);
         
-        const response = await fetchRandomContentFresh();
+        // Use session-specific content if sessionId is provided, otherwise use random content
+        const response = sessionId 
+          ? await fetchSessionContentCached(sessionId)
+          : await fetchRandomContentFresh();
         
         if (response.success) {
           setTip(response.tip || 'Look for \'the smudge.\' AI sometimes blurs or smudges details where objects meet, like a ring against a finger.');
@@ -40,7 +44,7 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
     };
 
     loadContent();
-  }, []);
+  }, [sessionId]);
 
   if (loading) {
     return (

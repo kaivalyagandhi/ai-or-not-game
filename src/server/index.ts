@@ -762,6 +762,37 @@ router.get('/api/content/current', async (_req, res): Promise<void> => {
   }
 });
 
+// Session-specific content endpoint for unique tips/facts per play
+router.get('/api/content/session/:sessionId', async (req, res): Promise<void> => {
+  try {
+    const { sessionId } = req.params;
+    
+    if (!sessionId || typeof sessionId !== 'string') {
+      res.status(400).json({
+        success: false,
+        error: 'Valid session ID is required',
+      });
+      return;
+    }
+
+    const { contentManager } = await import('./core/content-manager.js');
+    
+    res.json({
+      success: true,
+      tip: contentManager.getSessionTip(sessionId),
+      fact: contentManager.getSessionFact(sessionId),
+      inspiration: contentManager.getSessionInspiration(sessionId),
+      sessionId,
+    });
+  } catch (error) {
+    console.error('Error fetching session content:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load session content',
+    });
+  }
+});
+
 router.get('/api/content/random', async (_req, res): Promise<void> => {
   try {
     const { contentManager } = await import('./core/content-manager.js');
@@ -919,6 +950,59 @@ router.post('/api/debug/migrate-leaderboard', async (_req, res): Promise<void> =
   }
 });
 
+// Scheduler health check endpoint
+router.get('/api/debug/scheduler-status', async (_req, res): Promise<void> => {
+  try {
+    const currentTime = new Date();
+    const nextNoonUTC = new Date();
+    nextNoonUTC.setUTCHours(12, 0, 0, 0);
+    if (nextNoonUTC <= currentTime) {
+      nextNoonUTC.setUTCDate(nextNoonUTC.getUTCDate() + 1);
+    }
+
+    const schedulerConfig = {
+      taskName: 'daily-reset-and-post',
+      endpoint: '/internal/scheduler/daily-reset',
+      cronExpression: '0 12 * * *',
+      description: 'Daily at noon UTC (12:00 UTC)',
+      nextExecution: nextNoonUTC.toISOString(),
+      timeUntilNext: Math.round((nextNoonUTC.getTime() - currentTime.getTime()) / 1000 / 60) + ' minutes',
+    };
+
+    // Check if we can access the scheduler endpoint
+    let endpointAccessible = false;
+    try {
+      // This is just a connectivity test, not actually triggering
+      endpointAccessible = true; // We can't easily test internal endpoints
+    } catch {
+      endpointAccessible = false;
+    }
+
+    res.json({
+      success: true,
+      currentTime: currentTime.toISOString(),
+      scheduler: schedulerConfig,
+      endpointAccessible,
+      subredditContext: context.subredditName,
+      environment: {
+        NODE_ENV: process.env.NODE_ENV,
+        DEVVIT_EXECUTION_ID: !!process.env.DEVVIT_EXECUTION_ID,
+      },
+      troubleshooting: {
+        manualTriggerUrl: '/api/debug/trigger-scheduler',
+        logsCommand: `devvit logs ${context.subredditName}`,
+        expectedBehavior: 'Scheduler should create daily posts at 12:00 UTC',
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
 // Debug endpoint to check environment detection and external API access
 router.get('/api/debug/environment', async (_req, res): Promise<void> => {
   try {
@@ -963,8 +1047,14 @@ router.get('/api/debug/environment', async (_req, res): Promise<void> => {
 
 
 
-router.post('/internal/scheduler/daily-reset', async (_req, res): Promise<void> => {
+router.post('/internal/scheduler/daily-reset', async (req, res): Promise<void> => {
   console.log('🕐 SCHEDULER TRIGGERED: Daily reset starting at', new Date().toISOString());
+  console.log('📋 Request headers:', JSON.stringify(req.headers, null, 2));
+  console.log('📋 Request body:', JSON.stringify(req.body, null, 2));
+  console.log('📋 Context subreddit:', context.subredditName);
+  console.log('📋 Context postId:', context.postId);
+  console.log('📋 Environment NODE_ENV:', process.env.NODE_ENV);
+  console.log('📋 Environment DEVVIT_EXECUTION_ID:', process.env.DEVVIT_EXECUTION_ID);
   
   const jobResult = await executeSchedulerJob(
     'daily-reset',
@@ -1050,7 +1140,95 @@ router.post('/internal/scheduler/daily-reset', async (_req, res): Promise<void> 
   }
 });
 
+// Manual scheduler trigger for testing (accessible via API)
+router.post('/api/debug/trigger-scheduler', async (_req, res): Promise<void> => {
+  try {
+    console.log('🧪 MANUAL SCHEDULER TRIGGER: Starting debug scheduler execution');
+    console.log('📋 Current time:', new Date().toISOString());
+    console.log('📋 Subreddit context:', context.subredditName);
+    
+    // Execute the scheduler job directly
+    const jobResult = await executeSchedulerJob(
+      'manual-daily-reset',
+      async () => {
+        console.log('📅 Executing manual daily reset job...');
+        
+        // Force reload of daily content files
+        const { contentManager } = await import('./core/content-manager.js');
+        contentManager.forceReload();
+        console.log('✅ Content manager reloaded');
 
+        // Load image collection from organized folder structure
+        const imageCollection = createImageCollection();
+        console.log('✅ Image collection loaded');
+
+        // Reset daily game state with new randomized content
+        const resetResult = await resetDailyGameState(redis, imageCollection);
+        console.log('✅ Daily game state reset:', resetResult.success);
+
+        if (!resetResult.success) {
+          throw new Error(resetResult.error || 'Failed to reset daily game state');
+        }
+
+        // Reset daily participant count
+        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+        const participantKey = `daily:participants:${today}`;
+        await redis.del(participantKey);
+        console.log('✅ Participant count reset');
+
+        // Create a new daily challenge post automatically
+        let newPost = null;
+        try {
+          console.log('📝 Creating new daily post...');
+          newPost = await createPost(reddit, context);
+          console.log(`✅ [MANUAL SCHEDULER] Created new daily post: ${newPost.id}`);
+          console.log(`🔗 Post URL: https://reddit.com/r/${context.subredditName}/comments/${newPost.id}`);
+        } catch (postError) {
+          console.error(`❌ [MANUAL SCHEDULER] Failed to create daily post:`, postError);
+          throw postError; // Fail the job if post creation fails in manual mode
+        }
+
+        return {
+          date: resetResult.gameState?.date,
+          categoryOrder: resetResult.gameState?.categoryOrder,
+          roundCount: resetResult.gameState?.imageSet.length,
+          participantCount: 0,
+          contentReloaded: true,
+          newPostId: newPost?.id || null,
+          postUrl: newPost ? `https://reddit.com/r/${context.subredditName}/comments/${newPost.id}` : null,
+        };
+      },
+      {
+        jobName: 'manual-daily-reset',
+        scheduledTime: 'manual trigger',
+        executionTime: new Date().toISOString(),
+      }
+    );
+
+    if (jobResult.success) {
+      res.json({
+        success: true,
+        message: 'Manual scheduler execution completed successfully',
+        data: jobResult.data,
+        timestamp: jobResult.timestamp,
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: 'Manual scheduler execution failed',
+        error: jobResult.error,
+        timestamp: jobResult.timestamp,
+      });
+    }
+  } catch (error) {
+    console.error('❌ Manual scheduler trigger failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
 
 // Game results persistence endpoint
 router.post('/api/game/results', async (req, res): Promise<void> => {

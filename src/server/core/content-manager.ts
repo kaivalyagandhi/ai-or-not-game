@@ -369,7 +369,7 @@ export class ContentManager {
   }
 
   /**
-   * Get current tip for display
+   * Get current tip for display (daily-based)
    */
   public getCurrentTip(): string {
     const content = this.getDailyEducationalContent();
@@ -377,11 +377,64 @@ export class ContentManager {
   }
 
   /**
-   * Get current fact for display
+   * Get current fact for display (daily-based)
    */
   public getCurrentFact(): string {
     const content = this.getDailyEducationalContent();
     return content.facts[content.currentFactIndex] || content.facts[0] || 'No fact available';
+  }
+
+  /**
+   * Get unique tip for a specific session
+   */
+  public getSessionTip(sessionId: string): string {
+    this.ensureContentLoaded();
+    
+    if (!this.contentCache) {
+      return 'No tip available';
+    }
+
+    // Use session ID to generate unique tip index
+    const sessionHash = this.hashString(sessionId);
+    const tipIndex = sessionHash % this.contentCache.tips.length;
+    
+    return this.contentCache.tips[tipIndex] || this.contentCache.tips[0] || 'No tip available';
+  }
+
+  /**
+   * Get unique fact for a specific session
+   */
+  public getSessionFact(sessionId: string): string {
+    this.ensureContentLoaded();
+    
+    if (!this.contentCache) {
+      return 'No fact available';
+    }
+
+    // Use session ID to generate unique fact index (offset by 1 to avoid same as tip)
+    const sessionHash = this.hashString(sessionId);
+    const factIndex = (sessionHash + 1) % this.contentCache.facts.length;
+    
+    return this.contentCache.facts[factIndex] || this.contentCache.facts[0] || 'No fact available';
+  }
+
+  /**
+   * Get unique inspiration for a specific session
+   */
+  public getSessionInspiration(sessionId: string): string {
+    this.ensureContentLoaded();
+    
+    if (!this.contentCache) {
+      return 'Keep practicing!';
+    }
+
+    // Use session ID to determine content type and index
+    const sessionHash = this.hashString(sessionId);
+    const useQuotes = sessionHash % 2 === 0;
+    const contentArray = useQuotes ? this.contentCache.quotes : this.contentCache.jokes;
+    const contentIndex = Math.floor(sessionHash / 2) % contentArray.length;
+    
+    return contentArray[contentIndex] || contentArray[0] || 'Keep practicing!';
   }
 
   /**

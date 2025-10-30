@@ -38,7 +38,7 @@
     "tasks": {
       "daily-reset-and-post": {
         "endpoint": "/internal/scheduler/daily-reset",
-        "cron": "0 0 * * *"
+        "cron": "0 12 * * *"
       }
     }
   },
