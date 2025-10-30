@@ -189,12 +189,20 @@ export async function getLeaderboard(
         break;
     }
 
+    console.log(`🔍 Getting ${type} leaderboard with key:`, leaderboardKey);
+    
+    // Check if key exists and get total count
+    const totalCount = await redis.zCard(leaderboardKey);
+    console.log(`📊 Total entries in ${type} leaderboard:`, totalCount);
+    
     // Get entries in descending order (highest scores first)
     // Use zRange with reverse option to get highest scores first
     const entries = await redis.zRange(leaderboardKey, offset, offset + limit - 1, {
       by: 'rank',
       reverse: true,
     });
+    
+    console.log(`📋 Retrieved ${entries.length} entries from ${type} leaderboard`);
 
     const leaderboardEntries: LeaderboardEntry[] = [];
 

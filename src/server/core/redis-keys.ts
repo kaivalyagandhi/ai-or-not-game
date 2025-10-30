@@ -8,26 +8,28 @@
 
 /**
  * Redis Key Prefixes
+ * Using ultra-stable global prefixes to ensure data persistence across ALL app versions
+ * These keys are designed to be completely independent of Devvit's app namespacing
  */
 export const KEY_PREFIXES = {
-  // Daily game state keys
-  DAILY_GAME: 'daily_game',
-  DAILY_PARTICIPANTS: 'daily_participants',
+  // Daily game state keys - using global stable identifier
+  DAILY_GAME: 'global_aiornotgame_daily_game',
+  DAILY_PARTICIPANTS: 'global_aiornotgame_daily_participants',
 
-  // User session keys
-  USER_SESSION: 'user_session',
-  USER_DAILY_COMPLETION: 'user_daily_completion',
+  // User session keys - using global stable identifier
+  USER_SESSION: 'global_aiornotgame_user_session',
+  USER_DAILY_COMPLETION: 'global_aiornotgame_user_daily_completion',
 
-  // Leaderboard keys (using sorted sets)
-  LEADERBOARD_DAILY: 'leaderboard_daily',
-  LEADERBOARD_WEEKLY: 'leaderboard_weekly',
-  LEADERBOARD_ALL_TIME: 'leaderboard_all_time',
+  // Leaderboard keys (using sorted sets) - using global stable identifier
+  LEADERBOARD_DAILY: 'global_aiornotgame_leaderboard_daily',
+  LEADERBOARD_WEEKLY: 'global_aiornotgame_leaderboard_weekly',
+  LEADERBOARD_ALL_TIME: 'global_aiornotgame_leaderboard_all_time',
 
-  // Participant counting
-  PARTICIPANT_COUNT: 'participant_count',
+  // Participant counting - using global stable identifier
+  PARTICIPANT_COUNT: 'global_aiornotgame_participant_count',
 
-  // Play limit tracking
-  USER_PLAY_LIMIT: 'user_play_limit',
+  // Play limit tracking - using global stable identifier
+  USER_PLAY_LIMIT: 'global_aiornotgame_user_play_limit',
 } as const;
 
 /**
@@ -143,10 +145,12 @@ export const LeaderboardKeys = {
 
   /**
    * Key for all-time leaderboard sorted set
-   * Format: leaderboard_all_time
+   * Format: global_aiornotgame_leaderboard_all_time
    */
   allTime: (): string => {
-    return KEY_PREFIXES.LEADERBOARD_ALL_TIME;
+    const key = KEY_PREFIXES.LEADERBOARD_ALL_TIME;
+    console.log('🔑 All-time leaderboard key:', key);
+    return key;
   },
 };
 

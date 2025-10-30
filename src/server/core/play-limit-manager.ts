@@ -39,22 +39,30 @@ const DEVELOPMENT_MAX_ATTEMPTS = 999; // Effectively unlimited for testing
  * Check if we're in development mode
  */
 function isDevelopmentMode(): boolean {
-  // In development, allow unlimited attempts
-  // This can be controlled via environment variable or other configuration
-  return process.env.NODE_ENV !== 'production';
+  // FORCE PRODUCTION MODE - No more complex detection
+  console.log('🚨 FORCING PRODUCTION MODE - Play limits: 2 attempts per day');
+  console.error('🚨 FORCING PRODUCTION MODE - Play limits: 2 attempts per day'); // Use error to make it more visible
+  return false; // Always return false = always production mode
 }
 
 /**
  * Get maximum attempts allowed per day
  */
 function getMaxAttempts(): number {
-  return isDevelopmentMode() ? DEVELOPMENT_MAX_ATTEMPTS : PRODUCTION_MAX_ATTEMPTS;
+  const maxAttempts = isDevelopmentMode() ? DEVELOPMENT_MAX_ATTEMPTS : PRODUCTION_MAX_ATTEMPTS;
+  console.log(
+    `Max attempts determined: ${maxAttempts} (${isDevelopmentMode() ? 'Development' : 'Production'} mode)`
+  );
+  return maxAttempts;
 }
 
 /**
  * Get user's current play limit data for today
  */
-export async function getUserPlayLimit(userId: string, date?: string): Promise<UserPlayLimit | null> {
+export async function getUserPlayLimit(
+  userId: string,
+  date?: string
+): Promise<UserPlayLimit | null> {
   try {
     if (!userId || typeof userId !== 'string') {
       throw new PlayLimitError('Invalid user ID', PLAY_LIMIT_ERROR_CODES.INVALID_USER_ID);
@@ -68,7 +76,7 @@ export async function getUserPlayLimit(userId: string, date?: string): Promise<U
     }
 
     const parsedData = JSON.parse(playLimitData);
-    
+
     // Validate the data structure
     if (!parsedData || typeof parsedData !== 'object') {
       console.warn(`Invalid play limit data for user ${userId}:`, parsedData);
@@ -78,11 +86,11 @@ export async function getUserPlayLimit(userId: string, date?: string): Promise<U
     return parsedData as UserPlayLimit;
   } catch (error) {
     console.error('Error getting user play limit:', error);
-    
+
     if (error instanceof PlayLimitError) {
       throw error;
     }
-    
+
     throw new PlayLimitError('Failed to get play limit data', PLAY_LIMIT_ERROR_CODES.REDIS_ERROR);
   }
 }
@@ -90,7 +98,10 @@ export async function getUserPlayLimit(userId: string, date?: string): Promise<U
 /**
  * Initialize or get user's play limit data for today
  */
-export async function initializeUserPlayLimit(userId: string, date?: string): Promise<UserPlayLimit> {
+export async function initializeUserPlayLimit(
+  userId: string,
+  date?: string
+): Promise<UserPlayLimit> {
   try {
     if (!userId || typeof userId !== 'string') {
       throw new PlayLimitError('Invalid user ID', PLAY_LIMIT_ERROR_CODES.INVALID_USER_ID);
@@ -125,11 +136,11 @@ export async function initializeUserPlayLimit(userId: string, date?: string): Pr
     return newPlayLimit;
   } catch (error) {
     console.error('Error initializing user play limit:', error);
-    
+
     if (error instanceof PlayLimitError) {
       throw error;
     }
-    
+
     throw new PlayLimitError('Failed to initialize play limit', PLAY_LIMIT_ERROR_CODES.REDIS_ERROR);
   }
 }
@@ -137,7 +148,10 @@ export async function initializeUserPlayLimit(userId: string, date?: string): Pr
 /**
  * Check if user can start a new game (has remaining attempts)
  */
-export async function canUserPlay(userId: string, date?: string): Promise<{
+export async function canUserPlay(
+  userId: string,
+  date?: string
+): Promise<{
   canPlay: boolean;
   remainingAttempts: number;
   maxAttempts: number;
@@ -157,23 +171,39 @@ export async function canUserPlay(userId: string, date?: string): Promise<{
     const remainingAttempts = Math.max(0, playLimit.maxAttempts - playLimit.attempts);
     const canPlay = remainingAttempts > 0;
 
-    return {
-      canPlay,
-      remainingAttempts,
-      maxAttempts: playLimit.maxAttempts,
-      reason: canPlay ? undefined : 'Daily play limit reached',
-    };
+    if (canPlay) {
+      return {
+        canPlay,
+        remainingAttempts,
+        maxAttempts: playLimit.maxAttempts,
+      };
+    } else {
+      return {
+        canPlay,
+        remainingAttempts,
+        maxAttempts: playLimit.maxAttempts,
+        reason: 'Daily play limit reached',
+      };
+    }
   } catch (error) {
     console.error('Error checking if user can play:', error);
-    
+
     // In case of error, allow play in development mode, deny in production
     const fallbackMaxAttempts = getMaxAttempts();
-    return {
-      canPlay: isDevelopmentMode(),
-      remainingAttempts: isDevelopmentMode() ? fallbackMaxAttempts : 0,
-      maxAttempts: fallbackMaxAttempts,
-      reason: isDevelopmentMode() ? undefined : 'Error checking play limit',
-    };
+    if (isDevelopmentMode()) {
+      return {
+        canPlay: true,
+        remainingAttempts: fallbackMaxAttempts,
+        maxAttempts: fallbackMaxAttempts,
+      };
+    } else {
+      return {
+        canPlay: false,
+        remainingAttempts: 0,
+        maxAttempts: fallbackMaxAttempts,
+        reason: 'Error checking play limit',
+      };
+    }
   }
 }
 
@@ -187,7 +217,7 @@ export async function incrementUserAttempts(userId: string, date?: string): Prom
     }
 
     const playLimit = await initializeUserPlayLimit(userId, date);
-    
+
     // Check if user has remaining attempts
     if (playLimit.attempts >= playLimit.maxAttempts) {
       throw new PlayLimitError('Daily play limit exceeded', PLAY_LIMIT_ERROR_CODES.LIMIT_EXCEEDED);
@@ -204,11 +234,11 @@ export async function incrementUserAttempts(userId: string, date?: string): Prom
     return playLimit;
   } catch (error) {
     console.error('Error incrementing user attempts:', error);
-    
+
     if (error instanceof PlayLimitError) {
       throw error;
     }
-    
+
     throw new PlayLimitError('Failed to increment attempts', PLAY_LIMIT_ERROR_CODES.REDIS_ERROR);
   }
 }
@@ -231,7 +261,7 @@ export async function updateBestScore(
     }
 
     const playLimit = await initializeUserPlayLimit(userId, date);
-    
+
     // Update best score if this score is better
     if (completedSession.totalScore > playLimit.bestScore) {
       playLimit.bestScore = completedSession.totalScore;
@@ -246,11 +276,11 @@ export async function updateBestScore(
     return playLimit;
   } catch (error) {
     console.error('Error updating best score:', error);
-    
+
     if (error instanceof PlayLimitError) {
       throw error;
     }
-    
+
     throw new PlayLimitError('Failed to update best score', PLAY_LIMIT_ERROR_CODES.REDIS_ERROR);
   }
 }
@@ -258,7 +288,10 @@ export async function updateBestScore(
 /**
  * Get user's play statistics for today
  */
-export async function getUserPlayStats(userId: string, date?: string): Promise<{
+export async function getUserPlayStats(
+  userId: string,
+  date?: string
+): Promise<{
   attempts: number;
   maxAttempts: number;
   remainingAttempts: number;
@@ -275,17 +308,29 @@ export async function getUserPlayStats(userId: string, date?: string): Promise<{
     const remainingAttempts = Math.max(0, playLimit.maxAttempts - playLimit.attempts);
     const canPlayAgain = remainingAttempts > 0;
 
-    return {
+    const result: {
+      attempts: number;
+      maxAttempts: number;
+      remainingAttempts: number;
+      bestScore: number;
+      bestAttempt?: GameSession;
+      canPlayAgain: boolean;
+    } = {
       attempts: playLimit.attempts,
       maxAttempts: playLimit.maxAttempts,
       remainingAttempts,
       bestScore: playLimit.bestScore,
-      bestAttempt: playLimit.bestScore > 0 ? playLimit.bestAttempt : undefined,
       canPlayAgain,
     };
+
+    if (playLimit.bestScore > 0) {
+      result.bestAttempt = playLimit.bestAttempt;
+    }
+
+    return result;
   } catch (error) {
     console.error('Error getting user play stats:', error);
-    
+
     // Return safe defaults on error
     const maxAttempts = getMaxAttempts();
     return {

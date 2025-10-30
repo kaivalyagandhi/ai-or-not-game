@@ -1,10 +1,17 @@
-import { context, reddit } from '@devvit/web/server';
+import { Context, RedditAPIClient } from '@devvit/web/server';
 
-export const createPost = async (customTitle?: string, customDescription?: string) => {
-  const { subredditName } = context;
+export const createPost = async (
+  redditClient: RedditAPIClient, 
+  contextObj: Context, 
+  customTitle?: string, 
+  customDescription?: string
+) => {
+  const { subredditName } = contextObj;
   if (!subredditName) {
     throw new Error('subredditName is required');
   }
+  
+  console.log('📝 Creating post in subreddit:', subredditName);
 
   // Generate dynamic date
   const date = new Date().toLocaleString('en-US', {
@@ -15,7 +22,7 @@ export const createPost = async (customTitle?: string, customDescription?: strin
   const title = customTitle || 'AI or Not?';
   const description = customDescription || `Daily Challenge - ${date}`;
 
-  return await reddit.submitCustomPost({
+  return await redditClient.submitCustomPost({
     splash: {
       // Splash Screen Configuration
       appDisplayName: 'AI or Not?',

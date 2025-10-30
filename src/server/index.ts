@@ -275,15 +275,8 @@ router.post<object, SubmitAnswerResponse, SubmitAnswerRequest>(
       const username = await getCurrentUsername();
       const userId = username; // Use username as user ID
 
-      // Additional validation: Check if user still has valid play session
-      const playCheck = await canUserPlay(userId);
-      if (!playCheck.canPlay && playCheck.remainingAttempts === 0) {
-        res.status(400).json({
-          success: false,
-          error: 'Play session expired - daily limit reached',
-        });
-        return;
-      }
+      // Note: We don't check play limits here because the user already started this game session
+      // Play limits are only checked when starting a new game, not during active gameplay
 
       const result = await submitAnswer(userId, sessionId, roundNumber, userAnswer, timeRemaining);
       res.json(result);
@@ -865,19 +858,138 @@ router.post('/api/create-daily-post', async (_req, res): Promise<void> => {
   }
 });
 
+// Debug endpoint to migrate leaderboard data from old keys to new keys
+router.post('/api/debug/migrate-leaderboard', async (_req, res): Promise<void> => {
+  try {
+    console.log('🔄 Starting leaderboard data migration...');
+    
+    // Old key patterns (what might have been used before)
+    const oldKeyPatterns = [
+      'leaderboard_all_time',
+      'aiornotgame:leaderboard_all_time',
+    ];
+    
+    // New keys
+    const newAllTimeKey = 'global_aiornotgame_leaderboard_all_time';
+    
+    let migratedCount = 0;
+    
+    // Try to find and migrate all-time leaderboard data
+    for (const oldPattern of oldKeyPatterns) {
+      try {
+        const oldEntries = await redis.zRange(oldPattern, 0, -1, { by: 'rank', reverse: true });
+        console.log(`📊 Found ${oldEntries.length} entries in old key: ${oldPattern}`);
+        
+        if (oldEntries.length > 0) {
+          // Copy each entry to new key
+          for (const entry of oldEntries) {
+            const score = await redis.zScore(oldPattern, entry.member);
+            if (score !== null) {
+              await redis.zAdd(newAllTimeKey, { member: entry.member, score });
+              migratedCount++;
+            }
+          }
+          console.log(`✅ Migrated ${oldEntries.length} entries from ${oldPattern} to ${newAllTimeKey}`);
+        }
+      } catch (error) {
+        console.log(`⚠️ No data found in ${oldPattern}:`, error);
+      }
+    }
+    
+    // Check final state
+    const finalCount = await redis.zCard(newAllTimeKey);
+    console.log(`🎯 Final all-time leaderboard count: ${finalCount}`);
+    
+    res.json({
+      success: true,
+      message: 'Leaderboard migration completed',
+      migratedEntries: migratedCount,
+      finalAllTimeCount: finalCount,
+      newAllTimeKey,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Migration failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Debug endpoint to check environment detection and external API access
+router.get('/api/debug/environment', async (_req, res): Promise<void> => {
+  try {
+    const nodeEnv = process.env.NODE_ENV;
+    const isDevvitPlaytest = process.env.DEVVIT_PLAYTEST === 'true';
+    const hasRedditContext = !!process.env.REDDIT_CONTEXT || !!process.env.DEVVIT_EXECUTION_ID;
+    
+    // Import the function to test it
+    const { canUserPlay } = await import('./core/play-limit-manager.js');
+    const testUserId = 'debug-user-123';
+    const playResult = await canUserPlay(testUserId);
+    
+    // Test external API access (using globally allowed domains)
+    let externalApiTest = null;
+    try {
+      const randomResponse = await fetch('https://random.org/integers/?num=1&min=1&max=100&col=1&base=10&format=plain&rnd=new');
+      const randomNumber = await randomResponse.text();
+      externalApiTest = {
+        success: true,
+        randomNumber: randomNumber.trim(),
+        status: randomResponse.status
+      };
+    } catch (fetchError) {
+      externalApiTest = {
+        success: false,
+        error: fetchError instanceof Error ? fetchError.message : 'Unknown fetch error'
+      };
+    }
+    
+    res.json({
+      environment: {
+        NODE_ENV: nodeEnv,
+        DEVVIT_PLAYTEST: process.env.DEVVIT_PLAYTEST,
+        REDDIT_CONTEXT: !!process.env.REDDIT_CONTEXT,
+        DEVVIT_EXECUTION_ID: !!process.env.DEVVIT_EXECUTION_ID,
+        hasRedditContext,
+        isDevvitPlaytest
+      },
+      playLimitTest: playResult,
+      externalApiTest,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+
+
 router.post('/internal/scheduler/daily-reset', async (_req, res): Promise<void> => {
+  console.log('🕐 SCHEDULER TRIGGERED: Daily reset starting at', new Date().toISOString());
+  
   const jobResult = await executeSchedulerJob(
     'daily-reset',
     async () => {
+      console.log('📅 Executing daily reset job...');
+      
       // Force reload of daily content files
       const { contentManager } = await import('./core/content-manager.js');
       contentManager.forceReload();
+      console.log('✅ Content manager reloaded');
 
       // Load image collection from organized folder structure
       const imageCollection = createImageCollection();
+      console.log('✅ Image collection loaded');
 
       // Reset daily game state with new randomized content
       const resetResult = await resetDailyGameState(redis, imageCollection);
+      console.log('✅ Daily game state reset:', resetResult.success);
 
       if (!resetResult.success) {
         throw new Error(resetResult.error || 'Failed to reset daily game state');
@@ -887,21 +999,28 @@ router.post('/internal/scheduler/daily-reset', async (_req, res): Promise<void> 
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
       const participantKey = `daily:participants:${today}`;
       await redis.del(participantKey);
+      console.log('✅ Participant count reset');
 
       // Send realtime update for participant count reset
-      await realtime.send('participant_updates', {
-        type: 'participant_count_update',
-        count: 0,
-        timestamp: Date.now(),
-      });
+      try {
+        await realtime.send('participant_updates', {
+          type: 'participant_count_update',
+          count: 0,
+          timestamp: Date.now(),
+        });
+        console.log('✅ Realtime update sent');
+      } catch (realtimeError) {
+        console.error('⚠️ Realtime update failed:', realtimeError);
+      }
 
       // Create a new daily challenge post automatically
       let newPost = null;
       try {
-        newPost = await createPost();
-        console.log(`[SCHEDULER] Created new daily post: ${newPost.id}`);
+        console.log('📝 Creating new daily post...');
+        newPost = await createPost(reddit, context);
+        console.log(`✅ [SCHEDULER] Created new daily post: ${newPost.id}`);
       } catch (postError) {
-        console.error(`[SCHEDULER] Failed to create daily post: ${postError}`);
+        console.error(`❌ [SCHEDULER] Failed to create daily post:`, postError);
         // Don't fail the entire job if post creation fails
       }
 

@@ -6,31 +6,31 @@
 
 **AI or Not?** is a production-ready daily AI detection challenge that tests your ability to distinguish between real photographs and AI-generated images. Built natively for Reddit using the Devvit platform, this interactive game runs directly within Reddit posts and challenges players to identify which of two images is the REAL photograph across 6 rounds with 10-second timers.
 
-This fully-featured game includes revolutionary image magnification technology, real-time leaderboards, educational content, and comprehensive social features, providing an engaging entry point that encourages competition and builds practical AI detection skills for the digital age.
+This fully-featured game includes revolutionary 2.5x image magnification technology, real-time leaderboards, educational AI detection content, comprehensive social features, and intelligent play limit management, providing an engaging entry point that encourages competition and builds practical AI detection skills for the digital age.
 
 ### What the Game Does
 
 The game presents players with pairs of images - one real photograph and one AI-generated image - across different categories (Animals, Architecture, Nature, Food, Products, Science). Players must quickly identify which image is real while competing against a 10-second timer per round. 
 
 **Complete Game Flow:**
-1. **Welcome Screen**: Shows your weekly ranking, daily play count, and live participant statistics with the stylized "AI or Not?" title in DynaPuff font and animated "Start Playing!" button with wave animation
-2. **6-Round Challenge**: Each round presents two images with 10-second timer and revolutionary interactive magnification system
+1. **Welcome Screen**: Shows your weekly ranking, daily play count, live participant statistics, and intelligent play limit management with the stylized "AI or Not?" title in DynaPuff font and animated "Start Playing!" button that adapts based on remaining attempts
+2. **6-Round Challenge**: Each round presents two images with 10-second timer and revolutionary 2.5x interactive magnification system
 3. **Educational Break**: After round 3, learn AI detection tips and fascinating facts randomly selected from comprehensive content libraries
-4. **Results & Sharing**: View your score, badge, daily rank, challenge friends with detailed sharing messages, and post AI detection tips as comments
-5. **Leaderboards**: Compare your performance on daily, weekly, and all-time rankings
+4. **Results & Sharing**: View your score, badge, daily rank, challenge friends with detailed sharing messages, and post AI detection tips as comments to help the community
+5. **Leaderboards**: Compare your performance on daily, weekly, and all-time rankings with real-time updates
 
 The game features:
 
-- **6-Round Daily Challenge**: Each day brings fresh image pairs across 6 categories with randomized difficulty
+- **6-Round Daily Challenge**: Each day brings fresh image pairs across 6 categories with randomized difficulty and intelligent content rotation
 - **Tier-Based Scoring System**: 10 points per correct answer + speed bonuses (5 points for 7-10 seconds, 3 points for 4-6 seconds, 1 point for 1-3 seconds, 0 points for timeout)
 - **Revolutionary Image Magnification**: Interactive 2.5x zoom system with Canvas-based rendering, allowing detailed inspection of images with cursor tracking and cross-device support for examining AI artifacts
-- **Educational Integration**: AI Fact Check break with AI detection tips and fascinating facts randomly selected from comprehensive libraries
-- **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings plus real-time participant tracking
-- **Multiple Attempts**: Up to 2 attempts per day with best score tracking and improvement notifications
-- **Achievement System**: Earn badges from 🤖 AI Whisperer (6/6 correct) to 🎓 Human in Training (0-2/6 correct)
+- **Educational Integration**: AI Fact Check break with AI detection tips and fascinating facts randomly selected from comprehensive libraries (50+ tips, 50+ facts)
+- **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings plus real-time participant tracking via Devvit Realtime API
+- **Intelligent Play Limits**: Up to 2 attempts per day with smart button states - "Start Playing!" when attempts remain, "Come back tomorrow!" when daily limit reached
+- **Achievement System**: Earn badges from 🤖 AI Whisperer (6/6 correct) to 🎓 Human in Training (0-2/6 correct) with performance-based recognition
 - **Enhanced Audio Experience**: Background music and sound effects with simplified one-click controls (🎵/🔇) and balanced audio levels
-- **Social Features**: Challenge friends with detailed sharing messages and post AI detection tips as comments to help the community
-- **Reddit-Native Experience**: Seamless integration with Reddit accounts, no external apps or logins required
+- **Community Learning**: Challenge friends with detailed sharing messages and post AI detection tips as comments to help other players improve
+- **Reddit-Native Experience**: Seamless integration with Reddit accounts, no external apps or logins required, built specifically for Reddit's platform
 - **Mobile-Optimized Design**: Responsive layout with vertical image stacking on mobile, transitioning to side-by-side at 480px breakpoint for optimal Reddit feed viewing
 - **Animated UI Elements**: Wave animation on the "Start Playing!" button with enhanced 1.4x scale and staggered reveal animations on results screen
 
@@ -45,7 +45,7 @@ The game features:
    - Number of plays completed today and daily participant count
    - "View Leaderboard" button to see full rankings
 4. **Audio Setup** (Optional): Use the audio toggle button (🎵/🔇) in the top-right corner to enable/disable background music and sound effects
-5. **Join the Challenge**: Click the animated "Start Playing!" button (with enhanced wave animation) to begin your daily challenge and join the live participant count
+5. **Join the Challenge**: Click the animated "Start Playing!" button (with enhanced wave animation) to begin your daily challenge and join the live participant count, or see "Come back tomorrow!" if you've used your daily attempts
 
 ### 🎯 Complete Gameplay Flow
 
@@ -154,17 +154,18 @@ After completing your challenge:
 AI or Not? stands out as a pioneering AI detection game that combines entertainment with practical digital literacy skills. Built natively for Reddit using cutting-edge web technologies, it introduces several industry-first features:
 
 ### 🔍 Revolutionary Image Magnification System
-- **First-of-Its-Kind Technology**: Interactive 2.5x magnification with circular view that follows your cursor in real-time
+- **First-of-Its-Kind Technology**: Interactive 2.5x magnification with circular view that follows your cursor in real-time for unprecedented detail examination
 - **High-Performance Canvas Rendering**: Advanced Canvas-based rendering with circular clipping masks, intelligent performance monitoring, and graceful degradation
 - **Cross-Device Support**: Desktop users get smooth mouse hover magnification, mobile users can touch-and-hold (400ms activation) for detailed inspection
-- **Smart Positioning**: Magnified circle automatically adjusts position near screen edges with viewport boundary detection
-- **Strategic Advantage**: Enables detailed forensic analysis of AI artifacts, textures, and fine details invisible at normal zoom
+- **Smart Positioning**: Magnified circle automatically adjusts position near screen edges with viewport boundary detection and responsive sizing
+- **Strategic Advantage**: Enables detailed forensic analysis of AI artifacts, textures, and fine details invisible at normal zoom levels
 - **Responsive Design**: Circle radius adapts to screen size (70px mobile, 80px desktop) with automatic orientation change handling
 
 ### 📱 First Reddit-Native Gaming Experience
-- **Revolutionary Platform Integration**: The first comprehensive AI detection game built natively for Reddit using Devvit platform
+- **Revolutionary Platform Integration**: The first comprehensive AI detection game built natively for Reddit using Devvit platform, running directly within Reddit posts
 - **Zero-Friction Authentication**: Automatic user authentication through Reddit accounts - no separate login required
 - **Community-Centric Design**: Purpose-built for Reddit's social environment with integrated sharing, real-time competition, and community AI tip sharing
+- **Intelligent User Experience**: Smart play limit management with adaptive UI that shows appropriate messages based on remaining daily attempts
 - **Custom Typography**: Features the DynaPuff font for a distinctive, playful visual identity with button text styling
 - **Enhanced Animated UI Elements**: Improved wave animation effects on buttons and staggered reveal animations for enhanced user experience
 
@@ -184,9 +185,9 @@ AI or Not? stands out as a pioneering AI detection game that combines entertainm
 ### 🏆 Advanced Social & Competition Features
 - **Multi-Tier Leaderboards**: Daily, weekly, and all-time rankings with live updates via Devvit Realtime API
 - **Enhanced Social Sharing**: Friend challenge sharing with detailed messages including correct guesses, badge earned, and daily rank
-- **Community AI Tips**: Post your AI detection tips as comments to help other players learn and improve
-- **Multiple Daily Attempts**: Up to 2 attempts per day with best score tracking and improvement notifications
-- **Real-Time Participant Tracking**: Live participant counts and community engagement indicators showing active player base
+- **Community AI Tips**: Post your AI detection tips as comments to help other players learn and improve their skills
+- **Intelligent Play Management**: Up to 2 attempts per day with smart UI adaptation - button shows "Start Playing!" when attempts remain, "Come back tomorrow!" when limit reached
+- **Real-Time Participant Tracking**: Live participant counts and community engagement indicators showing active player base with automatic updates
 
 ## 🎯 Production Status
 
@@ -266,7 +267,7 @@ This magnification system transforms how players approach AI detection, enabling
 Based on the latest code analysis, AI or Not? is a fully functional AI detection game with a modern, polished interface featuring the DynaPuff font. The game is built as a React application that runs natively within Reddit posts using the Devvit platform, providing a seamless gaming experience with cutting-edge features:
 
 ### Complete Game Flow
-- **Enhanced Splash Screen**: Welcome screen featuring the stylized "AI or Not?" title in DynaPuff font, weekly rankings, daily play count, live participant statistics, current date display, and animated "Start Playing!" button with enhanced wave animation (1.4x scale)
+- **Enhanced Splash Screen**: Welcome screen featuring the stylized "AI or Not?" title in DynaPuff font, weekly rankings, daily play count, live participant statistics, current date display, and intelligent animated button that shows "Start Playing!" with wave animation when attempts remain or "Come back tomorrow!" when daily limit is reached
 - **6-Round Gameplay**: Each round presents two images (one real, one AI-generated) with 10-second timer and combined round/category labels positioned in the top-left
 - **Revolutionary Magnification**: Players can hover (desktop) or touch-and-hold 400ms (mobile) to see 2.5x magnified circular views with Canvas rendering and performance monitoring
 - **Educational Break**: After round 3, players receive fresh AI detection tips and facts randomly selected from comprehensive content libraries (50+ tips, 50+ facts)
@@ -448,7 +449,7 @@ After completing your challenge:
 - **Action Buttons**: Three vertically-aligned buttons evenly distributed to match rankings box height:
   - **💡 Post AI tip**: Share your AI detection insights as a comment to help other players (positioned above Challenge Friends)
   - **👥 Challenge Friends**: Share detailed results with the community using the new template format
-  - **🎮 Play Again / Play Again Tomorrow!**: Use your second daily attempt or return tomorrow (disabled state shows "Play Again Tomorrow!")
+  - **🎮 Play Again / Play Again Tomorrow!**: Use your second daily attempt or return tomorrow (intelligent state management shows appropriate message based on remaining attempts)
 - **Enhanced Social Sharing**: Challenge friends with detailed messages using the new template format:
   ```
   I just finished today's AI or Not? challenge:
@@ -497,10 +498,10 @@ After completing your challenge:
 
 ### 🏆 Daily Challenge Features
 - **Fresh Content Daily**: New image pairs generated every day across all 6 active categories (Animals, Architecture, Nature, Food, Products, Science) with randomized difficulty
-- **Multiple Attempts**: Up to 2 attempts per day with best score tracking and improvement notifications
+- **Intelligent Play Management**: Up to 2 attempts per day with smart UI that shows "Start Playing!" when attempts remain and "Come back tomorrow!" when daily limit is reached
 - **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings via Devvit Realtime API
-- **Social Sharing**: Challenge friends with detailed messages including your score, badge, and daily rank
-- **Educational Value**: Learn practical AI detection skills through gameplay and tips
+- **Enhanced Social Sharing**: Challenge friends with detailed messages including your score, badge, and daily rank, plus community AI tip sharing
+- **Educational Value**: Learn practical AI detection skills through gameplay, educational breaks, and community-shared tips
 
 ## 🎮 Production Implementation
 
@@ -554,11 +555,11 @@ AI or Not? is a complete and polished AI detection game running in production wi
 ### Game Rules & Fair Play
 
 #### Daily Challenge System
-- **Multiple Attempts**: Up to 2 attempts per day (unlimited in development mode)
-- **UTC Reset**: New challenges available daily at 00:00 UTC with fresh image sets
+- **Intelligent Play Limits**: Up to 2 attempts per day with smart UI adaptation (unlimited in development mode)
+- **UTC Reset**: New challenges available daily at 00:00 UTC with fresh image sets and reset attempt counters
 - **Best Score Tracking**: System remembers your highest score across attempts with improvement notifications
-- **Session Persistence**: Must complete started games (can't restart mid-game)
-- **Attempt Tracking**: Clear display of remaining attempts and encouragement to replay
+- **Session Persistence**: Must complete started games (can't restart mid-game) to maintain fair play
+- **Smart Attempt Management**: UI automatically adapts - shows "Start Playing!" when attempts remain, "Come back tomorrow!" when daily limit reached
 
 #### Timeout & Scoring Rules
 - **Server-Side Timeout Processing**: When time expires, the game communicates with the server to maintain proper game state
@@ -647,23 +648,25 @@ AI or Not? is a complete and polished AI detection game running in production wi
 #### Deployed & Active ✅
 The game is **live and running in production** with all core systems operational:
 - Complete 6-round gameplay with 6 active image categories (Animals, Architecture, Nature, Food, Products, Science)
-- Modernized whole-number scoring system for better user experience
+- Intelligent play limit management with adaptive UI that shows appropriate messages based on remaining daily attempts
+- Revolutionary 2.5x image magnification system with Canvas rendering and cross-device support
 - Simplified audio system with one-click toggle controls and enhanced sound effects
-- Real-time leaderboards and participant tracking
-- Educational content system with fresh content each session
-- Comprehensive error handling and offline support
+- Real-time leaderboards and participant tracking via Devvit Realtime API
+- Educational content system with fresh content each session from comprehensive libraries
+- Comprehensive error handling and offline support with graceful degradation
 - **Reddit-optimized responsive design** with mobile-first approach and 480px breakpoint for optimal Reddit feed viewing
-- Anti-cheat protection and play limit enforcement
+- Anti-cheat protection and server-side play limit enforcement
 
 #### Production Features ✅
-- **Complete Game Experience**: 6-round gameplay with revolutionary image magnification, educational content, and social features
-- **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings
-- **Advanced Audio System**: Background music and sound effects with one-click toggle controls
-- **Educational Integration**: AI Fact Check breaks with comprehensive tip and fact libraries
-- **Social Features**: Friend challenges, AI tip sharing, and community leaderboards
-- **Mobile-Optimized Design**: Responsive layout optimized for Reddit's mobile-first user base
-- **Anti-Cheat Protection**: Server-side validation and comprehensive security measures
-- **Performance Optimization**: Efficient loading, caching, and error handling systems
+- **Complete Game Experience**: 6-round gameplay with revolutionary 2.5x image magnification, educational content, and comprehensive social features
+- **Intelligent User Management**: Smart play limit system with adaptive UI that shows "Start Playing!" or "Come back tomorrow!" based on remaining attempts
+- **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings via Devvit Realtime API
+- **Advanced Audio System**: Background music and sound effects with one-click toggle controls and balanced audio levels
+- **Educational Integration**: AI Fact Check breaks with comprehensive tip and fact libraries (50+ tips, 50+ facts)
+- **Community Features**: Friend challenges, AI tip sharing as comments, and community leaderboards with real-time updates
+- **Mobile-Optimized Design**: Responsive layout optimized for Reddit's mobile-first user base with 480px breakpoint
+- **Anti-Cheat Protection**: Server-side validation, play limit enforcement, and comprehensive security measures
+- **Performance Optimization**: Efficient loading, caching, error handling, and graceful degradation systems
 
 #### Active Categories ✅
 - **Six Image Categories**: Animals, Architecture, Nature, Food, Products, and Science with comprehensive image libraries

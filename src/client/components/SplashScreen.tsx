@@ -262,33 +262,59 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStartGame, onViewL
 
         {/* Start Game Button */}
         <div className={`transition-all duration-500 ${showButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <button
-            onClick={async () => {
-              // Register participant join when starting game with error handling
-              try {
-                await apiCall('/api/participants/join', {
-                  method: 'POST',
-                }, {
-                  maxRetries: 1,
-                  baseDelay: 500,
-                });
-              } catch (err) {
-                console.error('Error registering participant:', err);
-                // Continue with game start even if registration fails
-                // This is not critical for gameplay
-              }
-              onStartGame();
-            }}
-            className="w-full font-bold py-4 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg bg-primary-500 hover:bg-primary-600 text-white hover:shadow-xl transform hover:scale-105 transition-transform btn-text"
-          >
-            <span className="magnify-wave-text btn-text">
-              {'Start Playing!'.split('').map((char, index) => (
-                <span key={index} className="char">
-                  {char === ' ' ? '\u00A0' : char}
+          {(() => {
+            const hasReachedLimit = !dailyPlayData.loading && dailyPlayData.playCount >= dailyPlayData.maxAttempts;
+            const buttonText = hasReachedLimit ? 'Come back tomorrow!' : 'Start Playing!';
+            
+            return (
+              <button
+                onClick={async () => {
+                  if (hasReachedLimit) return; // Prevent action if limit reached
+                  
+                  // Register participant join when starting game with error handling
+                  try {
+                    await apiCall('/api/participants/join', {
+                      method: 'POST',
+                    }, {
+                      maxRetries: 1,
+                      baseDelay: 500,
+                    });
+                  } catch (err) {
+                    console.error('Error registering participant:', err);
+                    // Continue with game start even if registration fails
+                    // This is not critical for gameplay
+                  }
+                  onStartGame();
+                }}
+                disabled={hasReachedLimit}
+                className={`w-full font-bold py-4 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg btn-text ${
+                  hasReachedLimit 
+                    ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                    : 'bg-primary-500 hover:bg-primary-600 text-white hover:shadow-xl transform hover:scale-105 transition-transform'
+                }`}
+              >
+                <span className="magnify-wave-text btn-text">
+                  {buttonText.split('').map((char, index) => (
+                    <span key={index} className="char">
+                      {char === ' ' ? '\u00A0' : char}
+                    </span>
+                  ))}
                 </span>
-              ))}
-            </span>
-          </button>
+              </button>
+            );
+          })()}
+          
+          {/* Daily limit message */}
+          {!dailyPlayData.loading && dailyPlayData.playCount >= dailyPlayData.maxAttempts && (
+            <div className="mt-3 text-center">
+              <p className="text-sm text-gray-600">
+                🎯 You've completed your daily challenges!
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                New challenges available tomorrow at midnight UTC
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-  "name": "ai-or-not",
+  "name": "aiornotgame-v1",
   "post": {
     "dir": "dist/client",
     "entrypoints": {
@@ -13,9 +13,15 @@
     "dir": "dist/server",
     "entry": "index.cjs"
   },
+  "http": {
+    "domains": []
+  },
   "realtime": true,
   "redis": true,
-  "reddit": ["read", "submit"],
+  "reddit": [
+    "read",
+    "submit"
+  ],
   "media": {
     "dir": "assets"
   },
@@ -40,5 +46,8 @@
         "cron": "0 0 * * *"
       }
     }
+  },
+  "dev": {
+    "subreddit": "aiornotgame_v1_dev"
   }
 }
