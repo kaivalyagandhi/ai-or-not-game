@@ -2,7 +2,7 @@
   "private": true,
   "name": "ai-or-not",
   "version": "1.0.0",
-  "license": "OSL-3.0",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "npm run build:client && npm run build:server",

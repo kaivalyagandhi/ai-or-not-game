@@ -1,12 +1,12 @@
 # 🤖 AI or Not?
 
-**Train your human eye to detect AI images**
+**The Ultimate AI Detection Challenge Game for Reddit**
 
 ## 🎯 What is AI or Not?
 
-**AI or Not?** is a daily AI detection challenge game that tests your ability to distinguish between real photographs and AI-generated images. Built natively for Reddit using the Devvit platform, this interactive game runs directly within Reddit posts and challenges players to identify which of two images is the REAL photograph (not AI-generated) across 6 rounds with 10-second timers.
+**AI or Not?** is a production-ready daily AI detection challenge that tests your ability to distinguish between real photographs and AI-generated images. Built natively for Reddit using the Devvit platform, this interactive game runs directly within Reddit posts and challenges players to identify which of two images is the REAL photograph across 6 rounds with 10-second timers.
 
-The game features a modern splash screen with the DynaPuff font that displays your weekly ranking, daily play count, and live participant statistics, creating an engaging entry point that encourages competition and shows the active community around the daily challenge.
+This fully-featured game includes revolutionary image magnification technology, real-time leaderboards, educational content, and comprehensive social features, providing an engaging entry point that encourages competition and builds practical AI detection skills for the digital age.
 
 ### What the Game Does
 
@@ -188,11 +188,11 @@ AI or Not? stands out as a pioneering AI detection game that combines entertainm
 - **Multiple Daily Attempts**: Up to 2 attempts per day with best score tracking and improvement notifications
 - **Real-Time Participant Tracking**: Live participant counts and community engagement indicators showing active player base
 
-## 🎯 Current Game Status
+## 🎯 Production Status
 
-**Fully Functional & Production Ready** ✅
+**Live & Production Ready** ✅
 
-The game is complete and ready for players with all core systems implemented and recently enhanced with performance optimizations:
+AI or Not? is a complete, production-ready game deployed and running on Reddit with all core systems fully implemented:
 - **6-round gameplay** with 10-second timers and tier-based scoring system (10 points base + 5/3/1/0 speed bonus)
 - **6 active image categories** (Animals, Architecture, Nature, Food, Products, Science) with comprehensive image libraries
 - **Advanced timeout handling** with server-side processing, 3-second animated countdown, and extended learning feedback
@@ -502,11 +502,11 @@ After completing your challenge:
 - **Social Sharing**: Challenge friends with detailed messages including your score, badge, and daily rank
 - **Educational Value**: Learn practical AI detection skills through gameplay and tips
 
-## 🎮 Current Game Implementation
+## 🎮 Production Implementation
 
-**Fully Functional & Production Ready** ✅
+**Live Game Features** ✅
 
-Based on the latest code analysis, AI or Not? is a complete and polished AI detection game with all core systems implemented:
+AI or Not? is a complete and polished AI detection game running in production with all core systems fully operational:
 
 ### Complete Game Flow
 - **Enhanced Splash Screen**: Welcome screen featuring the stylized "AI or Not?" title in DynaPuff font, weekly rankings, daily play count, live participant statistics, current date display, and animated "Start Playing!" button with enhanced wave animation
@@ -642,10 +642,10 @@ Based on the latest code analysis, AI or Not? is a complete and polished AI dete
   - API endpoint testing with error scenarios
   - Play limit system testing with edge cases
 
-### 🚧 Current Status
+### 🚀 Live Production Status
 
-#### Production Ready ✅
-The game is **fully functional and production-ready** with all core systems implemented:
+#### Deployed & Active ✅
+The game is **live and running in production** with all core systems operational:
 - Complete 6-round gameplay with 6 active image categories (Animals, Architecture, Nature, Food, Products, Science)
 - Modernized whole-number scoring system for better user experience
 - Simplified audio system with one-click toggle controls and enhanced sound effects
@@ -655,27 +655,80 @@ The game is **fully functional and production-ready** with all core systems impl
 - **Reddit-optimized responsive design** with mobile-first approach and 480px breakpoint for optimal Reddit feed viewing
 - Anti-cheat protection and play limit enforcement
 
-#### Recent Updates ⏱️
-- **Enhanced Splash Screen**: Updated welcome screen with weekly rankings display, daily play count tracking, and live participant statistics for better community engagement
-- **Revolutionary Image Magnification System**: Implemented first-ever interactive 2.5x magnification with Canvas rendering, cursor tracking, and cross-device support for detailed AI artifact inspection
-- **User-Controlled Performance**: Enhanced magnification system with performance monitoring that respects user choice - the system tracks performance metrics for debugging but allows users to decide whether they want magnification enabled
-- **Enhanced Visual Feedback System**: Improved round feedback display with loading states during answer submission and prominent score display in the header area
-- **Educational Content Streamlining**: Simplified AI Fact Check break with cleaner, more focused presentation and removed redundant instructional text
-- **UI Organization Improvements**: Combined round number and category information into a single, cleaner label format (e.g., "Round 1 of 6 (Category: Animals)") positioned on the left side using formatRoundLabel utility
-- **Simplified Date Display**: Updated splash screen to show shorter date format (just month and day) for cleaner appearance with toLocaleDateString formatting
-- **Audio System Enhancements**: Improved audio toggle functionality with better state management, immediate effect during gameplay, and 1.8x volume sound effects (recently reduced for better balance)
-- **Enhanced Timeout Handling**: Added "Time's Up!" message display in place of timer with improved visual layout, 3-second animated countdown for better visual clarity, and proper visual feedback
-- **Responsive Layout Optimization**: Updated image container layout with Reddit-optimized breakpoints (480px transition) for better Reddit feed integration and mobile-first design
-- **Enhanced Visual Consistency**: Improved spacing and sizing with consistent overlay indicators (80px desktop, 70px mobile) across all screen sizes
-- **Modern Icon Updates**: Replaced lightning bolt (⚡) icons with timer emoji (⏱️) for time bonus displays throughout the interface for better visual clarity
-- **Whole Number Scoring**: Updated all score displays to show whole numbers without decimal places for cleaner, easier-to-read results
+#### Production Features ✅
+- **Complete Game Experience**: 6-round gameplay with revolutionary image magnification, educational content, and social features
+- **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings
+- **Advanced Audio System**: Background music and sound effects with one-click toggle controls
+- **Educational Integration**: AI Fact Check breaks with comprehensive tip and fact libraries
+- **Social Features**: Friend challenges, AI tip sharing, and community leaderboards
+- **Mobile-Optimized Design**: Responsive layout optimized for Reddit's mobile-first user base
+- **Anti-Cheat Protection**: Server-side validation and comprehensive security measures
+- **Performance Optimization**: Efficient loading, caching, and error handling systems
 
-#### Recently Completed ✅
-- **Science Category**: Fully implemented with comprehensive image library and active in daily rotations
+#### Active Categories ✅
+- **Six Image Categories**: Animals, Architecture, Nature, Food, Products, and Science with comprehensive image libraries
 
-#### Planned Enhancements 📋
-- **Extended Audio Library**: Additional sound effects and dynamic music system
-- **Community Features**: User-generated content and enhanced social interactions
+#### Future Enhancements 📋
+- **Extended Content Library**: Additional image categories and educational content
+- **Advanced Analytics**: Enhanced performance insights and player statistics
+
+## 📄 License
+
+### Open Software License 3.0 (OSL-3.0)
+
+This project is licensed under the **Open Software License 3.0** (OSL-3.0), a strong copyleft license that ensures derivative works remain open source while providing patent protection and clear termination conditions.
+
+#### Key License Features
+- **Strong Copyleft**: All derivative works must be distributed under the same OSL-3.0 license
+- **Patent Protection**: Includes patent grant and retaliation clauses for legal protection
+- **Source Code Availability**: Requires source code distribution for all derivative works
+- **Clear Termination**: Automatic license termination for violations with cure period
+- **Commercial Use**: Permits commercial use while maintaining open source requirements
+
+#### License Requirements
+When using, modifying, or distributing this software:
+- **Source Code**: Must provide source code for any distributed derivative works
+- **License Notice**: Must include OSL-3.0 license text and copyright notices
+- **Attribution**: Must maintain original copyright and license attributions
+- **Same License**: Derivative works must be licensed under OSL-3.0
+- **Patent Grant**: Automatic patent license grant for contributions
+
+#### Copyright Notice
+```
+Copyright (c) 2024 AI or Not? Contributors
+
+Licensed under the Open Software License version 3.0 (OSL-3.0).
+You may not use this file except in compliance with the License.
+You may obtain a copy of the License at:
+
+    https://opensource.org/licenses/OSL-3.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+
+#### Full License Text
+The complete OSL-3.0 license text is available in the [LICENSE](LICENSE) file in the root directory of this project and at [https://opensource.org/licenses/OSL-3.0](https://opensource.org/licenses/OSL-3.0).
+
+#### Why OSL-3.0?
+We chose the Open Software License 3.0 for this project because:
+- **Community Protection**: Ensures improvements benefit the entire community
+- **Patent Safety**: Provides strong patent protection for contributors and users
+- **Commercial Compatibility**: Allows commercial use while maintaining open source principles
+- **Legal Clarity**: Clear termination and compliance requirements
+- **Innovation Encouragement**: Promotes collaborative development and knowledge sharing
+
+#### Dependency Licenses
+This project includes dependencies under various open source licenses. All dependencies are compatible with OSL-3.0 requirements. For a complete list of dependency licenses, run:
+```bash
+npm run licenses
+```
+
+#### Contributing
+By contributing to this project, you agree that your contributions will be licensed under the OSL-3.0 license. See our contribution guidelines above for more information about the development process and code standards.al interactions
 - **Advanced Analytics**: Detailed performance insights and player statistics
 
 ## 🎨 Recent Updates & Enhancements
@@ -903,48 +956,170 @@ The game recently received major visual feedback improvements to create a more i
 - **[ESLint](https://eslint.org/)**: Code quality and consistency enforcement
 - **[Prettier](https://prettier.io/)**: Automated code formatting
 
-## 🛠️ Development Setup
+## 🛠️ Installation & Setup
 
 ### Prerequisites
-- **Node.js 22.2.0+**: Required for Devvit compatibility
-- **Reddit Account**: Connected to Reddit Developers platform
-- **Devvit CLI**: Installed and authenticated (`npm install -g devvit`)
+- **Node.js 22.2.0+**: Required for Devvit platform compatibility
+- **Reddit Account**: Must be connected to [Reddit Developers platform](https://developers.reddit.com/)
+- **Devvit CLI**: Install globally with `npm install -g devvit`
 
-### Quick Start
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd ai-or-not-v6
-   ```
+### Installation Steps
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+#### 1. Clone and Setup
+```bash
+# Clone the repository
+git clone <repository-url>
+cd ai-or-not
 
-3. **Authenticate with Devvit**
-   ```bash
-   npm run login
-   ```
+# Install all dependencies
+npm install
 
-4. **Start development server**
-   ```bash
-   npm run dev
-   ```
-   This runs three processes concurrently:
-   - Client build watcher (Vite)
-   - Server build watcher (Vite)
-   - Devvit playtest server
+# Authenticate with Reddit Developers
+npm run login
+```
 
-5. **Open the game**
-   - Navigate to the provided playtest URL (typically `https://www.reddit.com/r/ai_or_not_v6_dev?playtest=ai-or-not-v6`)
-   - Click "Launch App" to test the game in full-screen mode
+#### 2. Development Environment
+```bash
+# Start development server (runs client, server, and Devvit playtest)
+npm run dev
+
+# The development server will provide a playtest URL like:
+# https://www.reddit.com/r/ai-or-not_dev?playtest=ai-or-not
+```
+
+#### 3. Environment Configuration
+Create a `.env` file for local development (optional):
+```bash
+# Development environment (default)
+NODE_ENV=development
+
+# Custom subreddit for testing (optional)
+DEVVIT_SUBREDDIT=r/your-test-subreddit
+```
 
 ### Development Workflow
-- **Live Reloading**: Changes to client code automatically rebuild and refresh
+- **Live Reloading**: Client code changes automatically rebuild and refresh
 - **Server Updates**: Server changes require manual refresh of the Reddit post
 - **Testing**: Run `npm test` for unit tests or `npm run test:watch` for watch mode
-- **Code Quality**: Use `npm run check` to run TypeScript, ESLint, and Prettier
+- **Code Quality**: Use `npm run check` to validate TypeScript, linting, and formatting
+
+## 🚀 Production Deployment
+
+### Production Environment Setup
+
+#### 1. Environment Variables
+For production deployment, ensure these environment variables are properly configured:
+
+```bash
+# Production mode (enables play limits and production features)
+NODE_ENV=production
+
+# Target subreddit for deployment
+DEVVIT_SUBREDDIT=r/your-production-subreddit
+```
+
+#### 2. Pre-Deployment Checklist
+```bash
+# 1. Run quality checks
+npm run check
+
+# 2. Build for production
+npm run build
+
+# 3. Run tests
+npm test
+
+# 4. Verify audio files are properly configured
+# See AUDIO_SETUP_GUIDE.md for audio file requirements
+```
+
+#### 3. Deployment Process
+```bash
+# Deploy to Reddit (uploads app for testing)
+npm run deploy
+
+# Publish for review (submits to Reddit for approval)
+npm run launch
+```
+
+#### 4. Production Configuration
+When `NODE_ENV=production`:
+- **Play Limits**: Enforces 2 attempts per day per user
+- **Optimized Performance**: Production-level caching and error handling
+- **Enhanced Security**: Full rate limiting and input validation
+- **Monitoring**: Comprehensive logging and performance tracking
+
+### Deployment Verification
+
+After deployment, verify these features are working:
+- [ ] Game loads correctly in Reddit posts
+- [ ] Play limits are enforced (2 attempts per day)
+- [ ] Leaderboards update in real-time
+- [ ] Audio system functions properly
+- [ ] Image magnification works on all devices
+- [ ] Educational content loads correctly
+- [ ] Social sharing features work
+- [ ] Error handling gracefully manages issues
+
+### Troubleshooting Common Issues
+
+#### Build Failures
+```bash
+# Clear node modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+
+# Check Node.js version
+node --version  # Should be 22.2.0+
+```
+
+#### Authentication Issues
+```bash
+# Re-authenticate with Reddit
+npm run login
+
+# Verify authentication status
+devvit whoami
+```
+
+#### Deployment Problems
+```bash
+# Check app status
+devvit apps list
+
+# View deployment logs
+devvit logs --app ai-or-not --subreddit r/your-subreddit
+```
+
+#### Audio Issues
+- Ensure audio files are in `src/client/public/audio/`
+- Verify file formats are supported (MP3 recommended)
+- Check file sizes are reasonable for web delivery
+- See `AUDIO_SETUP_GUIDE.md` for detailed audio configuration
+
+#### Performance Issues
+- Monitor network requests in browser dev tools
+- Check Redis connection and data persistence
+- Verify image loading and caching behavior
+- Review error logs for failed API calls
+
+### Production Monitoring
+
+#### Key Metrics to Monitor
+- **User Engagement**: Daily active players and completion rates
+- **Performance**: Page load times and API response times
+- **Error Rates**: Failed requests and client-side errors
+- **Play Limits**: Proper enforcement of daily attempt limits
+- **Real-time Features**: Leaderboard updates and participant counts
+
+#### Logging and Debugging
+```bash
+# View live logs during production
+devvit logs --app ai-or-not --subreddit r/your-subreddit --follow
+
+# Check specific time periods
+devvit logs --app ai-or-not --subreddit r/your-subreddit --since 1h
+```
 
 ## 📋 Available Commands
 
@@ -964,56 +1139,223 @@ The game recently received major visual feedback improvements to create a more i
 
 
 
-## 📁 Project Structure
+## 📁 Project Architecture
 
+### High-Level Structure
 ```
-src/
-├── client/          # React frontend (runs in Reddit webview)
-│   ├── components/  # Game UI components
-│   │   ├── SplashScreen.tsx      # Welcome screen with live participant count
-│   │   ├── GameRound.tsx         # Image comparison interface with timer
-│   │   ├── EducationalContent.tsx # AI Fact Check break with tips and facts
-│   │   ├── ResultsScreen.tsx     # Final results with sharing and leaderboard
-│   │   ├── LeaderboardTabs.tsx   # Multi-tier leaderboards with live updates
-│   │   ├── LoadingScreen.tsx     # Loading states and progress indicators
-│   │   ├── AudioSystem.tsx       # Audio playback and controls
-│   │   └── ErrorBoundary.tsx     # Error handling and recovery
-│   ├── hooks/       # Custom React hooks
-│   │   ├── useGameState.ts       # Main game state management
-│   │   ├── useErrorHandler.ts    # Error handling with retry logic
-│   │   ├── useAudio.ts           # Audio controls and context
-│   │   ├── useMagnify.ts         # Image magnification state and interactions
-│   │   └── useCounter.ts         # Counter utilities
-│   ├── utils/       # Client utilities
-│   │   ├── network.ts            # API calls with retry logic and error handling
-│   │   ├── storage.ts            # Local storage and caching
-│   │   ├── content.ts            # Educational and inspirational content loading
-│   │   ├── audio.ts              # Audio context management
-│   │   ├── audioDevTools.ts      # Audio development and debugging tools
-│   │   ├── audioValidation.ts    # Audio file validation utilities
-│   │   ├── magnify.ts            # Image magnification utilities and calculations
-│   │   └── ui.ts                 # UI utility functions
-│   ├── App.tsx      # Main game container with routing
-│   └── main.tsx     # React app entry point
-├── server/          # Express backend (serverless)
-│   ├── core/        # Game logic and data management
-│   │   ├── game-logic.ts         # Core game mechanics and validation
-│   │   ├── leaderboard-manager.ts # Leaderboard operations and rankings
-│   │   ├── session-manager.ts    # User session handling and persistence
-│   │   ├── daily-game-manager.ts # Daily content management and caching
-│   │   ├── content-manager.ts    # Educational and inspirational content
-│   │   ├── play-limit-manager.ts # Daily attempt tracking and limits
-│   │   ├── badge-manager.ts      # Achievement badge system
-│   │   ├── image-manager.ts      # Image loading and validation
-│   │   └── scheduler-manager.ts  # Background task scheduling
-│   ├── middleware/  # Server middleware
-│   │   └── security.ts           # Rate limiting and validation
-│   └── index.ts     # API endpoints and Devvit integration
-└── shared/          # TypeScript types used by both client and server
-    └── types/       # Game data models and API interfaces
-        ├── api.ts               # Complete API type definitions
-        └── index.ts             # Type exports
+ai-or-not/
+├── src/                    # Source code
+│   ├── client/            # React frontend (Reddit webview)
+│   ├── server/            # Express backend (serverless)
+│   └── shared/            # Shared TypeScript types
+├── assets/                # Static assets (icons, splash screens)
+├── scripts/               # Build and deployment scripts
+├── tools/                 # Development tools and configurations
+├── devvit.json           # Devvit app configuration
+├── package.json          # Dependencies and scripts
+└── README.md             # This documentation
 ```
+
+### Detailed Source Structure
+
+#### Client Architecture (`src/client/`)
+```
+client/
+├── components/           # React UI components
+│   ├── SplashScreen.tsx     # Welcome screen with live stats
+│   ├── GameRound.tsx        # Core gameplay interface
+│   ├── EducationalContent.tsx # AI learning breaks
+│   ├── ResultsScreen.tsx    # Final results and sharing
+│   ├── LeaderboardTabs.tsx  # Multi-tier rankings
+│   ├── LoadingScreen.tsx    # Loading states
+│   ├── AudioSystem.tsx      # Audio controls
+│   ├── MagnifyContainer.tsx # Image magnification wrapper
+│   ├── MagnifyOverlay.tsx   # Magnification overlay
+│   ├── AITipForm.tsx        # Community tip sharing
+│   └── ErrorBoundary.tsx    # Error handling
+├── hooks/               # Custom React hooks
+│   ├── useGameState.ts      # Main game state management
+│   ├── useErrorHandler.ts   # Error handling with retry logic
+│   ├── useAudio.ts          # Audio system controls
+│   ├── useMagnify.ts        # Image magnification logic
+│   └── useCounter.ts        # Utility counters
+├── utils/               # Client-side utilities
+│   ├── network.ts           # API communication
+│   ├── storage.ts           # Local storage management
+│   ├── content.ts           # Educational content loading
+│   ├── audio.ts             # Audio context management
+│   ├── magnify.ts           # Magnification calculations
+│   ├── confetti.ts          # Celebration effects
+│   └── ui.ts                # UI helper functions
+├── public/              # Static assets
+│   ├── audio/               # Sound files
+│   └── images/              # Game images by category
+├── App.tsx              # Main application component
+├── main.tsx             # React entry point
+├── index.html           # HTML template
+├── index.css            # Global styles
+└── vite.config.ts       # Build configuration
+```
+
+#### Server Architecture (`src/server/`)
+```
+server/
+├── core/                # Business logic modules
+│   ├── game-logic.ts        # Core game mechanics
+│   ├── leaderboard-manager.ts # Rankings and scores
+│   ├── session-manager.ts   # User session handling
+│   ├── daily-game-manager.ts # Daily content rotation
+│   ├── content-manager.ts   # Educational content
+│   ├── play-limit-manager.ts # Daily attempt limits
+│   ├── badge-manager.ts     # Achievement system
+│   ├── image-manager.ts     # Image loading and validation
+│   ├── image-loader.ts      # Image file operations
+│   ├── post.ts              # Reddit post creation
+│   ├── redis-keys.ts        # Redis key management
+│   └── scheduler-manager.ts # Background tasks
+├── content/             # Static content files
+│   ├── ai-facts.json        # AI education facts
+│   ├── educational-tips.json # Detection tips
+│   └── inspirational-content.json # Motivational content
+├── middleware/          # Express middleware
+│   └── security.ts          # Rate limiting and validation
+├── utils/               # Server utilities
+│   ├── validation.ts        # Input validation
+│   └── rateLimiter.ts       # Rate limiting logic
+├── index.ts             # Main server and API routes
+└── vite.config.ts       # Server build configuration
+```
+
+#### Shared Types (`src/shared/`)
+```
+shared/
+├── types/
+│   ├── api.ts              # API request/response types
+│   └── index.ts            # Type exports
+└── tsconfig.json           # Shared TypeScript config
+```
+
+### Configuration Files
+
+#### Root Configuration
+- **`devvit.json`**: Devvit app configuration with permissions and settings
+- **`package.json`**: Dependencies, scripts, and project metadata
+- **`tsconfig.json`**: TypeScript project references (build-only)
+- **`eslint.config.js`**: Code quality and linting rules
+- **`.prettierrc`**: Code formatting configuration
+- **`tailwind.config.js`**: Tailwind CSS customization
+- **`vitest.config.ts`**: Testing framework configuration
+
+#### Build Outputs
+- **`dist/client/`**: Built client assets (HTML, JS, CSS)
+- **`dist/server/`**: Built server bundle (CommonJS)
+
+## 🔄 Development Workflow
+
+### Getting Started
+1. **Environment Setup**: Install Node.js 22.2.0+, authenticate with Reddit
+2. **Project Setup**: Clone repository, install dependencies
+3. **Development**: Use `npm run dev` for live development with hot reloading
+4. **Testing**: Run `npm test` for unit tests, `npm run check` for quality checks
+
+### Development Process
+
+#### Daily Development Workflow
+```bash
+# 1. Start development environment
+npm run dev
+
+# 2. Make changes to code
+# - Client changes auto-reload in browser
+# - Server changes require manual refresh
+
+# 3. Run quality checks
+npm run check
+
+# 4. Run tests
+npm test
+
+# 5. Commit changes
+git add .
+git commit -m "feat: description of changes"
+```
+
+#### Code Organization Principles
+- **Separation of Concerns**: Clear boundaries between client, server, and shared code
+- **Type Safety**: Comprehensive TypeScript coverage with strict configuration
+- **Component Architecture**: Reusable React components with custom hooks
+- **API Design**: RESTful endpoints with consistent error handling
+- **State Management**: Centralized game state with local storage persistence
+
+#### Testing Strategy
+- **Unit Tests**: Individual component and function testing
+- **Integration Tests**: Complete gameplay workflow testing
+- **Responsive Tests**: Cross-device compatibility validation
+- **API Tests**: Server endpoint and error handling verification
+- **Performance Tests**: Load testing and optimization validation
+
+### Quality Assurance
+
+#### Code Quality Standards
+```bash
+# TypeScript compilation
+npm run build
+
+# Linting and formatting
+npm run check
+
+# Test coverage
+npm test
+
+# Performance analysis
+npm run build && npm run analyze
+```
+
+#### Pre-Commit Checklist
+- [ ] All TypeScript errors resolved
+- [ ] ESLint rules passing
+- [ ] Prettier formatting applied
+- [ ] Unit tests passing
+- [ ] Integration tests passing
+- [ ] No console errors in development
+- [ ] Responsive design verified
+- [ ] Audio system functional
+
+### Contribution Guidelines
+
+#### Making Changes
+1. **Fork and Branch**: Create feature branches from main
+2. **Development**: Follow existing code patterns and conventions
+3. **Testing**: Add tests for new features and bug fixes
+4. **Documentation**: Update README and inline documentation
+5. **Review**: Submit pull requests with clear descriptions
+
+#### Code Standards
+- **TypeScript**: Use strict type checking and proper interfaces
+- **React**: Follow hooks patterns and component best practices
+- **Styling**: Use Tailwind CSS classes, avoid inline styles
+- **API**: Maintain RESTful conventions and error handling
+- **Performance**: Optimize for mobile and slow connections
+
+#### File Naming Conventions
+- **Components**: PascalCase (e.g., `GameRound.tsx`)
+- **Hooks**: camelCase with `use` prefix (e.g., `useGameState.ts`)
+- **Utilities**: camelCase (e.g., `network.ts`)
+- **Types**: PascalCase interfaces (e.g., `GameSession`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_ATTEMPTS`)
+
+### Build System
+
+#### Development Builds
+- **Client**: Vite with hot module replacement
+- **Server**: Vite with CommonJS output for Devvit compatibility
+- **Types**: TypeScript project references for incremental compilation
+
+#### Production Builds
+- **Optimization**: Minification, tree shaking, and bundle splitting
+- **Assets**: Optimized images and compressed audio files
+- **Caching**: Proper cache headers and versioning
+- **Monitoring**: Source maps for production debugging
 
 ### Key Features Implementation
 

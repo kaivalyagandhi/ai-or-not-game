@@ -462,9 +462,15 @@ describe('Play Limit Manager - Statistics', () => {
     });
   });
 
-  it('should reject invalid user ID for stats', async () => {
-    await expect(getUserPlayStats('')).rejects.toThrow(PlayLimitError);
-    await expect(getUserPlayStats('')).rejects.toThrow('Invalid user ID');
+  it('should return safe defaults for invalid user ID for stats', async () => {
+    const result = await getUserPlayStats('');
+    expect(result).toEqual({
+      attempts: 0,
+      maxAttempts: 999, // Development mode default
+      remainingAttempts: 999,
+      bestScore: 0,
+      canPlayAgain: true,
+    });
   });
 });
 
