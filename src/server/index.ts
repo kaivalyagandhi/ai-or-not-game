@@ -32,6 +32,8 @@ import {
   getUserRank, 
   getLeaderboardParticipantCount,
   consolidateLeaderboard,
+  consolidateAllLeaderboards,
+  initializeLeaderboardSystem,
   LeaderboardType 
 } from './core/leaderboard-manager.js';
 import { BadgeType } from '../shared/types/api.js';
@@ -638,6 +640,126 @@ router.post('/api/leaderboard/consolidate/:type', async (req, res): Promise<void
     });
   } catch (error) {
     console.error('Error in /api/leaderboard/consolidate:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+// Consolidate all leaderboards at once
+router.post('/api/leaderboard/consolidate-all', async (_req, res): Promise<void> => {
+  try {
+    const results = await consolidateAllLeaderboards();
+
+    const totalOriginal = results.daily.originalCount + results.weekly.originalCount + results.allTime.originalCount;
+    const totalConsolidated = results.daily.consolidatedCount + results.weekly.consolidatedCount + results.allTime.consolidatedCount;
+    const totalDuplicatesRemoved = results.daily.duplicatesRemoved + results.weekly.duplicatesRemoved + results.allTime.duplicatesRemoved;
+
+    res.json({
+      success: true,
+      message: `Successfully consolidated all leaderboards`,
+      totalOriginal,
+      totalConsolidated,
+      totalDuplicatesRemoved,
+      details: results,
+    });
+  } catch (error) {
+    console.error('Error in /api/leaderboard/consolidate-all:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+// Debug endpoint to inspect leaderboard contents
+router.get('/api/debug/leaderboard/:type', async (req, res): Promise<void> => {
+  try {
+    const type = req.params.type as LeaderboardType;
+    
+    if (!['daily', 'weekly', 'all-time'].includes(type)) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid leaderboard type. Must be daily, weekly, or all-time.',
+      });
+      return;
+    }
+
+    // Get all entries with full details
+    const entries = await getLeaderboard(type, -1, 0); // Get all entries
+    
+    // Group by userId to show duplicates
+    const userGroups = new Map<string, typeof entries>();
+    for (const entry of entries) {
+      if (!userGroups.has(entry.userId)) {
+        userGroups.set(entry.userId, []);
+      }
+      userGroups.get(entry.userId)!.push(entry);
+    }
+
+    // Find users with multiple entries
+    const duplicateUsers = Array.from(userGroups.entries())
+      .filter(([_, userEntries]) => userEntries.length > 1)
+      .map(([userId, userEntries]) => ({
+        userId,
+        username: userEntries[0]?.username,
+        entryCount: userEntries.length,
+        entries: userEntries.map(e => ({
+          score: e.score,
+          correctCount: e.correctCount,
+          timeBonus: e.timeBonus,
+          completedAt: new Date(e.completedAt).toISOString(),
+          badge: e.badge,
+        })),
+      }));
+
+    res.json({
+      success: true,
+      leaderboardType: type,
+      totalEntries: entries.length,
+      uniqueUsers: userGroups.size,
+      duplicateUsers: duplicateUsers.length,
+      duplicateDetails: duplicateUsers,
+      allEntries: entries.map(e => ({
+        userId: e.userId,
+        username: e.username,
+        score: e.score,
+        correctCount: e.correctCount,
+        timeBonus: e.timeBonus,
+        completedAt: new Date(e.completedAt).toISOString(),
+        badge: e.badge,
+      })),
+    });
+  } catch (error) {
+    console.error('Error in /api/debug/leaderboard:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+// Manual trigger for consolidation (can be called from UI)
+router.post('/api/leaderboard/trigger-consolidation', async (_req, res): Promise<void> => {
+  try {
+    console.log('🔧 Manual consolidation triggered');
+    const results = await consolidateAllLeaderboards();
+
+    const totalOriginal = results.daily.originalCount + results.weekly.originalCount + results.allTime.originalCount;
+    const totalConsolidated = results.daily.consolidatedCount + results.weekly.consolidatedCount + results.allTime.consolidatedCount;
+    const totalDuplicatesRemoved = results.daily.duplicatesRemoved + results.weekly.duplicatesRemoved + results.allTime.duplicatesRemoved;
+
+    res.json({
+      success: true,
+      message: `Manual consolidation completed`,
+      totalOriginal,
+      totalConsolidated,
+      totalDuplicatesRemoved,
+      details: results,
+    });
+  } catch (error) {
+    console.error('Error in manual consolidation trigger:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -1676,6 +1798,11 @@ app.use(router);
 
 // Security error handling middleware (must be after routes)
 app.use(securityErrorHandler());
+
+// Initialize leaderboard system (includes startup consolidation)
+initializeLeaderboardSystem().catch(error => {
+  console.error('Failed to initialize leaderboard system:', error);
+});
 
 // Get port from environment variable with fallback
 const port = getServerPort();

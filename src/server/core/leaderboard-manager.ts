@@ -37,6 +37,26 @@ export const LEADERBOARD_ERROR_CODES = {
 export type LeaderboardType = 'daily' | 'weekly' | 'all-time';
 
 /**
+ * Auto-consolidation settings
+ */
+const AUTO_CONSOLIDATION_CONFIG = {
+  // Enable auto-consolidation on leaderboard retrieval
+  CONSOLIDATE_ON_RETRIEVAL: true,
+  
+  // Consolidate after every N score additions
+  CONSOLIDATE_AFTER_SCORES: 10,
+  
+  // Redis key to track consolidation counters
+  CONSOLIDATION_COUNTER_KEY: 'global_aiornotgame_consolidation_counter',
+  
+  // Redis key to track last consolidation time
+  LAST_CONSOLIDATION_KEY: 'global_aiornotgame_last_consolidation',
+  
+  // Minimum time between auto-consolidations (in milliseconds)
+  MIN_CONSOLIDATION_INTERVAL: 5 * 60 * 1000, // 5 minutes
+};
+
+/**
  * Leaderboard entry for Redis storage (simplified)
  */
 interface RedisLeaderboardEntry {
@@ -87,14 +107,20 @@ export async function addScoreToLeaderboards(
     const weeklyKey = LeaderboardKeys.weekly();
     const allTimeKey = LeaderboardKeys.allTime();
 
+    console.log(`🎯 Adding score for user ${userId} (${username}) with score ${score}`);
+    console.log(`📅 Daily key: ${dailyKey}`);
+    console.log(`📊 Weekly key: ${weeklyKey}`);
+    console.log(`🏆 All-time key: ${allTimeKey}`);
+
     // For each leaderboard, check if user exists and only update if new score is better
     const leaderboardConfigs = [
-      { key: dailyKey, expiration: KEY_EXPIRATION.DAILY_LEADERBOARD },
-      { key: weeklyKey, expiration: KEY_EXPIRATION.WEEKLY_LEADERBOARD },
-      { key: allTimeKey, expiration: null }, // No expiration for all-time
+      { key: dailyKey, expiration: KEY_EXPIRATION.DAILY_LEADERBOARD, type: 'daily' },
+      { key: weeklyKey, expiration: KEY_EXPIRATION.WEEKLY_LEADERBOARD, type: 'weekly' },
+      { key: allTimeKey, expiration: null, type: 'all-time' }, // No expiration for all-time
     ];
 
     for (const config of leaderboardConfigs) {
+      console.log(`🔄 Processing ${config.type} leaderboard...`);
       await updateUserBestScore(config.key, entryData, config.expiration);
     }
 
@@ -111,7 +137,7 @@ export async function addScoreToLeaderboards(
 
     // Send updates for each leaderboard type
     const leaderboardTypes: LeaderboardType[] = ['daily', 'weekly', 'all-time'];
-    
+
     for (const leaderboardType of leaderboardTypes) {
       // Send leaderboard update message
       await realtime.send('leaderboard_updates', {
@@ -147,6 +173,12 @@ export async function addScoreToLeaderboards(
         // Don't fail the whole operation if rank lookup fails
       }
     }
+
+    // Trigger auto-consolidation counter (runs in background, doesn't block)
+    incrementConsolidationCounter().catch(error => {
+      console.error('Error incrementing consolidation counter:', error);
+    });
+
   } catch (error) {
     console.error('Error adding score to leaderboards:', error);
     throw new LeaderboardError(
@@ -168,7 +200,7 @@ async function updateUserBestScore(
   try {
     // Get all entries to find existing user entry
     const allEntries = await redis.zRange(leaderboardKey, 0, -1, { by: 'rank' });
-    
+
     let existingEntry: string | null = null;
     let existingScore = 0;
 
@@ -176,7 +208,7 @@ async function updateUserBestScore(
     for (const entry of allEntries) {
       try {
         if (!entry || !entry.member) continue;
-        
+
         const entryData: RedisLeaderboardEntry = JSON.parse(entry.member);
         if (entryData.userId === newEntry.userId) {
           existingEntry = entry.member;
@@ -191,8 +223,19 @@ async function updateUserBestScore(
 
     // If user exists and new score is not better, don't update
     if (existingEntry && newEntry.score <= existingScore) {
-      console.log(`User ${newEntry.userId} already has better score (${existingScore} vs ${newEntry.score})`);
+      console.log(
+        `🚫 User ${newEntry.userId} already has better score (${existingScore} vs ${newEntry.score}) - skipping update`
+      );
       return;
+    }
+
+    // Log what we're about to do
+    if (existingEntry) {
+      console.log(
+        `🔄 User ${newEntry.userId} has existing score ${existingScore}, updating to better score ${newEntry.score}`
+      );
+    } else {
+      console.log(`✨ New user ${newEntry.userId} being added with score ${newEntry.score}`);
     }
 
     // Remove existing entry if it exists
@@ -247,18 +290,18 @@ export async function getLeaderboard(
     }
 
     console.log(`🔍 Getting ${type} leaderboard with key:`, leaderboardKey);
-    
+
     // Check if key exists and get total count
     const totalCount = await redis.zCard(leaderboardKey);
     console.log(`📊 Total entries in ${type} leaderboard:`, totalCount);
-    
+
     // Get entries in descending order (highest scores first)
     // Use zRange with reverse option to get highest scores first
     const entries = await redis.zRange(leaderboardKey, offset, offset + limit - 1, {
       by: 'rank',
       reverse: true,
     });
-    
+
     console.log(`📋 Retrieved ${entries.length} entries from ${type} leaderboard`);
 
     const leaderboardEntries: LeaderboardEntry[] = [];
@@ -283,6 +326,13 @@ export async function getLeaderboard(
         // Skip malformed entries
         continue;
       }
+    }
+
+    // Trigger auto-consolidation on retrieval if enabled (runs in background)
+    if (AUTO_CONSOLIDATION_CONFIG.CONSOLIDATE_ON_RETRIEVAL) {
+      autoConsolidateIfNeeded().catch(error => {
+        console.error('Error during auto-consolidation on retrieval:', error);
+      });
     }
 
     return leaderboardEntries;
@@ -519,6 +569,141 @@ export async function userExistsOnLeaderboard(
 }
 
 /**
+ * Check if auto-consolidation should run based on time and counter thresholds
+ */
+async function shouldAutoConsolidate(): Promise<boolean> {
+  try {
+    // Check last consolidation time
+    const lastConsolidationStr = await redis.get(AUTO_CONSOLIDATION_CONFIG.LAST_CONSOLIDATION_KEY);
+    const lastConsolidation = lastConsolidationStr ? parseInt(lastConsolidationStr, 10) : 0;
+    const now = Date.now();
+    
+    // Don't consolidate if we did it recently
+    if (now - lastConsolidation < AUTO_CONSOLIDATION_CONFIG.MIN_CONSOLIDATION_INTERVAL) {
+      return false;
+    }
+    
+    // Check consolidation counter
+    const counterStr = await redis.get(AUTO_CONSOLIDATION_CONFIG.CONSOLIDATION_COUNTER_KEY);
+    const counter = counterStr ? parseInt(counterStr, 10) : 0;
+    
+    return counter >= AUTO_CONSOLIDATION_CONFIG.CONSOLIDATE_AFTER_SCORES;
+  } catch (error) {
+    console.error('Error checking auto-consolidation conditions:', error);
+    return false;
+  }
+}
+
+/**
+ * Increment the consolidation counter and trigger auto-consolidation if needed
+ */
+async function incrementConsolidationCounter(): Promise<void> {
+  try {
+    const newCount = await redis.incr(AUTO_CONSOLIDATION_CONFIG.CONSOLIDATION_COUNTER_KEY);
+    
+    if (newCount >= AUTO_CONSOLIDATION_CONFIG.CONSOLIDATE_AFTER_SCORES) {
+      console.log(`🎯 Auto-consolidation triggered after ${newCount} score additions`);
+      await autoConsolidateIfNeeded();
+    }
+  } catch (error) {
+    console.error('Error incrementing consolidation counter:', error);
+  }
+}
+
+/**
+ * Reset consolidation counter and update last consolidation time
+ */
+async function resetConsolidationTracking(): Promise<void> {
+  try {
+    await redis.set(AUTO_CONSOLIDATION_CONFIG.CONSOLIDATION_COUNTER_KEY, '0');
+    await redis.set(AUTO_CONSOLIDATION_CONFIG.LAST_CONSOLIDATION_KEY, Date.now().toString());
+  } catch (error) {
+    console.error('Error resetting consolidation tracking:', error);
+  }
+}
+
+/**
+ * Auto-consolidate leaderboards if conditions are met
+ */
+async function autoConsolidateIfNeeded(): Promise<boolean> {
+  if (!(await shouldAutoConsolidate())) {
+    return false;
+  }
+  
+  try {
+    console.log('🤖 Running auto-consolidation...');
+    const results = await consolidateAllLeaderboards();
+    
+    const totalDuplicatesRemoved = results.daily.duplicatesRemoved + 
+                                  results.weekly.duplicatesRemoved + 
+                                  results.allTime.duplicatesRemoved;
+    
+    if (totalDuplicatesRemoved > 0) {
+      console.log(`🎉 Auto-consolidation removed ${totalDuplicatesRemoved} duplicates`);
+    }
+    
+    await resetConsolidationTracking();
+    return true;
+  } catch (error) {
+    console.error('Error during auto-consolidation:', error);
+    return false;
+  }
+}
+
+/**
+ * Consolidate all leaderboards (daily, weekly, all-time)
+ * Useful for maintenance or fixing existing duplicate data
+ */
+export async function consolidateAllLeaderboards(): Promise<{
+  daily: { originalCount: number; consolidatedCount: number; duplicatesRemoved: number };
+  weekly: { originalCount: number; consolidatedCount: number; duplicatesRemoved: number };
+  allTime: { originalCount: number; consolidatedCount: number; duplicatesRemoved: number };
+}> {
+  console.log('🧹 Starting consolidation of all leaderboards...');
+
+  const results = {
+    daily: await consolidateLeaderboard('daily'),
+    weekly: await consolidateLeaderboard('weekly'),
+    allTime: await consolidateLeaderboard('all-time'),
+  };
+
+  const totalDuplicatesRemoved =
+    results.daily.duplicatesRemoved +
+    results.weekly.duplicatesRemoved +
+    results.allTime.duplicatesRemoved;
+
+  console.log(`✅ Consolidation complete! Removed ${totalDuplicatesRemoved} total duplicates`);
+
+  return results;
+}
+
+/**
+ * Initialize leaderboard system and run startup consolidation if needed
+ */
+export async function initializeLeaderboardSystem(): Promise<void> {
+  try {
+    console.log('🚀 Initializing leaderboard system...');
+    
+    // Check if we should run a startup consolidation
+    const lastConsolidationStr = await redis.get(AUTO_CONSOLIDATION_CONFIG.LAST_CONSOLIDATION_KEY);
+    const lastConsolidation = lastConsolidationStr ? parseInt(lastConsolidationStr, 10) : 0;
+    const now = Date.now();
+    
+    // If it's been more than 1 hour since last consolidation, run it
+    const oneHour = 60 * 60 * 1000;
+    if (now - lastConsolidation > oneHour) {
+      console.log('⏰ Running startup consolidation (last run was over 1 hour ago)');
+      await autoConsolidateIfNeeded();
+    }
+    
+    console.log('✅ Leaderboard system initialized');
+  } catch (error) {
+    console.error('Error initializing leaderboard system:', error);
+    // Don't throw - we don't want to break the app if consolidation fails
+  }
+}
+
+/**
  * Get leaderboard statistics
  */
 export async function getLeaderboardStats(type: LeaderboardType): Promise<{
@@ -578,7 +763,7 @@ export async function consolidateLeaderboard(type: LeaderboardType): Promise<{
     // Get appropriate leaderboard key
     let leaderboardKey: string;
     let expiration: number | null = null;
-    
+
     switch (type) {
       case 'daily':
         leaderboardKey = LeaderboardKeys.daily();
@@ -607,7 +792,7 @@ export async function consolidateLeaderboard(type: LeaderboardType): Promise<{
     for (const entry of allEntries) {
       try {
         if (!entry || !entry.member) continue;
-        
+
         const entryData: RedisLeaderboardEntry = JSON.parse(entry.member);
         const existingBest = userBestEntries.get(entryData.userId);
 
@@ -632,7 +817,9 @@ export async function consolidateLeaderboard(type: LeaderboardType): Promise<{
       return { originalCount, consolidatedCount, duplicatesRemoved: 0 };
     }
 
-    console.log(`Consolidating ${type} leaderboard: ${originalCount} -> ${consolidatedCount} entries (${duplicatesRemoved} duplicates removed)`);
+    console.log(
+      `Consolidating ${type} leaderboard: ${originalCount} -> ${consolidatedCount} entries (${duplicatesRemoved} duplicates removed)`
+    );
 
     // Clear the leaderboard
     await redis.del(leaderboardKey);
