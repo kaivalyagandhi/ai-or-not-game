@@ -26,11 +26,40 @@ export class ContentManager {
   }
 
   /**
-   * Load content from embedded data (since fs is not available in serverless environment)
+   * Load content from JSON files (using dynamic imports since fs is not available in serverless environment)
    */
-  private loadContentFromFiles(): ContentFiles {
+  private async loadContentFromFiles(): Promise<ContentFiles> {
     try {
-      // Import content directly since we can't use fs in serverless environment
+      // Import JSON files directly using dynamic imports
+      const [tipsModule, factsModule, inspirationModule] = await Promise.all([
+        import('../content/educational-tips.json', { assert: { type: 'json' } }),
+        import('../content/ai-facts.json', { assert: { type: 'json' } }),
+        import('../content/inspirational-content.json', { assert: { type: 'json' } })
+      ]);
+
+      const tips = tipsModule.default;
+      const facts = factsModule.default;
+      const inspiration = inspirationModule.default;
+
+      // Validate content structure
+      this.validateContentStructure(tips, facts, inspiration);
+
+      console.log(`✅ Content loaded successfully: ${tips.tips.length} tips, ${facts.facts.length} facts, ${inspiration.quotes.length} quotes, ${inspiration.jokes.length} jokes`);
+
+      return { tips, facts, inspiration };
+    } catch (error) {
+      console.error('❌ Error loading content from JSON files:', error);
+      console.log('🔄 Falling back to embedded content...');
+      return this.getEmbeddedContent();
+    }
+  }
+
+  /**
+   * Load content synchronously from embedded data (fallback method)
+   */
+  private loadContentFromFilesSync(): ContentFiles {
+    try {
+      // Try to load from embedded content as fallback
       const tips = this.getEmbeddedTips();
       const facts = this.getEmbeddedFacts();
       const inspiration = this.getEmbeddedInspiration();
@@ -38,9 +67,11 @@ export class ContentManager {
       // Validate content structure
       this.validateContentStructure(tips, facts, inspiration);
 
+      console.log('⚠️ Using embedded content as fallback');
       return { tips, facts, inspiration };
     } catch (error) {
-      console.error('Error loading content:', error);
+      console.error('❌ Error loading embedded content:', error);
+      console.log('🆘 Using minimal fallback content...');
       return this.getFallbackContent();
     }
   }
@@ -186,33 +217,44 @@ export class ContentManager {
   }
 
   /**
-   * Get embedded inspirational content (replaces file reading)
+   * Get embedded content (matches JSON files exactly - used as fallback)
+   */
+  private getEmbeddedContent(): ContentFiles {
+    return {
+      tips: this.getEmbeddedTips(),
+      facts: this.getEmbeddedFacts(),
+      inspiration: this.getEmbeddedInspiration()
+    };
+  }
+
+  /**
+   * Get embedded inspirational content (matches inspirational-content.json exactly)
    */
   private getEmbeddedInspiration(): { quotes: string[]; jokes: string[] } {
     return {
       quotes: [
         "Every expert was once a beginner. Keep practicing your AI detection skills!",
-        "Your human intuition is valuable in our increasingly digital world.",
-        "Practice makes perfect - each game makes you better at spotting AI content.",
-        "Trust your instincts - humans have evolved to notice when something feels 'off'.",
-        "The future belongs to those who can work alongside AI while maintaining their human judgment.",
-        "Every mistake is a learning opportunity to sharpen your visual perception.",
-        "You're developing a superpower for the digital age - the ability to spot artificial content.",
-        "Remember: AI is a tool created by humans, and humans can learn to understand it.",
-        "Your curiosity and attention to detail are your greatest assets in this challenge.",
-        "The more you play, the more you're training your brain to see what others might miss."
+        "The future belongs to those who can tell the difference between human and artificial creativity.",
+        "Your ability to spot AI-generated content is a superpower in the digital age.",
+        "Practice makes perfect - each game makes you better at identifying AI images.",
+        "In a world of artificial intelligence, your human intuition is more valuable than ever.",
+        "Great job exercising your critical thinking skills in the age of AI!",
+        "You're developing an important skill for navigating our AI-enhanced world.",
+        "Every mistake is a learning opportunity - you're getting better with each attempt!",
+        "Your human eye for detail is what makes you special in an AI world.",
+        "Keep questioning what you see - that's the key to staying ahead of AI deception."
       ],
       jokes: [
-        "Why don't AI images win at poker? They always have a tell - extra fingers!",
-        "What's an AI's favorite type of photography? Anything without hands in the shot!",
-        "Why did the AI go to art school? To learn proper finger counting!",
-        "What do you call an AI that's bad at generating text? A spell-wreck generator!",
-        "Why don't AI artists ever get tired? Because they never have to lift a finger... or count them!",
-        "What's the difference between AI art and human art? About 2.7 extra fingers per hand!",
-        "Why did the AI image fail the driving test? It couldn't handle the wheel properly!",
-        "What's an AI's least favorite game? Rock, paper, scissors... it always generates rock, paper, scissors, thumb, pinky!",
-        "Why don't AI models make good comedians? Their timing is always a bit off by a few milliseconds!",
-        "What did the AI say when it finally generated perfect hands? 'I've got to hand it to myself!'"
+        "Why don't AI images ever win at poker? Because they always have a tell - usually an extra finger!",
+        "What's an AI's favorite type of photography? Anything that doesn't require counting fingers correctly!",
+        "Why did the AI image go to art school? To learn how to draw hands that don't look like octopi!",
+        "What do you call an AI that's really good at generating images? Still not as good as you at spotting them!",
+        "Why don't AI images ever become hand models? For obvious reasons... count the fingers!",
+        "What's the difference between AI art and human art? About 2.3 extra fingers on average!",
+        "Why did the AI image fail its driving test? It couldn't figure out which hand goes on the steering wheel!",
+        "What's an AI's least favorite song? 'Give me five!' - it never knows which five to give!",
+        "Why don't AI images ever become dentists? They can't count teeth any better than fingers!",
+        "What do you call an AI that finally learns to draw hands correctly? Unemployed - because that's when we know it's too good!"
       ]
     };
   }
@@ -289,7 +331,8 @@ export class ContentManager {
     const currentDate = this.getCurrentDate();
     
     if (!this.contentCache || this.lastLoadDate !== currentDate) {
-      const contentFiles = this.loadContentFromFiles();
+      // Use synchronous fallback for now since ensureContentLoaded is called synchronously
+      const contentFiles = this.loadContentFromFilesSync();
       
       this.contentCache = {
         tips: contentFiles.tips.tips,
@@ -299,7 +342,30 @@ export class ContentManager {
       };
       
       this.lastLoadDate = currentDate;
-      console.log(`Content loaded for date: ${currentDate}`);
+      console.log(`📚 Content loaded for date: ${currentDate} - ${this.contentCache.tips.length} tips, ${this.contentCache.facts.length} facts, ${this.contentCache.quotes.length} quotes, ${this.contentCache.jokes.length} jokes`);
+    }
+  }
+
+  /**
+   * Async method to preload content from JSON files (call this during server startup)
+   */
+  public async preloadContent(): Promise<void> {
+    try {
+      const contentFiles = await this.loadContentFromFiles();
+      
+      this.contentCache = {
+        tips: contentFiles.tips.tips,
+        facts: contentFiles.facts.facts,
+        quotes: contentFiles.inspiration.quotes,
+        jokes: contentFiles.inspiration.jokes
+      };
+      
+      this.lastLoadDate = this.getCurrentDate();
+      console.log(`🚀 Content preloaded successfully: ${this.contentCache.tips.length} tips, ${this.contentCache.facts.length} facts, ${this.contentCache.quotes.length} quotes, ${this.contentCache.jokes.length} jokes`);
+    } catch (error) {
+      console.error('❌ Failed to preload content:', error);
+      // Fall back to sync loading
+      this.ensureContentLoaded();
     }
   }
 

@@ -5,6 +5,7 @@ import { fetchCurrentContentCached, fetchSessionContentCached } from '../utils/c
 import { useAudio } from '../hooks/useAudio';
 import { AITipForm } from './AITipForm';
 import { formatAITipComment } from '../utils/aiTipFormatting';
+import { getFallbackTip, getFallbackInspiration } from '../utils/fallbackContent';
 
 interface ResultsScreenProps {
   session: GameSession;
@@ -112,17 +113,20 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
           setInspirationalContent(contentResponse.inspiration);
         } else {
           // Fallback inspirational content
-          setInspirationalContent('Every expert was once a beginner. Keep practicing!');
+          setInspirationalContent(getFallbackInspiration('empty'));
         }
         
         // Set AI tip from the current content
         if (contentResponse.tip) {
           setAiTip(contentResponse.tip);
+        } else {
+          // Set fallback tip when response succeeds but tip is empty
+          setAiTip(getFallbackTip('empty'));
         }
       } else {
         // Set fallback content
-        setInspirationalContent('Practice makes perfect - each game makes you better!');
-        setAiTip('Look for details that seem too perfect or slightly off - AI often struggles with small imperfections that make images feel real.');
+        setInspirationalContent(getFallbackInspiration('failed'));
+        setAiTip(getFallbackTip('failed'));
       }
 
       const playAttemptsData: PlayAttemptsResponse = await playAttemptsResponse.json();
@@ -136,8 +140,8 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
     } catch (error) {
       console.error('Error fetching data:', error);
       // Set fallback content
-      setInspirationalContent('Practice makes perfect - each game makes you better!');
-      setAiTip('Look for details that seem too perfect or slightly off - AI often struggles with small imperfections that make images feel real.');
+      setInspirationalContent(getFallbackInspiration('failed'));
+      setAiTip(getFallbackTip('error'));
     } finally {
       setLoading(false);
     }

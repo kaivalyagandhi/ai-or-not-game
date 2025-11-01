@@ -311,7 +311,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStartGame, onViewL
                 🎯 You've completed your daily challenges!
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                New challenges available tomorrow at midnight UTC
+                New challenges available tomorrow at noon UTC
               </p>
             </div>
           )}

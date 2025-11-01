@@ -24,7 +24,7 @@ The game features:
 - **6-Round Daily Challenge**: Each day brings fresh image pairs across 6 categories with randomized difficulty and intelligent content rotation
 - **Tier-Based Scoring System**: 10 points per correct answer + speed bonuses (5 points for 7-10 seconds, 3 points for 4-6 seconds, 1 point for 1-3 seconds, 0 points for timeout)
 - **Revolutionary Image Magnification**: Interactive 2.5x zoom system with Canvas-based rendering, allowing detailed inspection of images with cursor tracking and cross-device support for examining AI artifacts
-- **Educational Integration**: AI Fact Check break with AI detection tips and fascinating facts randomly selected from comprehensive libraries (50+ tips, 50+ facts)
+- **Educational Integration**: AI Fact Check break with AI detection tips and fascinating facts randomly selected from comprehensive libraries (50+ tips, 50+ facts) with intelligent fallback system ensuring content is always available
 - **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings plus real-time participant tracking via Devvit Realtime API
 - **Intelligent Play Limits**: Up to 2 attempts per day with smart button states - "Start Playing!" when attempts remain, "Come back tomorrow!" when daily limit reached
 - **Achievement System**: Earn badges from 🤖 AI Whisperer (6/6 correct) to 🎓 Human in Training (0-2/6 correct) with performance-based recognition
@@ -147,7 +147,7 @@ After completing your challenge:
 - **Multiple Attempts**: Up to 2 attempts per day with best score tracking
 - **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings via Devvit Realtime API
 - **Social Sharing**: Challenge friends with detailed messages including your performance
-- **Educational Value**: Learn practical AI detection skills through gameplay and tips
+- **Educational Value**: Learn practical AI detection skills through gameplay and tips with robust fallback system ensuring consistent learning experience
 
 ## 🌟 What Makes This Game Innovative & Unique
 
@@ -171,7 +171,7 @@ AI or Not? stands out as a pioneering AI detection game that combines entertainm
 
 ### 🎯 Real-World AI Detection Training
 - **Authentic AI Content**: Uses genuine AI-generated images from modern models, providing practical training for spotting deepfakes and synthetic media
-- **Educational Value**: AI Fact Check breaks with comprehensive AI detection tips and fascinating facts about AI image generation randomly selected from extensive libraries
+- **Educational Value**: AI Fact Check breaks with comprehensive AI detection tips and fascinating facts about AI image generation randomly selected from extensive libraries, plus intelligent fallback system ensuring content availability
 - **Progressive Difficulty**: Mixed categories and randomized AI placement keep players guessing across diverse image types (Animals, Architecture, Nature, Food, Products, Science)
 - **Community Learning**: Players can share their AI detection tips as comments, creating a collaborative learning environment
 
@@ -198,7 +198,7 @@ AI or Not? is a complete, production-ready game deployed and running on Reddit w
 - **6 active image categories** (Animals, Architecture, Nature, Food, Products, Science) with comprehensive image libraries
 - **Advanced timeout handling** with server-side processing, 3-second animated countdown, and extended learning feedback
 - **Optimized audio system** with one-click toggle controls (🎵/🔇), enhanced sound effects, balanced background music, smart audio context management, and immediate session-start background music
-- **Educational content system** with fresh AI detection tips and facts randomly loaded from comprehensive libraries
+- **Educational content system** with fresh AI detection tips and facts randomly loaded from comprehensive libraries, plus intelligent fallback system ensuring content availability
 - **Real-time features** including live participant counts, leaderboard updates, and community engagement indicators via Devvit Realtime API
 - **Enhanced visual feedback** with loading states during answer processing, custom overlay indicators (✕ for AI, ✓ for Human), colored borders with glow effects, and responsive mobile-first design
 - **Revolutionary image magnification** with 2.5x zoom capability, Canvas-based rendering with circular clipping masks, intelligent performance monitoring, and graceful degradation on low-performance devices
@@ -501,7 +501,7 @@ After completing your challenge:
 - **Intelligent Play Management**: Up to 2 attempts per day with smart UI that shows "Start Playing!" when attempts remain and "Come back tomorrow!" when daily limit is reached
 - **Real-Time Competition**: Live leaderboards with daily, weekly, and all-time rankings via Devvit Realtime API
 - **Enhanced Social Sharing**: Challenge friends with detailed messages including your score, badge, and daily rank, plus community AI tip sharing
-- **Educational Value**: Learn practical AI detection skills through gameplay, educational breaks, and community-shared tips
+- **Educational Value**: Learn practical AI detection skills through gameplay, educational breaks, and community-shared tips with robust fallback content system
 
 ## 🎮 Production Implementation
 
@@ -548,7 +548,7 @@ AI or Not? is a complete and polished AI detection game running in production wi
 - **Multiple Daily Attempts**: Up to 2 attempts per day with best score tracking and improvement notifications
 - **Real-Time Features**: Live participant counts, leaderboard updates, and community engagement indicators via Devvit Realtime API
 - **Comprehensive Error Handling**: Offline support, retry logic with exponential backoff, and graceful degradation
-- **Educational Value**: Learn practical AI detection skills through gameplay and educational content
+- **Educational Value**: Learn practical AI detection skills through gameplay and educational content with intelligent fallback system ensuring consistent learning experience
 
 
 
@@ -556,7 +556,7 @@ AI or Not? is a complete and polished AI detection game running in production wi
 
 #### Daily Challenge System
 - **Intelligent Play Limits**: Up to 2 attempts per day with smart UI adaptation (unlimited in development mode)
-- **UTC Reset**: New challenges available daily at 00:00 UTC with fresh image sets and reset attempt counters
+- **UTC Reset**: New challenges available daily at 12:00 UTC with fresh image sets and reset attempt counters
 - **Best Score Tracking**: System remembers your highest score across attempts with improvement notifications
 - **Session Persistence**: Must complete started games (can't restart mid-game) to maintain fair play
 - **Smart Attempt Management**: UI automatically adapts - shows "Start Playing!" when attempts remain, "Come back tomorrow!" when daily limit reached
@@ -736,14 +736,17 @@ By contributing to this project, you agree that your contributions will be licen
 
 ## 🎨 Recent Updates & Enhancements
 
-### 🔥 Latest Update: Educational Content Enhancement
-The game recently received comprehensive enhancements including AI tip sharing functionality and typography improvements. **Most Recent Change**: Enhanced the educational content system with session-specific content loading - the EducationalContent component now supports optional sessionId parameter for unique content per game session, improving content variety and preventing repetition across multiple plays.
+### 🔥 Latest Update: Robust Fallback Content System
+The game recently received comprehensive enhancements including AI tip sharing functionality and typography improvements. **Most Recent Change**: Implemented a robust fallback content system that ensures educational content is always available to players, even when server content fails to load. The new system provides three tiers of fallback content with different messages for various error scenarios, maintaining consistent educational quality and user experience.
 
 **Latest Educational Content Improvements:**
 - **Session-Specific Content**: Enhanced EducationalContent component with optional sessionId parameter for unique content per game session
 - **Improved Content Variety**: Session-based content loading prevents repetition and ensures fresh educational experiences across multiple plays
 - **Dual Content Loading**: Supports both session-specific cached content (`fetchSessionContentCached`) and random fresh content (`fetchRandomContentFresh`)
 - **Enhanced Learning Experience**: Players receive varied educational content with session-specific caching for better content distribution
+- **Robust Fallback System**: Comprehensive fallback content system ensures educational content is always available, even when server content fails to load
+- **Intelligent Error Handling**: Three-tier fallback system with different content for empty responses, failed requests, and network errors
+- **Consistent User Experience**: Fallback content maintains the same quality and educational value as server-provided content
 
 **Latest AI Tip Form Improvements:**
 - **Enhanced Typography**: AI tip form now uses Montserrat font for improved readability in the comment text area
@@ -806,6 +809,8 @@ The game recently received comprehensive enhancements including AI tip sharing f
 - **No Content Repetition**: Each educational break provides fresh, randomly selected tips and facts from comprehensive libraries with session-based caching
 - **Streamlined Presentation**: Clean, focused educational break design with progress indicator and clear visual hierarchy
 - **Enhanced Learning Experience**: Players receive varied educational content across multiple game sessions with fallback content for reliability and session-specific variety
+- **Intelligent Fallback System**: Three-tier fallback content system ensures educational content is always available with different messages for empty responses, failed requests, and network errors
+- **Consistent Quality**: Fallback content maintains the same educational value and writing style as server-provided content for seamless user experience
 
 **Scoring System Modernization:**
 - **Simplified Calculations**: Moved from complex decimal-based scoring to clean whole numbers for better user experience
@@ -1193,6 +1198,7 @@ client/
 │   ├── network.ts           # API communication
 │   ├── storage.ts           # Local storage management
 │   ├── content.ts           # Educational content loading
+│   ├── fallbackContent.ts   # Fallback content system
 │   ├── audio.ts             # Audio context management
 │   ├── magnify.ts           # Magnification calculations
 │   ├── confetti.ts          # Celebration effects
@@ -1377,7 +1383,7 @@ npm run build && npm run analyze
 - **Image Handling**: Responsive grid layout with 1:1 aspect ratio, custom overlay indicators, enhanced visual feedback, and interactive magnification
 - **Score Calculation**: Tier-based bonus system (5/3/1 points based on remaining time) with server-side validation and whole number scoring
 - **Badge Assignment**: Automatic badge calculation based on performance with 5 achievement tiers (6 correct = AI Whisperer, 5 = AI Detective, etc.)
-- **Content Management**: Fresh educational content system with random selection from comprehensive libraries and caching
+- **Content Management**: Fresh educational content system with random selection from comprehensive libraries, caching, and intelligent three-tier fallback system
 - **Social Sharing**: Native sharing API with clipboard fallback for friend challenges
 - **Error Resilience**: Comprehensive error boundaries, network retry logic with exponential backoff, offline detection via `useErrorHandler`
 - **Session Management**: Secure Redis-based persistence with local storage caching and session validation

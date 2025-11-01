@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchSessionContentCached, fetchRandomContentFresh } from '../utils/content';
+import { getFallbackTip, getFallbackFact } from '../utils/fallbackContent';
 
 interface EducationalContentProps {
   onContinue: () => void;
@@ -24,20 +25,20 @@ export const EducationalContent: React.FC<EducationalContentProps> = ({ onContin
           : await fetchRandomContentFresh();
         
         if (response.success) {
-          setTip(response.tip || 'Look for \'the smudge.\' AI sometimes blurs or smudges details where objects meet, like a ring against a finger.');
-          setFact(response.fact || 'AI image generators don\'t \'see\' or \'think.\' They\'re just incredibly complex pattern-matching machines.');
+          setTip(response.tip || getFallbackTip('empty'));
+          setFact(response.fact || getFallbackFact('empty'));
         } else {
           setError(response.error || 'Failed to load content');
           // Set fallback content
-          setTip('AI still gets hands wrong. Count the fingers. If it looks like a horror movie monster\'s hand, you\'ve found your tell.');
-          setFact('The term \'AI\' was first used at a college conference in 1956. It\'s older than your parents\' vinyl collection.');
+          setTip(getFallbackTip('failed'));
+          setFact(getFallbackFact('failed'));
         }
       } catch (err) {
         console.error('Error loading educational content:', err);
         setError('Failed to load educational content');
         // Set fallback content
-        setTip('Check for perfect symmetry. Reality is rarely perfect. If a face or building is flawlessly symmetrical, it\'s a red flag.');
-        setFact('An AI-generated artwork was sold at an auction for $432,500. It was basically a blurry portrait.');
+        setTip(getFallbackTip('error'));
+        setFact(getFallbackFact('error'));
       } finally {
         setLoading(false);
       }

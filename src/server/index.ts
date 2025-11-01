@@ -773,14 +773,38 @@ router.get('/api/content/current', async (_req, res): Promise<void> => {
   try {
     const { contentManager } = await import('./core/content-manager.js');
     
-    res.json({
-      success: true,
-      tip: contentManager.getCurrentTip(),
-      fact: contentManager.getCurrentFact(),
-      inspiration: contentManager.getCurrentInspiration(),
-    });
+    // Get content with fallback handling
+    const tip = contentManager.getCurrentTip();
+    const fact = contentManager.getCurrentFact();
+    const inspiration = contentManager.getCurrentInspiration();
+
+    // Validate that we got actual content (not just fallback messages)
+    if (!tip || tip === 'No tip available' || !fact || fact === 'No fact available') {
+      console.warn('⚠️ Content appears to be using fallbacks, forcing reload...');
+      contentManager.forceReload();
+      
+      // Try again after reload
+      const retryTip = contentManager.getCurrentTip();
+      const retryFact = contentManager.getCurrentFact();
+      const retryInspiration = contentManager.getCurrentInspiration();
+      
+      res.json({
+        success: true,
+        tip: retryTip,
+        fact: retryFact,
+        inspiration: retryInspiration,
+        _reloaded: true
+      });
+    } else {
+      res.json({
+        success: true,
+        tip,
+        fact,
+        inspiration,
+      });
+    }
   } catch (error) {
-    console.error('Error fetching current content:', error);
+    console.error('❌ Error fetching current content:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to load current content',
@@ -803,15 +827,40 @@ router.get('/api/content/session/:sessionId', async (req, res): Promise<void> =>
 
     const { contentManager } = await import('./core/content-manager.js');
     
-    res.json({
-      success: true,
-      tip: contentManager.getSessionTip(sessionId),
-      fact: contentManager.getSessionFact(sessionId),
-      inspiration: contentManager.getSessionInspiration(sessionId),
-      sessionId,
-    });
+    // Get session-specific content with validation
+    const tip = contentManager.getSessionTip(sessionId);
+    const fact = contentManager.getSessionFact(sessionId);
+    const inspiration = contentManager.getSessionInspiration(sessionId);
+
+    // Validate content quality
+    if (!tip || tip === 'No tip available' || !fact || fact === 'No fact available') {
+      console.warn(`⚠️ Session content appears to be using fallbacks for session ${sessionId}, forcing reload...`);
+      contentManager.forceReload();
+      
+      // Try again after reload
+      const retryTip = contentManager.getSessionTip(sessionId);
+      const retryFact = contentManager.getSessionFact(sessionId);
+      const retryInspiration = contentManager.getSessionInspiration(sessionId);
+      
+      res.json({
+        success: true,
+        tip: retryTip,
+        fact: retryFact,
+        inspiration: retryInspiration,
+        sessionId,
+        _reloaded: true
+      });
+    } else {
+      res.json({
+        success: true,
+        tip,
+        fact,
+        inspiration,
+        sessionId,
+      });
+    }
   } catch (error) {
-    console.error('Error fetching session content:', error);
+    console.error('❌ Error fetching session content:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to load session content',
@@ -838,10 +887,75 @@ router.get('/api/content/random', async (_req, res): Promise<void> => {
   }
 });
 
+// Content health check endpoint
+router.get('/api/content/health', async (_req, res): Promise<void> => {
+  try {
+    const { contentManager } = await import('./core/content-manager.js');
+    
+    // Force a content check
+    const allContent = contentManager.getAllContent();
+    
+    const health = {
+      success: true,
+      contentLoaded: true,
+      tipCount: allContent.educational.tips.length,
+      factCount: allContent.educational.facts.length,
+      quoteCount: allContent.inspirational.quotes.length,
+      jokeCount: allContent.inspirational.jokes.length,
+      currentTip: contentManager.getCurrentTip(),
+      currentFact: contentManager.getCurrentFact(),
+      currentInspiration: contentManager.getCurrentInspiration(),
+      timestamp: new Date().toISOString()
+    };
+
+    // Check if content seems healthy
+    const isHealthy = health.tipCount > 10 && 
+                     health.factCount > 10 && 
+                     health.quoteCount > 5 && 
+                     health.jokeCount > 5 &&
+                     health.currentTip !== 'No tip available' &&
+                     health.currentFact !== 'No fact available';
+
+    if (!isHealthy) {
+      console.warn('⚠️ Content health check failed, attempting reload...');
+      contentManager.forceReload();
+      
+      // Re-check after reload
+      const reloadedContent = contentManager.getAllContent();
+      health.tipCount = reloadedContent.educational.tips.length;
+      health.factCount = reloadedContent.educational.facts.length;
+      health.quoteCount = reloadedContent.inspirational.quotes.length;
+      health.jokeCount = reloadedContent.inspirational.jokes.length;
+      health.currentTip = contentManager.getCurrentTip();
+      health.currentFact = contentManager.getCurrentFact();
+      health.currentInspiration = contentManager.getCurrentInspiration();
+      (health as any)._reloaded = true;
+    }
+
+    res.json(health);
+  } catch (error) {
+    console.error('❌ Content health check failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Content health check failed',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
   try {
     console.log('🚀 APP INSTALLATION TRIGGERED');
     console.log('📅 Installation time:', new Date().toISOString());
+    
+    // Preload content on app install
+    try {
+      const { contentManager } = await import('./core/content-manager.js');
+      await contentManager.preloadContent();
+      console.log('✅ Content preloaded successfully during app installation');
+    } catch (contentError) {
+      console.error('⚠️ Failed to preload content during app installation:', contentError);
+    }
     
     // Log scheduler configuration on app install
     console.log('⏰ SCHEDULER CONFIGURED:');
@@ -930,7 +1044,7 @@ router.post('/internal/menu/post-create', async (_req, res): Promise<void> => {
       console.log('   - Image categories available:', Object.keys(imageCollection).length);
       
       // Test Redis connectivity
-      await redis.ping();
+      await redis.set('health-check', 'ok', { expiration: new Date(Date.now() + 1000) });
       console.log('   ✓ Redis connection active');
       
       // Test daily game state functionality
@@ -1232,7 +1346,7 @@ router.post('/internal/scheduler/daily-reset', async (req, res): Promise<void> =
       let newPost = null;
       try {
         console.log('📝 Creating new daily post...');
-        newPost = await createPost(reddit, context);
+        newPost = await createPost(reddit, context, undefined, undefined, true);
         console.log(`✅ [SCHEDULER] Created new daily post: ${newPost.id}`);
       } catch (postError) {
         console.error(`❌ [SCHEDULER] Failed to create daily post:`, postError);
