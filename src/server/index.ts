@@ -31,6 +31,7 @@ import {
   getLeaderboard, 
   getUserRank, 
   getLeaderboardParticipantCount,
+  consolidateLeaderboard,
   LeaderboardType 
 } from './core/leaderboard-manager.js';
 import { BadgeType } from '../shared/types/api.js';
@@ -606,6 +607,37 @@ router.get<object, WeeklyUserRankResponse>('/api/leaderboard/user-rank/weekly', 
     });
   } catch (error) {
     console.error('Error in /api/leaderboard/user-rank/weekly:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+// Leaderboard consolidation endpoint - removes duplicate users and keeps only best scores
+router.post('/api/leaderboard/consolidate/:type', async (req, res): Promise<void> => {
+  try {
+    const type = req.params.type as LeaderboardType;
+    
+    if (!['daily', 'weekly', 'all-time'].includes(type)) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid leaderboard type. Must be daily, weekly, or all-time.',
+      });
+      return;
+    }
+
+    const result = await consolidateLeaderboard(type);
+
+    res.json({
+      success: true,
+      message: `Successfully consolidated ${type} leaderboard`,
+      originalCount: result.originalCount,
+      consolidatedCount: result.consolidatedCount,
+      duplicatesRemoved: result.duplicatesRemoved,
+    });
+  } catch (error) {
+    console.error('Error in /api/leaderboard/consolidate:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',

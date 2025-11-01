@@ -8,6 +8,7 @@ import {
   getLeaderboard,
   getUserRank,
   getLeaderboardParticipantCount,
+  consolidateLeaderboard,
   LeaderboardError,
   LEADERBOARD_ERROR_CODES,
 } from '../leaderboard-manager.js';
@@ -244,6 +245,162 @@ describe('Leaderboard Manager - Participant Count', () => {
     await expect(
       getLeaderboardParticipantCount('invalid' as any)
     ).rejects.toThrow(LeaderboardError);
+  });
+});
+
+describe('Leaderboard Manager - Consolidation', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should consolidate leaderboard by removing duplicates and keeping best scores', async () => {
+    // Mock entries with duplicates - user1 has two entries, user2 has one
+    const mockEntries = [
+      { member: JSON.stringify({ userId: 'user1', username: 'player1', score: 85, correctCount: 4, timeBonus: 10, completedAt: 1000, badge: 'detective' as BadgeType }), score: 85 },
+      { member: JSON.stringify({ userId: 'user2', username: 'player2', score: 90, correctCount: 5, timeBonus: 15, completedAt: 2000, badge: 'expert' as BadgeType }), score: 90 },
+      { member: JSON.stringify({ userId: 'user1', username: 'player1', score: 95, correctCount: 5, timeBonus: 20, completedAt: 3000, badge: 'expert' as BadgeType }), score: 95 }, // Better score for user1
+    ];
+
+    mockRedis.zRange.mockResolvedValue(mockEntries);
+    mockRedis.del.mockResolvedValue(1);
+    mockRedis.zAdd.mockResolvedValue(1);
+    mockRedis.expire.mockResolvedValue(1);
+
+    const result = await consolidateLeaderboard('daily');
+
+    expect(result.originalCount).toBe(3);
+    expect(result.consolidatedCount).toBe(2); // Only 2 unique users
+    expect(result.duplicatesRemoved).toBe(1);
+
+    // Should delete the old leaderboard
+    expect(mockRedis.del).toHaveBeenCalledWith(expect.stringContaining('daily'));
+
+    // Should add back only the best entries (2 calls for 2 unique users)
+    expect(mockRedis.zAdd).toHaveBeenCalledTimes(2);
+    
+    // Should add user1's better score (95) and user2's score (90)
+    expect(mockRedis.zAdd).toHaveBeenCalledWith(
+      expect.stringContaining('daily'),
+      { member: expect.stringContaining('"score":95'), score: 95 }
+    );
+    expect(mockRedis.zAdd).toHaveBeenCalledWith(
+      expect.stringContaining('daily'),
+      { member: expect.stringContaining('"score":90'), score: 90 }
+    );
+  });
+
+  it('should handle leaderboard with no duplicates', async () => {
+    const mockEntries = [
+      { member: JSON.stringify({ userId: 'user1', username: 'player1', score: 85, correctCount: 4, timeBonus: 10, completedAt: 1000, badge: 'detective' as BadgeType }), score: 85 },
+      { member: JSON.stringify({ userId: 'user2', username: 'player2', score: 90, correctCount: 5, timeBonus: 15, completedAt: 2000, badge: 'expert' as BadgeType }), score: 90 },
+    ];
+
+    mockRedis.zRange.mockResolvedValue(mockEntries);
+
+    const result = await consolidateLeaderboard('weekly');
+
+    expect(result.originalCount).toBe(2);
+    expect(result.consolidatedCount).toBe(2);
+    expect(result.duplicatesRemoved).toBe(0);
+
+    // Should not delete or rebuild if no duplicates
+    expect(mockRedis.del).not.toHaveBeenCalled();
+    expect(mockRedis.zAdd).not.toHaveBeenCalled();
+  });
+
+  it('should handle empty leaderboard', async () => {
+    mockRedis.zRange.mockResolvedValue([]);
+
+    const result = await consolidateLeaderboard('all-time');
+
+    expect(result.originalCount).toBe(0);
+    expect(result.consolidatedCount).toBe(0);
+    expect(result.duplicatesRemoved).toBe(0);
+  });
+
+  it('should reject invalid leaderboard type', async () => {
+    await expect(
+      consolidateLeaderboard('invalid' as any)
+    ).rejects.toThrow(LeaderboardError);
+  });
+});
+
+describe('Leaderboard Manager - Best Score Updates', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should only update if new score is better', async () => {
+    // Mock existing entry with score 90
+    const existingEntry = { 
+      member: JSON.stringify({ 
+        userId: 'user1', 
+        username: 'player1', 
+        score: 90, 
+        correctCount: 5, 
+        timeBonus: 15, 
+        completedAt: 1000, 
+        badge: 'expert' as BadgeType 
+      }), 
+      score: 90 
+    };
+
+    mockRedis.zRange.mockResolvedValue([existingEntry]);
+    mockRedis.zRem.mockResolvedValue(1);
+    mockRedis.zAdd.mockResolvedValue(1);
+    mockRedis.expire.mockResolvedValue(1);
+
+    // Try to add a better score (95)
+    await addScoreToLeaderboards(
+      'user1',
+      'player1',
+      95,
+      5,
+      20,
+      'expert',
+      2000
+    );
+
+    // Should remove old entry and add new one
+    expect(mockRedis.zRem).toHaveBeenCalled();
+    expect(mockRedis.zAdd).toHaveBeenCalledWith(
+      expect.any(String),
+      { member: expect.stringContaining('"score":95'), score: 95 }
+    );
+  });
+
+  it('should not update if new score is worse', async () => {
+    // Mock existing entry with score 90
+    const existingEntry = { 
+      member: JSON.stringify({ 
+        userId: 'user1', 
+        username: 'player1', 
+        score: 90, 
+        correctCount: 5, 
+        timeBonus: 15, 
+        completedAt: 1000, 
+        badge: 'expert' as BadgeType 
+      }), 
+      score: 90 
+    };
+
+    mockRedis.zRange.mockResolvedValue([existingEntry]);
+
+    // Try to add a worse score (85)
+    await addScoreToLeaderboards(
+      'user1',
+      'player1',
+      85,
+      4,
+      10,
+      'detective',
+      2000
+    );
+
+    // Should not remove or add anything for worse scores
+    expect(mockRedis.zRem).not.toHaveBeenCalled();
+    // zAdd should still be called 3 times for the 3 leaderboards, but with no actual updates
+    expect(mockRedis.zAdd).toHaveBeenCalledTimes(3);
   });
 });
 

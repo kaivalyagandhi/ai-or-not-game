@@ -411,6 +411,52 @@ describe('API Endpoints - Leaderboard Operations', () => {
       expect(response.body.error).toContain('User ID is required');
     });
   });
+
+  describe('POST /api/leaderboard/consolidate/:type', () => {
+    it('should consolidate leaderboard successfully', async () => {
+      // Mock entries with duplicates
+      const mockEntries = [
+        { member: JSON.stringify({ userId: 'user1', score: 85 }), score: 85 },
+        { member: JSON.stringify({ userId: 'user2', score: 90 }), score: 90 },
+        { member: JSON.stringify({ userId: 'user1', score: 95 }), score: 95 }, // Duplicate user1 with better score
+      ];
+
+      mockRedis.zRange.mockResolvedValue(mockEntries);
+      mockRedis.del.mockResolvedValue(1);
+      mockRedis.zAdd.mockResolvedValue(1);
+      mockRedis.expire.mockResolvedValue(1);
+
+      const response = await request(app)
+        .post('/api/leaderboard/consolidate/daily')
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.originalCount).toBe(3);
+      expect(response.body.consolidatedCount).toBe(2);
+      expect(response.body.duplicatesRemoved).toBe(1);
+      expect(response.body.message).toContain('Successfully consolidated daily leaderboard');
+    });
+
+    it('should validate leaderboard type', async () => {
+      const response = await request(app)
+        .post('/api/leaderboard/consolidate/invalid')
+        .expect(400);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.error).toContain('Invalid leaderboard type');
+    });
+
+    it('should handle consolidation errors', async () => {
+      mockRedis.zRange.mockRejectedValue(new Error('Redis error'));
+
+      const response = await request(app)
+        .post('/api/leaderboard/consolidate/weekly')
+        .expect(500);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.error).toBe('Internal server error');
+    });
+  });
 });
 
 describe('API Endpoints - Real-time Features', () => {

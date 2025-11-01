@@ -51,6 +51,7 @@ interface RedisLeaderboardEntry {
 
 /**
  * Add or update a user's score on all leaderboards atomically
+ * Only keeps the best score per user to avoid duplicate entries
  */
 export async function addScoreToLeaderboards(
   userId: string,
@@ -86,19 +87,16 @@ export async function addScoreToLeaderboards(
     const weeklyKey = LeaderboardKeys.weekly();
     const allTimeKey = LeaderboardKeys.allTime();
 
-    // Note: Devvit Redis doesn't support pipelines, so we'll use individual operations
-    // This is less atomic but still functional for our use case
+    // For each leaderboard, check if user exists and only update if new score is better
+    const leaderboardConfigs = [
+      { key: dailyKey, expiration: KEY_EXPIRATION.DAILY_LEADERBOARD },
+      { key: weeklyKey, expiration: KEY_EXPIRATION.WEEKLY_LEADERBOARD },
+      { key: allTimeKey, expiration: null }, // No expiration for all-time
+    ];
 
-    // Add to daily leaderboard
-    await redis.zAdd(dailyKey, { member: JSON.stringify(entryData), score });
-    await redis.expire(dailyKey, KEY_EXPIRATION.DAILY_LEADERBOARD);
-
-    // Add to weekly leaderboard
-    await redis.zAdd(weeklyKey, { member: JSON.stringify(entryData), score });
-    await redis.expire(weeklyKey, KEY_EXPIRATION.WEEKLY_LEADERBOARD);
-
-    // Add to all-time leaderboard (no expiration)
-    await redis.zAdd(allTimeKey, { member: JSON.stringify(entryData), score });
+    for (const config of leaderboardConfigs) {
+      await updateUserBestScore(config.key, entryData, config.expiration);
+    }
 
     // Send realtime leaderboard updates for all leaderboard types
     const leaderboardEntry: LeaderboardEntry = {
@@ -155,6 +153,65 @@ export async function addScoreToLeaderboards(
       'Failed to add score to leaderboards',
       LEADERBOARD_ERROR_CODES.REDIS_ERROR
     );
+  }
+}
+
+/**
+ * Update user's best score on a specific leaderboard
+ * Removes old entry if new score is better, or adds new entry if user doesn't exist
+ */
+async function updateUserBestScore(
+  leaderboardKey: string,
+  newEntry: RedisLeaderboardEntry,
+  expiration: number | null
+): Promise<void> {
+  try {
+    // Get all entries to find existing user entry
+    const allEntries = await redis.zRange(leaderboardKey, 0, -1, { by: 'rank' });
+    
+    let existingEntry: string | null = null;
+    let existingScore = 0;
+
+    // Find user's existing entry
+    for (const entry of allEntries) {
+      try {
+        if (!entry || !entry.member) continue;
+        
+        const entryData: RedisLeaderboardEntry = JSON.parse(entry.member);
+        if (entryData.userId === newEntry.userId) {
+          existingEntry = entry.member;
+          existingScore = entryData.score;
+          break;
+        }
+      } catch (parseError) {
+        console.error('Error parsing entry during best score update:', parseError);
+        continue;
+      }
+    }
+
+    // If user exists and new score is not better, don't update
+    if (existingEntry && newEntry.score <= existingScore) {
+      console.log(`User ${newEntry.userId} already has better score (${existingScore} vs ${newEntry.score})`);
+      return;
+    }
+
+    // Remove existing entry if it exists
+    if (existingEntry) {
+      await redis.zRem(leaderboardKey, [existingEntry]);
+      console.log(`Removed old entry for user ${newEntry.userId} with score ${existingScore}`);
+    }
+
+    // Add new entry
+    await redis.zAdd(leaderboardKey, { member: JSON.stringify(newEntry), score: newEntry.score });
+    console.log(`Added new entry for user ${newEntry.userId} with score ${newEntry.score}`);
+
+    // Set expiration if specified
+    if (expiration) {
+      await redis.expire(leaderboardKey, expiration);
+    }
+  } catch (error) {
+    console.error('Error updating user best score:', error);
+    throw error;
   }
 }
 
@@ -495,6 +552,108 @@ export async function getLeaderboardStats(type: LeaderboardType): Promise<{
     console.error('Error getting leaderboard stats:', error);
     throw new LeaderboardError(
       'Failed to get leaderboard stats',
+      LEADERBOARD_ERROR_CODES.REDIS_ERROR
+    );
+  }
+}
+
+/**
+ * Consolidate existing leaderboard by removing duplicate users and keeping only their best scores
+ * This is useful for cleaning up leaderboards that already have multiple entries per user
+ */
+export async function consolidateLeaderboard(type: LeaderboardType): Promise<{
+  originalCount: number;
+  consolidatedCount: number;
+  duplicatesRemoved: number;
+}> {
+  // Validate leaderboard type
+  if (!['daily', 'weekly', 'all-time'].includes(type)) {
+    throw new LeaderboardError(
+      'Invalid leaderboard type',
+      LEADERBOARD_ERROR_CODES.INVALID_LEADERBOARD_TYPE
+    );
+  }
+
+  try {
+    // Get appropriate leaderboard key
+    let leaderboardKey: string;
+    let expiration: number | null = null;
+    
+    switch (type) {
+      case 'daily':
+        leaderboardKey = LeaderboardKeys.daily();
+        expiration = KEY_EXPIRATION.DAILY_LEADERBOARD;
+        break;
+      case 'weekly':
+        leaderboardKey = LeaderboardKeys.weekly();
+        expiration = KEY_EXPIRATION.WEEKLY_LEADERBOARD;
+        break;
+      case 'all-time':
+        leaderboardKey = LeaderboardKeys.allTime();
+        break;
+    }
+
+    // Get all entries
+    const allEntries = await redis.zRange(leaderboardKey, 0, -1, { by: 'rank' });
+    const originalCount = allEntries.length;
+
+    if (originalCount === 0) {
+      return { originalCount: 0, consolidatedCount: 0, duplicatesRemoved: 0 };
+    }
+
+    // Group entries by userId and keep only the best score for each user
+    const userBestEntries = new Map<string, { entry: RedisLeaderboardEntry; serialized: string }>();
+
+    for (const entry of allEntries) {
+      try {
+        if (!entry || !entry.member) continue;
+        
+        const entryData: RedisLeaderboardEntry = JSON.parse(entry.member);
+        const existingBest = userBestEntries.get(entryData.userId);
+
+        if (!existingBest || entryData.score > existingBest.entry.score) {
+          userBestEntries.set(entryData.userId, {
+            entry: entryData,
+            serialized: entry.member,
+          });
+        }
+      } catch (parseError) {
+        console.error('Error parsing entry during consolidation:', parseError);
+        continue;
+      }
+    }
+
+    const consolidatedCount = userBestEntries.size;
+    const duplicatesRemoved = originalCount - consolidatedCount;
+
+    // If no duplicates found, no need to rebuild
+    if (duplicatesRemoved === 0) {
+      console.log(`No duplicates found in ${type} leaderboard`);
+      return { originalCount, consolidatedCount, duplicatesRemoved: 0 };
+    }
+
+    console.log(`Consolidating ${type} leaderboard: ${originalCount} -> ${consolidatedCount} entries (${duplicatesRemoved} duplicates removed)`);
+
+    // Clear the leaderboard
+    await redis.del(leaderboardKey);
+
+    // Add back only the best entries for each user
+    for (const { entry, serialized } of userBestEntries.values()) {
+      await redis.zAdd(leaderboardKey, { member: serialized, score: entry.score });
+    }
+
+    // Restore expiration if needed
+    if (expiration) {
+      await redis.expire(leaderboardKey, expiration);
+    }
+
+    console.log(`Successfully consolidated ${type} leaderboard`);
+
+    return { originalCount, consolidatedCount, duplicatesRemoved };
+  } catch (error) {
+    console.error('Error consolidating leaderboard:', error);
+    throw new LeaderboardError(
+      'Failed to consolidate leaderboard',
       LEADERBOARD_ERROR_CODES.REDIS_ERROR
     );
   }
