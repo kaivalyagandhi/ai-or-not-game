@@ -950,7 +950,7 @@ async function generateUniqueSessionRounds(
   sessionId: string
 ): Promise<GameRound[]> {
   try {
-    console.log(`Generating unique rounds for user ${userId}, session ${sessionId}`);
+    console.log(`🎯 Generating unique rounds with smart rotation for user ${userId}, session ${sessionId}`);
 
     // Create image collection
     const imageCollection = createImageCollection();
@@ -967,20 +967,35 @@ async function generateUniqueSessionRounds(
 
     console.log(`Generated unique category order for session ${sessionId}:`, categoryOrder);
 
-    // Generate rounds with the unique category order
-    const rounds = generateDailyGameRounds(imageCollection, {
-      categoryOrder,
-      randomizeAIPlacement: true,
-      ensureBalance: true,
-    });
+    // Try to generate rounds with smart image rotation first
+    try {
+      const { generateSmartGameRounds } = await import('./daily-game-manager.js');
+      const smartRounds = await generateSmartGameRounds(imageCollection, userId, sessionId, {
+        categoryOrder,
+        randomizeAIPlacement: true,
+        ensureBalance: true,
+      });
 
-    console.log(`Generated ${rounds.length} unique rounds for session ${sessionId}`);
-    return rounds;
+      console.log(`✅ Generated ${smartRounds.length} smart unique rounds for session ${sessionId}`);
+      return smartRounds;
+    } catch (smartError) {
+      console.warn('⚠️ Smart image rotation failed, falling back to random selection:', smartError);
+      
+      // Fallback to regular random generation
+      const rounds = generateDailyGameRounds(imageCollection, {
+        categoryOrder,
+        randomizeAIPlacement: true,
+        ensureBalance: true,
+      });
+
+      console.log(`📦 Generated ${rounds.length} fallback unique rounds for session ${sessionId}`);
+      return rounds;
+    }
   } catch (error) {
-    console.error('Error generating unique session rounds:', error);
+    console.error('❌ Error generating unique session rounds:', error);
 
     // Fallback to daily game state if unique generation fails
-    console.log('Falling back to daily game state for session rounds');
+    console.log('🔄 Falling back to daily game state for session rounds');
     const dailyGameResult = await getDailyGameState(redis);
     if (dailyGameResult.success && dailyGameResult.gameState) {
       return [...dailyGameResult.gameState.imageSet];

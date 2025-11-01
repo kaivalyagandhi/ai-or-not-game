@@ -887,6 +887,47 @@ router.get('/api/content/random', async (_req, res): Promise<void> => {
   }
 });
 
+// Image rotation monitoring endpoint
+router.get('/api/images/rotation-status', async (_req, res): Promise<void> => {
+  try {
+    const { imageRotationManager } = await import('./core/image-rotation-manager.js');
+    
+    const poolStatus = await imageRotationManager.getPoolStatus();
+    const usageStats = await imageRotationManager.getImageUsageStats();
+    
+    // Calculate freshness metrics
+    const totalImages = usageStats.length;
+    const freshImages = usageStats.filter(stat => {
+      const daysSinceUsed = Math.ceil((Date.now() - new Date(stat.lastUsed).getTime()) / (1000 * 60 * 60 * 24));
+      return daysSinceUsed >= 7 || stat.totalUsage === 0;
+    }).length;
+    
+    const freshnessPercentage = totalImages > 0 ? Math.round((freshImages / totalImages) * 100) : 100;
+    
+    res.json({
+      success: true,
+      poolStatus,
+      metrics: {
+        totalImagePairs: totalImages,
+        freshImagePairs: freshImages,
+        freshnessPercentage,
+        averageUsage: totalImages > 0 ? Math.round(usageStats.reduce((sum, stat) => sum + stat.totalUsage, 0) / totalImages) : 0,
+      },
+      recentUsage: usageStats
+        .sort((a, b) => new Date(b.lastUsed).getTime() - new Date(a.lastUsed).getTime())
+        .slice(0, 10), // Last 10 used images
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Image rotation status check failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Image rotation status check failed',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Content health check endpoint
 router.get('/api/content/health', async (_req, res): Promise<void> => {
   try {
@@ -1315,6 +1356,21 @@ router.post('/internal/scheduler/daily-reset', async (req, res): Promise<void> =
       // Load image collection from organized folder structure
       const imageCollection = createImageCollection();
       console.log('✅ Image collection loaded');
+
+      // Reset image rotation pools for fresh daily content
+      try {
+        const { imageRotationManager } = await import('./core/image-rotation-manager.js');
+        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+        await imageRotationManager.resetDailyPools(today);
+        console.log('✅ Image rotation pools reset');
+        
+        // Initialize new pools for today
+        await imageRotationManager.initializeDailyImagePools(imageCollection, today);
+        console.log('✅ New image pools initialized');
+      } catch (error) {
+        console.error('⚠️ Image rotation reset failed:', error);
+        // Continue with fallback - don't fail the entire job
+      }
 
       // Reset daily game state with new randomized content
       const resetResult = await resetDailyGameState(redis, imageCollection);

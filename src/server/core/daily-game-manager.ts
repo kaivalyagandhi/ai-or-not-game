@@ -46,7 +46,36 @@ export function generateRandomCategoryOrder(): ImageCategory[] {
 }
 
 /**
- * Selects random image pair from a category
+ * Selects smart image pair from a category using rotation manager
+ */
+export async function selectSmartImagePair(
+  collection: ImageCollection,
+  category: ImageCategory,
+  userId: string,
+  sessionId: string,
+  date?: string
+): Promise<{ aiImage: ImageAsset; humanImage: ImageAsset } | null> {
+  const { imageRotationManager } = await import('./image-rotation-manager.js');
+  
+  const result = await imageRotationManager.selectImagePairForSession(
+    collection,
+    category,
+    userId,
+    sessionId,
+    date
+  );
+
+  if (!result.success || !result.imagePair) {
+    console.warn(`Smart image selection failed for category ${category}: ${result.error}`);
+    return null;
+  }
+
+  console.log(`🎯 Selected ${result.freshness} image pair for ${category}: ${result.pairId}`);
+  return result.imagePair;
+}
+
+/**
+ * Selects random image pair from a category (fallback method)
  */
 export function selectRandomImagePair(
   collection: ImageCollection,
@@ -86,13 +115,46 @@ export function selectRandomImagePair(
   
   // Select a random matching pair
   const selectedPair = matchingPairs[Math.floor(Math.random() * matchingPairs.length)]!;
-  console.log(`Selected pair for ${category}: ${selectedPair.humanImage.filename} + ${selectedPair.aiImage.filename}`);
+  console.log(`Selected random pair for ${category}: ${selectedPair.humanImage.filename} + ${selectedPair.aiImage.filename}`);
   
   return selectedPair;
 }
 
 /**
- * Generates a single game round with randomized AI placement
+ * Generates a single game round with smart image selection and randomized AI placement
+ */
+export async function generateSmartGameRound(
+  collection: ImageCollection,
+  category: ImageCategory,
+  roundNumber: number,
+  userId: string,
+  sessionId: string,
+  date?: string
+): Promise<GameRound | null> {
+  const imagePair = await selectSmartImagePair(collection, category, userId, sessionId, date);
+
+  if (!imagePair) {
+    return null;
+  }
+
+  // Randomize AI image placement (left or right)
+  const aiOnLeft = Math.random() < 0.5;
+
+  const imageA = aiOnLeft ? imagePair.aiImage : imagePair.humanImage;
+  const imageB = aiOnLeft ? imagePair.humanImage : imagePair.aiImage;
+
+  return {
+    roundNumber,
+    category,
+    imageA: assetToImageData(imageA),
+    imageB: assetToImageData(imageB),
+    correctAnswer: aiOnLeft ? 'B' : 'A', // Human image position
+    aiImagePosition: aiOnLeft ? 'A' : 'B', // AI image position
+  };
+}
+
+/**
+ * Generates a single game round with randomized AI placement (fallback method)
  */
 export function generateGameRound(
   collection: ImageCollection,
@@ -122,7 +184,62 @@ export function generateGameRound(
 }
 
 /**
- * Generates complete set of game rounds for daily game
+ * Generates complete set of game rounds with smart image rotation for a user session
+ */
+export async function generateSmartGameRounds(
+  collection: ImageCollection,
+  userId: string,
+  sessionId: string,
+  options: GameRoundGenerationOptions & { date?: string } = {}
+): Promise<GameRound[]> {
+  const {
+    categoryOrder = generateRandomCategoryOrder(),
+    randomizeAIPlacement = true,
+    ensureBalance = true,
+    date,
+  } = options;
+
+  console.log(`🎯 Generating smart game rounds for user ${userId}, session ${sessionId}`);
+
+  // Initialize daily image pools
+  const { imageRotationManager } = await import('./image-rotation-manager.js');
+  await imageRotationManager.initializeDailyImagePools(collection, date);
+
+  const rounds: GameRound[] = [];
+
+  // Generate 6 rounds (one per category) with smart selection
+  for (let i = 0; i < 6 && i < categoryOrder.length; i++) {
+    const category = categoryOrder[i]!;
+    const round = await generateSmartGameRound(collection, category, i + 1, userId, sessionId, date);
+
+    if (round) {
+      rounds.push(round);
+    } else {
+      console.warn(`Failed to generate smart round for category ${category}, falling back to random`);
+      // Fallback to random selection
+      const fallbackRound = generateGameRound(collection, category, i + 1);
+      if (fallbackRound) {
+        rounds.push(fallbackRound);
+      }
+    }
+  }
+
+  // Ensure we have exactly 6 rounds
+  if (rounds.length < 6) {
+    throw new Error(`Failed to generate 6 rounds. Only generated ${rounds.length} rounds.`);
+  }
+
+  // Optional: Ensure balanced AI placement across rounds
+  if (ensureBalance && randomizeAIPlacement) {
+    ensureBalancedAIPlacement(rounds);
+  }
+
+  console.log(`✅ Generated ${rounds.length} smart game rounds for user ${userId}`);
+  return rounds;
+}
+
+/**
+ * Generates complete set of game rounds for daily game (fallback method)
  */
 export function generateDailyGameRounds(
   collection: ImageCollection,
