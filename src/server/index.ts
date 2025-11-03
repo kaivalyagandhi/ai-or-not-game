@@ -31,9 +31,7 @@ import {
   getLeaderboard, 
   getUserRank, 
   getLeaderboardParticipantCount,
-  consolidateLeaderboard,
-  consolidateAllLeaderboards,
-  initializeLeaderboardSystem,
+  clearAllLeaderboards,
   LeaderboardType 
 } from './core/leaderboard-manager.js';
 import { BadgeType } from '../shared/types/api.js';
@@ -616,56 +614,16 @@ router.get<object, WeeklyUserRankResponse>('/api/leaderboard/user-rank/weekly', 
   }
 });
 
-// Leaderboard consolidation endpoint - removes duplicate users and keeps only best scores
-router.post('/api/leaderboard/consolidate/:type', async (req, res): Promise<void> => {
+// Clear all leaderboards (for fixing existing duplicates)
+router.post('/api/leaderboard/clear-all', async (_req, res): Promise<void> => {
   try {
-    const type = req.params.type as LeaderboardType;
-    
-    if (!['daily', 'weekly', 'all-time'].includes(type)) {
-      res.status(400).json({
-        success: false,
-        error: 'Invalid leaderboard type. Must be daily, weekly, or all-time.',
-      });
-      return;
-    }
-
-    const result = await consolidateLeaderboard(type);
-
+    await clearAllLeaderboards();
     res.json({
       success: true,
-      message: `Successfully consolidated ${type} leaderboard`,
-      originalCount: result.originalCount,
-      consolidatedCount: result.consolidatedCount,
-      duplicatesRemoved: result.duplicatesRemoved,
+      message: 'All leaderboards cleared successfully. New scores will not have duplicates.',
     });
   } catch (error) {
-    console.error('Error in /api/leaderboard/consolidate:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error',
-    });
-  }
-});
-
-// Consolidate all leaderboards at once
-router.post('/api/leaderboard/consolidate-all', async (_req, res): Promise<void> => {
-  try {
-    const results = await consolidateAllLeaderboards();
-
-    const totalOriginal = results.daily.originalCount + results.weekly.originalCount + results.allTime.originalCount;
-    const totalConsolidated = results.daily.consolidatedCount + results.weekly.consolidatedCount + results.allTime.consolidatedCount;
-    const totalDuplicatesRemoved = results.daily.duplicatesRemoved + results.weekly.duplicatesRemoved + results.allTime.duplicatesRemoved;
-
-    res.json({
-      success: true,
-      message: `Successfully consolidated all leaderboards`,
-      totalOriginal,
-      totalConsolidated,
-      totalDuplicatesRemoved,
-      details: results,
-    });
-  } catch (error) {
-    console.error('Error in /api/leaderboard/consolidate-all:', error);
+    console.error('Error clearing leaderboards:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -740,26 +698,18 @@ router.get('/api/debug/leaderboard/:type', async (req, res): Promise<void> => {
   }
 });
 
-// Manual trigger for consolidation (can be called from UI)
-router.post('/api/leaderboard/trigger-consolidation', async (_req, res): Promise<void> => {
+// Manual trigger for clearing leaderboards (can be called from UI)
+router.post('/api/leaderboard/clear-all', async (_req, res): Promise<void> => {
   try {
-    console.log('🔧 Manual consolidation triggered');
-    const results = await consolidateAllLeaderboards();
-
-    const totalOriginal = results.daily.originalCount + results.weekly.originalCount + results.allTime.originalCount;
-    const totalConsolidated = results.daily.consolidatedCount + results.weekly.consolidatedCount + results.allTime.consolidatedCount;
-    const totalDuplicatesRemoved = results.daily.duplicatesRemoved + results.weekly.duplicatesRemoved + results.allTime.duplicatesRemoved;
+    console.log('🔧 Manual leaderboard clear triggered');
+    await clearAllLeaderboards();
 
     res.json({
       success: true,
-      message: `Manual consolidation completed`,
-      totalOriginal,
-      totalConsolidated,
-      totalDuplicatesRemoved,
-      details: results,
+      message: `All leaderboards cleared successfully`,
     });
   } catch (error) {
-    console.error('Error in manual consolidation trigger:', error);
+    console.error('Error in manual leaderboard clear:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -1485,17 +1435,13 @@ router.get('/api/debug/environment', async (_req, res): Promise<void> => {
 
 
 router.post('/internal/scheduler/daily-reset', async (req, res): Promise<void> => {
-  console.log('🚨🚨🚨 SCHEDULER TRIGGERED! 🚨🚨🚨');
+  console.log('🚨🚨🚨 DAILY SCHEDULER TRIGGERED AT NOON UTC! 🚨🚨🚨');
   console.log('🕐 SCHEDULER EXECUTION START:', new Date().toISOString());
   console.log('🕐 UTC Time:', new Date().toUTCString());
   console.log('🕐 Expected: Daily at 12:00 PM UTC (cron: 0 12 * * *)');
-  console.log('📋 Scheduler request headers:', JSON.stringify(req.headers, null, 2));
-  console.log('📋 Scheduler request body:', JSON.stringify(req.body, null, 2));
+  console.log('🌅 Creating today\'s challenge at noon for better visibility!');
   console.log('📋 Context subreddit:', context.subredditName);
-  console.log('📋 Context postId:', context.postId);
-  console.log('📋 Environment NODE_ENV:', process.env.NODE_ENV);
-  console.log('📋 Environment DEVVIT_EXECUTION_ID:', process.env.DEVVIT_EXECUTION_ID);
-  console.log('🎯 THIS CONFIRMS SCHEDULER IS WORKING!');
+  console.log('🎯 THIS CONFIRMS NOON SCHEDULER IS WORKING!');
   
   const jobResult = await executeSchedulerJob(
     'daily-reset',
@@ -1799,10 +1745,7 @@ app.use(router);
 // Security error handling middleware (must be after routes)
 app.use(securityErrorHandler());
 
-// Initialize leaderboard system (includes startup consolidation)
-initializeLeaderboardSystem().catch(error => {
-  console.error('Failed to initialize leaderboard system:', error);
-});
+// Leaderboard system uses simplified approach - no initialization needed
 
 // Get port from environment variable with fallback
 const port = getServerPort();

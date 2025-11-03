@@ -31,6 +31,7 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
     const audioFiles = useRef<AudioFiles>({});
     const backgroundMusicRef = useRef<HTMLAudioElement | null>(null);
     const isInitialized = useRef(false);
+    const audioEnabledRef = useRef(audioEnabled);
 
     // Audio file paths (static to prevent re-renders)
     const audioFilePaths = {
@@ -94,7 +95,7 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
             backgroundMusic.volume = audioEnabled ? volume * 0.15 : 0; // Reduced from 0.3 to 0.15 (half)
             backgroundMusicRef.current = backgroundMusic;
 
-            // Add event listeners for debugging and loop handling
+            // Add event listeners for debugging and volume management
             backgroundMusic.addEventListener('play', () => {
               console.log('🎵 Background music started playing');
             });
@@ -103,11 +104,13 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
               console.log('⏸️ Background music paused');
             });
 
-            backgroundMusic.addEventListener('ended', () => {
-              console.log('🔚 Background music ended');
-              // Respect the current audio enabled state when looping
-              if (audioEnabled && backgroundMusicRef.current) {
-                backgroundMusicRef.current.volume = volume * 0.15;
+            // Ensure volume stays consistent during playback
+            backgroundMusic.addEventListener('timeupdate', () => {
+              if (backgroundMusicRef.current) {
+                const expectedVolume = audioEnabledRef.current ? volume * 0.15 : 0;
+                if (Math.abs(backgroundMusicRef.current.volume - expectedVolume) > 0.01) {
+                  backgroundMusicRef.current.volume = expectedVolume;
+                }
               }
             });
 
@@ -149,6 +152,11 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
       };
     }, [loadAudioFile]); // Only depend on loadAudioFile, which depends on volume
 
+    // Keep audioEnabledRef in sync with audioEnabled state
+    useEffect(() => {
+      audioEnabledRef.current = audioEnabled;
+    }, [audioEnabled]);
+
     // Update volume for all audio files
     useEffect(() => {
       // Update volume for non-background audio files
@@ -168,6 +176,7 @@ export const AudioSystem = forwardRef<AudioControls, AudioSystemProps>(
     const setAudioEnabledState = useCallback(
       (enabled: boolean) => {
         setAudioEnabled(enabled);
+        audioEnabledRef.current = enabled; // Keep ref in sync
 
         // Save to localStorage immediately
         try {

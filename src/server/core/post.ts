@@ -41,7 +41,6 @@ export const createPost = async (
     console.log('🕐 ISO string:', now.toISOString());
 
     // Use UTC date to ensure consistency across timezones
-    const utcYear = now.getUTCFullYear();
     const utcMonth = now.getUTCMonth();
     const utcDay = now.getUTCDate();
 
@@ -75,18 +74,31 @@ export const createPost = async (
       'December',
     ];
 
-    const finalDateForTitle = `${monthNames[utcMonth]} ${utcDay}, ${utcYear}`;
+    const finalDateForTitle = `${monthNames[utcMonth]} ${utcDay}`;
     const dateForDescription = `${monthNamesLong[utcMonth]} ${utcDay}`;
 
     console.log('📅 UTC-based date for title:', finalDateForTitle);
     console.log('📅 UTC-based date for description:', dateForDescription);
 
-    const title = customTitle || `AI or Not? - ${finalDateForTitle}`;
+    const title = customTitle || `AI or Not? - ${finalDateForTitle} Challenge`;
     const description = customDescription || `Daily Challenge - ${dateForDescription}`;
 
+    console.log('🔍 DEBUG: customTitle provided:', customTitle);
+    console.log('🔍 DEBUG: finalDateForTitle:', finalDateForTitle);
     console.log('📅 Final title:', title);
     console.log('📅 Final description:', description);
     console.log('✅ Using UTC-based date to ensure correct year (2025) and consistency');
+    
+    // Extra verification
+    const expectedMonth = monthNames[utcMonth];
+    if (!expectedMonth || !title.includes(expectedMonth) || !title.includes(utcDay.toString())) {
+      console.error('❌ WARNING: Title does not include current date!');
+      console.error('❌ Title:', title);
+      console.error('❌ Expected month:', expectedMonth);
+      console.error('❌ Expected day:', utcDay);
+    } else {
+      console.log('✅ Title correctly includes current date:', `${expectedMonth} ${utcDay}`);
+    }
 
     console.log('📋 Post details:', { title, description, subredditName });
 

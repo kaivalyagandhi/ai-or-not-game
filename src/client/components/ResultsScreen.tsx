@@ -157,7 +157,9 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
 ✅ Correct Guesses: ${session.correctCount}/6 images
 🏆 Badge Earned: ${badgeInfo.emoji} ${badgeInfo.title}
 📈 Daily Rank: ${dailyRank}${totalPlayers} players
-Want to see if you can beat me before I get my next try?`;
+Want to see if you can beat me before I get my next try?
+
+Play at: https://reddit.com/r/AIorNotGame`;
   };
 
   // Generate AI tip message in the specific multi-line format requested
