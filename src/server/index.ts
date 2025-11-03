@@ -421,6 +421,58 @@ router.get('/api/badges/progress/:correctCount', async (req, res): Promise<void>
 
 // Leaderboard API Endpoints
 
+// Generic leaderboard endpoint that handles all types
+router.get('/api/leaderboard/:type', async (req, res): Promise<void> => {
+  try {
+    const type = req.params.type as LeaderboardType;
+    
+    if (!['daily', 'weekly', 'all-time'].includes(type)) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid leaderboard type. Must be daily, weekly, or all-time.',
+      });
+      return;
+    }
+
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 100;
+    const offset = req.query.offset ? parseInt(req.query.offset as string, 10) : 0;
+
+    // Enhanced validation
+    if (isNaN(limit) || limit < 1 || limit > 1000) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid limit. Must be between 1 and 1000.',
+      });
+      return;
+    }
+
+    if (isNaN(offset) || offset < 0) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid offset. Must be 0 or greater.',
+      });
+      return;
+    }
+
+    const entries = await getLeaderboard(type, limit, offset);
+    const totalParticipants = await getLeaderboardParticipantCount(type);
+
+    console.log(`📊 Returning ${entries.length} entries for ${type} leaderboard`);
+    
+    res.json({
+      success: true,
+      entries,
+      totalParticipants,
+    });
+  } catch (error) {
+    console.error(`Error in /api/leaderboard/${req.params.type}:`, error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
 router.get('/api/leaderboard/daily', async (req, res): Promise<void> => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 100;
@@ -618,9 +670,17 @@ router.get<object, WeeklyUserRankResponse>('/api/leaderboard/user-rank/weekly', 
 router.post('/api/leaderboard/clear-all', async (_req, res): Promise<void> => {
   try {
     await clearAllLeaderboards();
+    
+    // Also clear old participant tracking data
+    const today = new Date().toISOString().split('T')[0];
+    const participantKey = `daily:participants:${today}`;
+    await redis.del(participantKey);
+    
+    console.log('🧹 Cleared leaderboards and old participant data');
+    
     res.json({
       success: true,
-      message: 'All leaderboards cleared successfully. New scores will not have duplicates.',
+      message: 'All leaderboards and participant data cleared successfully. Counts will now be consistent.',
     });
   } catch (error) {
     console.error('Error clearing leaderboards:', error);
@@ -729,17 +789,10 @@ router.get('/api/participants/count', async (req, res): Promise<void> => {
       return;
     }
 
-    let count: number;
+    // Use leaderboard-based counting for all types to ensure consistency
+    const count = await getLeaderboardParticipantCount(type);
     
-    if (type === 'daily') {
-      // Use Redis Hash for real-time daily participant tracking
-      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-      const participantKey = `daily:participants:${today}`;
-      count = await redis.hLen(participantKey);
-    } else {
-      // Use leaderboard-based counting for weekly/all-time
-      count = await getLeaderboardParticipantCount(type);
-    }
+    console.log(`👥 Participant count for ${type}: ${count}`);
 
     res.json({
       success: true,
@@ -760,36 +813,23 @@ router.post('/api/participants/join', async (_req, res): Promise<void> => {
     const username = await getCurrentUsername();
     const userId = username; // Use username as user ID
 
-    // Track participant join in Redis using Hash
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-    const participantKey = `daily:participants:${today}`;
-    
-    // Add user to today's participant hash (Redis Hash ensures uniqueness)
-    const wasNew = await redis.hSet(participantKey, { [userId]: Date.now().toString() });
-    
-    // Set expiration for cleanup (keep for 7 days)
-    await redis.expire(participantKey, 7 * 24 * 60 * 60);
-    
-    // Get updated count
-    const count = await redis.hLen(participantKey);
+    // Get current daily participant count from leaderboard
+    const count = await getLeaderboardParticipantCount('daily');
 
-    // Only send updates if this is a new participant
-    if (wasNew > 0) {
-      // Send realtime update to all connected clients
-      await realtime.send('participant_updates', {
-        type: 'participant_count_update',
-        count,
-        timestamp: Date.now(),
-      });
+    // Send realtime update to all connected clients
+    await realtime.send('participant_updates', {
+      type: 'participant_count_update',
+      count,
+      timestamp: Date.now(),
+    });
 
-      // Also send participant join event
-      await realtime.send('participant_updates', {
-        type: 'participant_join',
-        userId,
-        username,
-        timestamp: Date.now(),
-      });
-    }
+    // Send participant join event
+    await realtime.send('participant_updates', {
+      type: 'participant_join',
+      userId,
+      username,
+      timestamp: Date.now(),
+    });
 
     res.json({
       success: true,

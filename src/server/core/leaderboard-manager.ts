@@ -255,7 +255,9 @@ export async function getLeaderboardParticipantCount(type: LeaderboardType): Pro
         break;
     }
 
-    return (await redis.zCard(leaderboardKey)) || 0;
+    const count = (await redis.zCard(leaderboardKey)) || 0;
+    console.log(`📊 Leaderboard ${type} has ${count} participants (key: ${leaderboardKey})`);
+    return count;
   } catch (error) {
     console.error('Error getting participant count:', error);
     throw new LeaderboardError(
