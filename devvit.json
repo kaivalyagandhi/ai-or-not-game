@@ -17,6 +17,11 @@
     "realtime": true,
     "redis": true
   },
+  "reddit": {
+    "asUser": [
+      "SUBMIT_COMMENT"
+    ]
+  },
   "http": {
     "domains": [
       "api.openai.com",

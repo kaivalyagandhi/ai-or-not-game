@@ -1957,10 +1957,11 @@ router.post('/api/comments/post-ai-tip', async (req, res): Promise<void> => {
     }
     
     try {
-      // Submit comment using Devvit Reddit API
+      // Submit comment using Devvit Reddit API as the authenticated user
       const commentResult = await reddit.submitComment({
         id: postId,
         text: comment.trim(),
+        runAs: 'USER',
       });
       
       console.log(`AI tip comment posted by ${username}:`, commentResult.id);
