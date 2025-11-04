@@ -34,6 +34,7 @@ import {
   clearAllLeaderboards,
   LeaderboardType 
 } from './core/leaderboard-manager.js';
+import { LeaderboardKeys } from './core/redis-keys.js';
 import { BadgeType } from '../shared/types/api.js';
 
 const app = express();
@@ -684,6 +685,70 @@ router.post('/api/leaderboard/clear-all', async (_req, res): Promise<void> => {
     });
   } catch (error) {
     console.error('Error clearing leaderboards:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+// Test endpoint to verify leaderboard functionality
+router.get('/api/test/leaderboard-verification/:type', async (req, res): Promise<void> => {
+  try {
+    const type = req.params.type as LeaderboardType;
+    
+    if (!['daily', 'weekly', 'all-time'].includes(type)) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid leaderboard type. Must be daily, weekly, or all-time.',
+      });
+      return;
+    }
+
+    // Get leaderboard key
+    let leaderboardKey: string;
+    switch (type) {
+      case 'daily':
+        leaderboardKey = LeaderboardKeys.daily();
+        break;
+      case 'weekly':
+        leaderboardKey = LeaderboardKeys.weekly();
+        break;
+      case 'all-time':
+        leaderboardKey = LeaderboardKeys.allTime();
+        break;
+    }
+
+    // Get raw Redis data
+    const rawEntries = await redis.zRange(leaderboardKey, 0, -1, {
+      by: 'rank',
+      reverse: true,
+    });
+
+    // Get processed leaderboard data
+    const processedEntries = await getLeaderboard(type, -1, 0);
+
+    res.json({
+      success: true,
+      leaderboardType: type,
+      leaderboardKey,
+      rawEntriesCount: rawEntries.length,
+      processedEntriesCount: processedEntries.length,
+      rawEntries: rawEntries.map(entry => ({
+        userId: entry.member,
+        score: entry.score,
+      })),
+      processedEntries: processedEntries.map(entry => ({
+        userId: entry.userId,
+        username: entry.username,
+        score: entry.score,
+        correctCount: entry.correctCount,
+        timeBonus: entry.timeBonus,
+        badge: entry.badge,
+      })),
+    });
+  } catch (error) {
+    console.error('Error in leaderboard verification:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',

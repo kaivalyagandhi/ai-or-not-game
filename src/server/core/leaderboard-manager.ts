@@ -63,20 +63,34 @@ export async function addScoreToLeaderboards(
     });
     await redis.expire(userDataKey, 30 * 24 * 60 * 60); // 30 days
 
-    // Add to leaderboards using userId as member (automatically prevents duplicates)
+    // Add to leaderboards using userId as member, but only if score is better
     const dailyKey = LeaderboardKeys.daily();
     const weeklyKey = LeaderboardKeys.weekly();
     const allTimeKey = LeaderboardKeys.allTime();
 
-    await redis.zAdd(dailyKey, { member: userId, score });
-    await redis.expire(dailyKey, KEY_EXPIRATION.DAILY_LEADERBOARD);
+    const leaderboards = [
+      { key: dailyKey, expiration: KEY_EXPIRATION.DAILY_LEADERBOARD, name: 'daily' },
+      { key: weeklyKey, expiration: KEY_EXPIRATION.WEEKLY_LEADERBOARD, name: 'weekly' },
+      { key: allTimeKey, expiration: null, name: 'all-time' },
+    ];
 
-    await redis.zAdd(weeklyKey, { member: userId, score });
-    await redis.expire(weeklyKey, KEY_EXPIRATION.WEEKLY_LEADERBOARD);
-
-    await redis.zAdd(allTimeKey, { member: userId, score });
-
-    console.log(`✅ Added/updated score for ${username} (${userId}): ${score} points`);
+    for (const leaderboard of leaderboards) {
+      // Check existing score
+      const existingScore = await redis.zScore(leaderboard.key, userId);
+      
+      if (existingScore === null || existingScore === undefined || score > existingScore) {
+        // Add/update score (new user or better score)
+        await redis.zAdd(leaderboard.key, { member: userId, score });
+        
+        if (leaderboard.expiration) {
+          await redis.expire(leaderboard.key, leaderboard.expiration);
+        }
+        
+        console.log(`🎯 Updated ${leaderboard.name} leaderboard for ${username}: ${existingScore || 'new'} → ${score}`);
+      } else {
+        console.log(`⏭️ Skipped ${leaderboard.name} leaderboard for ${username}: ${score} ≤ ${existingScore} (existing is better)`);
+      }
+    }
 
   } catch (error) {
     console.error('Error adding score to leaderboards:', error);
@@ -122,6 +136,8 @@ export async function getLeaderboard(
       reverse: true,
     });
 
+    console.log(`📋 Retrieved ${userIds.length} user entries from ${type} leaderboard (key: ${leaderboardKey})`);
+    
     const entries: LeaderboardEntry[] = [];
 
     for (const entry of userIds) {
@@ -145,6 +161,9 @@ export async function getLeaderboard(
             completedAt: parseInt(userData.completedAt || '0', 10),
             badge: (userData.badge as BadgeType) || 'good_samaritan',
           });
+          console.log(`👤 Added ${userData.username} to leaderboard with score ${score}`);
+        } else {
+          console.log(`⚠️ Missing user data for userId: ${userId}`);
         }
       } catch (userDataError) {
         console.error(`Error getting user data for ${userId}:`, userDataError);
