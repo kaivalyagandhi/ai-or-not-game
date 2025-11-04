@@ -143,15 +143,59 @@ export async function getLeaderboard(
     for (const entry of userIds) {
       if (!entry || !entry.member) continue;
 
-      const userId = entry.member;
-      const score = entry.score || 0;
+      let userId = entry.member;
+      let score = entry.score || 0;
+      let userData: any = null;
 
       try {
-        // Get user data
-        const userDataKey = `user_data:${userId}`;
-        const userData = await redis.hGetAll(userDataKey);
+        // First, check if this is old JSON format data
+        try {
+          const parsedData = JSON.parse(entry.member);
+          if (parsedData.userId && parsedData.username) {
+            // This is old format - migrate it automatically
+            console.log(`🔄 Auto-migrating old entry for ${parsedData.username}`);
+            
+            userId = parsedData.userId;
+            score = parsedData.score || score;
+            
+            // Remove old JSON entry
+            await redis.zRem(leaderboardKey, [entry.member]);
+            
+            // Add new entry with userId as member
+            await redis.zAdd(leaderboardKey, { member: userId, score });
+            
+            // Store user data separately
+            const userDataKey = `user_data:${userId}`;
+            await redis.hSet(userDataKey, {
+              username: parsedData.username,
+              correctCount: (parsedData.correctCount || 0).toString(),
+              timeBonus: (parsedData.timeBonus || 0).toString(),
+              completedAt: (parsedData.completedAt || Date.now()).toString(),
+              badge: parsedData.badge || 'good_samaritan',
+            });
+            await redis.expire(userDataKey, 30 * 24 * 60 * 60); // 30 days
+            
+            // Use the migrated data
+            userData = {
+              username: parsedData.username,
+              correctCount: (parsedData.correctCount || 0).toString(),
+              timeBonus: (parsedData.timeBonus || 0).toString(),
+              completedAt: (parsedData.completedAt || Date.now()).toString(),
+              badge: parsedData.badge || 'good_samaritan',
+            };
+          }
+        } catch (parseError) {
+          // Not JSON - this is new format, continue normally
+        }
+
+        // If we didn't migrate, get user data normally
+        if (!userData) {
+          const userDataKey = `user_data:${userId}`;
+          userData = await redis.hGetAll(userDataKey);
+        }
 
         if (userData && userData.username) {
+          // User data exists - use it
           entries.push({
             userId,
             username: userData.username,
@@ -163,11 +207,21 @@ export async function getLeaderboard(
           });
           console.log(`👤 Added ${userData.username} to leaderboard with score ${score}`);
         } else {
-          console.log(`⚠️ Missing user data for userId: ${userId}`);
+          // User data missing - create entry with userId as fallback username
+          console.log(`⚠️ Missing user data for userId: ${userId}, using fallback`);
+          entries.push({
+            userId,
+            username: userId, // Use userId as username fallback
+            score,
+            correctCount: 0,
+            timeBonus: 0,
+            completedAt: Date.now(),
+            badge: 'good_samaritan',
+          });
         }
       } catch (userDataError) {
-        console.error(`Error getting user data for ${userId}:`, userDataError);
-        // Skip this entry if we can't get user data
+        console.error(`Error processing entry for ${userId}:`, userDataError);
+        // Skip this entry if we can't process it
         continue;
       }
     }

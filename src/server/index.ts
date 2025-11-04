@@ -667,6 +667,149 @@ router.get<object, WeeklyUserRankResponse>('/api/leaderboard/user-rank/weekly', 
   }
 });
 
+// Debug endpoint to check raw Redis data
+router.get('/api/debug/redis-keys/:type', async (req, res): Promise<void> => {
+  try {
+    const type = req.params.type as LeaderboardType;
+    
+    if (!['daily', 'weekly', 'all-time'].includes(type)) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid leaderboard type.',
+      });
+      return;
+    }
+
+    // Get leaderboard key
+    let leaderboardKey: string;
+    switch (type) {
+      case 'daily':
+        leaderboardKey = LeaderboardKeys.daily();
+        break;
+      case 'weekly':
+        leaderboardKey = LeaderboardKeys.weekly();
+        break;
+      case 'all-time':
+        leaderboardKey = LeaderboardKeys.allTime();
+        break;
+    }
+
+    // Get all entries from Redis sorted set
+    const allEntries = await redis.zRange(leaderboardKey, 0, -1, {
+      by: 'rank',
+      reverse: true,
+    });
+
+    // Check user data for each entry
+    const entriesWithUserData = [];
+    for (const entry of allEntries) {
+      if (!entry || !entry.member) continue;
+      
+      const userId = entry.member;
+      const userDataKey = `user_data:${userId}`;
+      const userData = await redis.hGetAll(userDataKey);
+      
+      entriesWithUserData.push({
+        userId,
+        score: entry.score,
+        hasUserData: !!(userData && userData.username),
+        userData: userData || null,
+      });
+    }
+
+    res.json({
+      success: true,
+      leaderboardKey,
+      totalEntries: allEntries.length,
+      entries: entriesWithUserData,
+    });
+  } catch (error) {
+    console.error('Error checking Redis keys:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+// Migrate old leaderboard data to new format
+router.post('/api/leaderboard/migrate-old-data', async (_req, res): Promise<void> => {
+  try {
+    console.log('🔄 Starting leaderboard data migration...');
+    
+    const results = {
+      daily: { migrated: 0, skipped: 0 },
+      weekly: { migrated: 0, skipped: 0 },
+      allTime: { migrated: 0, skipped: 0 },
+    };
+
+    const leaderboards = [
+      { type: 'daily' as LeaderboardType, key: LeaderboardKeys.daily() },
+      { type: 'weekly' as LeaderboardType, key: LeaderboardKeys.weekly() },
+      { type: 'all-time' as LeaderboardType, key: LeaderboardKeys.allTime() },
+    ];
+
+    for (const leaderboard of leaderboards) {
+      console.log(`🔍 Checking ${leaderboard.type} leaderboard...`);
+      
+      // Get all entries
+      const allEntries = await redis.zRange(leaderboard.key, 0, -1, { by: 'rank' });
+      
+      for (const entry of allEntries) {
+        if (!entry || !entry.member) continue;
+        
+        try {
+          // Check if this is old JSON format
+          const parsedData = JSON.parse(entry.member);
+          
+          if (parsedData.userId && parsedData.username) {
+            // This is old format - migrate it
+            console.log(`📦 Migrating ${parsedData.username} (${parsedData.userId})`);
+            
+            // Remove old entry
+            await redis.zRem(leaderboard.key, [entry.member]);
+            
+            // Add new entry with userId as member
+            await redis.zAdd(leaderboard.key, { member: parsedData.userId, score: entry.score || parsedData.score });
+            
+            // Store user data separately
+            const userDataKey = `user_data:${parsedData.userId}`;
+            await redis.hSet(userDataKey, {
+              username: parsedData.username,
+              correctCount: (parsedData.correctCount || 0).toString(),
+              timeBonus: (parsedData.timeBonus || 0).toString(),
+              completedAt: (parsedData.completedAt || Date.now()).toString(),
+              badge: parsedData.badge || 'good_samaritan',
+            });
+            await redis.expire(userDataKey, 30 * 24 * 60 * 60); // 30 days
+            
+            results[leaderboard.type === 'all-time' ? 'allTime' : leaderboard.type].migrated++;
+          } else {
+            results[leaderboard.type === 'all-time' ? 'allTime' : leaderboard.type].skipped++;
+          }
+        } catch (parseError) {
+          // Not JSON - probably already in new format
+          results[leaderboard.type === 'all-time' ? 'allTime' : leaderboard.type].skipped++;
+        }
+      }
+    }
+
+    console.log('✅ Migration completed:', results);
+
+    res.json({
+      success: true,
+      message: 'Migration completed',
+      results,
+    });
+  } catch (error) {
+    console.error('Error migrating leaderboard data:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
 // Clear all leaderboards (for fixing existing duplicates)
 router.post('/api/leaderboard/clear-all', async (_req, res): Promise<void> => {
   try {
@@ -1850,7 +1993,72 @@ app.use(router);
 // Security error handling middleware (must be after routes)
 app.use(securityErrorHandler());
 
-// Leaderboard system uses simplified approach - no initialization needed
+// Auto-migrate leaderboard data on server startup
+(async () => {
+  try {
+    console.log('🚀 Starting automatic leaderboard migration...');
+    
+    const leaderboards = [
+      { type: 'daily' as LeaderboardType, key: LeaderboardKeys.daily() },
+      { type: 'weekly' as LeaderboardType, key: LeaderboardKeys.weekly() },
+      { type: 'all-time' as LeaderboardType, key: LeaderboardKeys.allTime() },
+    ];
+
+    let totalMigrated = 0;
+
+    for (const leaderboard of leaderboards) {
+      try {
+        // Get all entries to check for old format
+        const allEntries = await redis.zRange(leaderboard.key, 0, -1, { by: 'rank' });
+        
+        for (const entry of allEntries) {
+          if (!entry || !entry.member) continue;
+          
+          try {
+            // Check if this is old JSON format
+            const parsedData = JSON.parse(entry.member);
+            
+            if (parsedData.userId && parsedData.username) {
+              // This is old format - migrate it
+              console.log(`📦 Migrating ${parsedData.username} from ${leaderboard.type} leaderboard`);
+              
+              // Remove old entry
+              await redis.zRem(leaderboard.key, [entry.member]);
+              
+              // Add new entry with userId as member
+              await redis.zAdd(leaderboard.key, { member: parsedData.userId, score: entry.score || parsedData.score });
+              
+              // Store user data separately
+              const userDataKey = `user_data:${parsedData.userId}`;
+              await redis.hSet(userDataKey, {
+                username: parsedData.username,
+                correctCount: (parsedData.correctCount || 0).toString(),
+                timeBonus: (parsedData.timeBonus || 0).toString(),
+                completedAt: (parsedData.completedAt || Date.now()).toString(),
+                badge: parsedData.badge || 'good_samaritan',
+              });
+              await redis.expire(userDataKey, 30 * 24 * 60 * 60); // 30 days
+              
+              totalMigrated++;
+            }
+          } catch (parseError) {
+            // Not JSON - already in new format, skip
+          }
+        }
+      } catch (leaderboardError) {
+        console.error(`Error migrating ${leaderboard.type} leaderboard:`, leaderboardError);
+      }
+    }
+
+    if (totalMigrated > 0) {
+      console.log(`✅ Migration completed! Migrated ${totalMigrated} entries to new format.`);
+    } else {
+      console.log('✅ No migration needed - all data already in new format.');
+    }
+  } catch (error) {
+    console.error('❌ Error during automatic migration:', error);
+  }
+})();
 
 // Get port from environment variable with fallback
 const port = getServerPort();
