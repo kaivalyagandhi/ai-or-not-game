@@ -171,7 +171,7 @@ export async function getLeaderboard(
               correctCount: (parsedData.correctCount || 0).toString(),
               timeBonus: (parsedData.timeBonus || 0).toString(),
               completedAt: (parsedData.completedAt || Date.now()).toString(),
-              badge: parsedData.badge || 'good_samaritan',
+              badge: parsedData.badge || BadgeType.GOOD_SAMARITAN,
             });
             await redis.expire(userDataKey, 30 * 24 * 60 * 60); // 30 days
             
@@ -216,7 +216,7 @@ export async function getLeaderboard(
             correctCount: 0,
             timeBonus: 0,
             completedAt: Date.now(),
-            badge: 'good_samaritan',
+            badge: BadgeType.GOOD_SAMARITAN,
           });
         }
       } catch (userDataError) {
