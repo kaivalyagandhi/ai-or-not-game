@@ -181,7 +181,7 @@ export async function getLeaderboard(
               correctCount: (parsedData.correctCount || 0).toString(),
               timeBonus: (parsedData.timeBonus || 0).toString(),
               completedAt: (parsedData.completedAt || Date.now()).toString(),
-              badge: parsedData.badge || 'good_samaritan',
+              badge: parsedData.badge || BadgeType.GOOD_SAMARITAN,
             };
           }
         } catch (parseError) {
