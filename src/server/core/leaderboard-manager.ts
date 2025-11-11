@@ -203,7 +203,7 @@ export async function getLeaderboard(
             correctCount: parseInt(userData.correctCount || '0', 10),
             timeBonus: parseInt(userData.timeBonus || '0', 10),
             completedAt: parseInt(userData.completedAt || '0', 10),
-            badge: (userData.badge as BadgeType) || 'good_samaritan',
+            badge: (userData.badge as BadgeType) || BadgeType.GOOD_SAMARITAN,
           });
           console.log(`👤 Added ${userData.username} to leaderboard with score ${score}`);
         } else {
